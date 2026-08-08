@@ -45,10 +45,17 @@ const envSchema = z.object({
   DOCKER_SOCKET_PATH: z.string().optional(),
   ORION_URL: z
     .preprocess((value) => {
-      if (value === "" || value === undefined || value === null) {
+      if (typeof value !== "string") {
         return undefined;
       }
-      return value;
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return undefined;
+      }
+      if (!/^https?:\/\//i.test(trimmed)) {
+        return `https://${trimmed}`;
+      }
+      return trimmed;
     }, z.string().url())
     .optional(),
   ORION_API_KEY: z

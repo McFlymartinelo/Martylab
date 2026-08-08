@@ -6,45 +6,52 @@ import { bootstrapPlugins } from "./plugins/bootstrap.js";
 
 const env = loadEnv();
 const logger = createLogger(env);
-const database = createDatabase(env, logger);
-await bootstrapPlugins(env);
-const app = createApp(env, logger, database);
 
-const server = app.listen(env.PORT, env.HOST, () => {
-  logger.info(
-    {
-      host: env.HOST,
-      port: env.PORT,
-      env: env.NODE_ENV,
-      corsOrigin: env.CORS_ORIGIN,
-      databaseConfigured: Boolean(env.DATABASE_URL),
-    },
-    "Martylab backend listening",
-  );
-});
+try {
+  const database = createDatabase(env, logger);
+  await bootstrapPlugins(env);
+  const app = createApp(env, logger, database);
 
-async function shutdown(signal: string) {
-  logger.info({ signal }, "Shutting down backend");
-
-  await new Promise<void>((resolve, reject) => {
-    server.close((error) => {
-      if (error) {
-        reject(error);
-        return;
-      }
-      resolve();
-    });
-  }).catch((error: unknown) => {
-    logger.error({ err: error }, "Error while closing HTTP server");
+  const server = app.listen(env.PORT, env.HOST, () => {
+    logger.info(
+      {
+        host: env.HOST,
+        port: env.PORT,
+        env: env.NODE_ENV,
+        corsOrigin: env.CORS_ORIGIN,
+        databaseConfigured: Boolean(env.DATABASE_URL),
+        orionConfigured: Boolean(env.ORION_URL),
+      },
+      "Martylab backend listening",
+    );
   });
 
-  await database.close();
-  process.exit(0);
-}
+  async function shutdown(signal: string) {
+    logger.info({ signal }, "Shutting down backend");
 
-process.on("SIGINT", () => {
-  void shutdown("SIGINT");
-});
-process.on("SIGTERM", () => {
-  void shutdown("SIGTERM");
-});
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    }).catch((error: unknown) => {
+      logger.error({ err: error }, "Error while closing HTTP server");
+    });
+
+    await database.close();
+    process.exit(0);
+  }
+
+  process.on("SIGINT", () => {
+    void shutdown("SIGINT");
+  });
+  process.on("SIGTERM", () => {
+    void shutdown("SIGTERM");
+  });
+} catch (error) {
+  logger.fatal({ err: error }, "Martylab backend failed to start");
+  process.exit(1);
+}

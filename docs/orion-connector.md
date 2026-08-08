@@ -39,7 +39,7 @@ ORION_URL=http://localhost:4000
 - Si `ORION_URL` est absent : le panneau **Maison** affiche « non configuré ».
 - Si Orion est hors ligne : état explicite, aucune donnée inventée.
 - Si Netatmo échoue côté Orion (502) : « données indisponibles ».
-- Le plugin Orion passe à `enabled: true` au démarrage si le health check réussit.
+- Le plugin Orion passe à `enabled: true` quand `ORION_URL` est configuré (état live via `/api/orion/status`).
 
 ## Sécurité
 

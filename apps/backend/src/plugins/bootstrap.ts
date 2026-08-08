@@ -13,8 +13,9 @@ export async function bootstrapPlugins(env: Env): Promise<void> {
 
   for (const plugin of manifests) {
     if (plugin.id === "orion" && orionClient.isConfigured) {
-      const online = await orionClient.checkHealth();
-      registerPlugin({ ...plugin, enabled: online });
+      // Do not block HTTP startup on an external Orion health probe.
+      // Live status is exposed via GET /api/orion/status.
+      registerPlugin({ ...plugin, enabled: true });
       continue;
     }
 

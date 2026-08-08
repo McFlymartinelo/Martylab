@@ -68,7 +68,7 @@ services:
         ]
       interval: 10s
       timeout: 5s
-      start_period: 25s
+      start_period: 40s
       retries: 5
     networks:
       - martylab
