@@ -1,0 +1,36 @@
+# Local development database only — NOT used in production.
+# Production PostgreSQL is provisioned by the root compose.yaml on Debian,
+# where it stays internal to the Docker network and is never published on
+# the host. Here, for Windows dev convenience, we bind it to 127.0.0.1 only
+# so the locally-run backend (npm run dev, outside Docker) can reach it.
+#
+# Usage (from repo root):
+#   docker compose -f docker/dev/compose.postgres.yml up -d
+#   docker compose -f docker/dev/compose.postgres.yml down      # stop
+#   docker compose -f docker/dev/compose.postgres.yml down -v   # stop + wipe data
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-martylab}
+      POSTGRES_USER: ${POSTGRES_USER:-martylab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-martylab-dev-password}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - martylab_dev_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-martylab} -d ${POSTGRES_DB:-martylab}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  martylab_dev_postgres_data:
+    name: martylab_dev_postgres_data
