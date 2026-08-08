@@ -1,17 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import {
-  AlertTriangle,
-  Blocks,
-  CheckCircle2,
-  Cpu,
-  Gauge,
-  HardDrive,
-  History,
-} from "lucide-react";
-import { useHealthQuery } from "@/features/health/use-health-query";
+import { Blocks, History } from "lucide-react";
 import { usePluginsQuery } from "@/features/plugins/use-plugins-query";
-import { useSystemMetricsQuery } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +15,6 @@ import { HomeLightsPanel } from "@/components/dashboard/home-lights-panel";
 import { HomePanel } from "@/components/dashboard/home-panel";
 import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
 import { JellyfinPanel } from "@/components/dashboard/jellyfin-panel";
-import { MetricCard } from "@/components/dashboard/metric-card";
-import { formatBytes, formatPercent } from "@/lib/format";
 
 const SystemPanel = lazy(() =>
   import("@/components/dashboard/system-panel").then((module) => ({
@@ -34,115 +22,12 @@ const SystemPanel = lazy(() =>
   })),
 );
 
-function databaseLabel(status: string | undefined) {
-  switch (status) {
-    case "up":
-      return "base de données en ligne";
-    case "down":
-      return "base de données indisponible";
-    case "not_configured":
-      return "base de données non configurée";
-    default:
-      return "état de la base inconnu";
-  }
-}
-
 export function DashboardPage() {
-  const healthQuery = useHealthQuery();
   const pluginsQuery = usePluginsQuery();
-  const metricsQuery = useSystemMetricsQuery();
-
-  const isHealthy = healthQuery.data?.status === "ok";
   const apps = pluginsQuery.data?.plugins.slice(0, 6) ?? [];
-  const metrics = metricsQuery.data;
 
   return (
     <div className="space-y-6">
-      <section className="space-y-4">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          Aperçu système
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            label="Statut général"
-            icon={
-              healthQuery.isLoading
-                ? Gauge
-                : isHealthy
-                  ? CheckCircle2
-                  : AlertTriangle
-            }
-            tone={
-              healthQuery.isLoading
-                ? "default"
-                : isHealthy
-                  ? "success"
-                  : "warning"
-            }
-            value={
-              healthQuery.isLoading
-                ? "Vérification…"
-                : isHealthy
-                  ? "Opérationnel"
-                  : "Incident"
-            }
-            caption={
-              healthQuery.data
-                ? databaseLabel(healthQuery.data.database)
-                : "Backend inaccessible"
-            }
-          />
-          <MetricCard
-            label="CPU"
-            icon={Cpu}
-            value={
-              metricsQuery.isLoading
-                ? "Chargement…"
-                : metrics
-                  ? formatPercent(metrics.cpu.usagePercent)
-                  : undefined
-            }
-            caption={
-              metrics
-                ? `${metrics.cpu.cores} cœurs · source ${metrics.source === "host" ? "hôte" : "conteneur"}`
-                : "Métriques indisponibles"
-            }
-          />
-          <MetricCard
-            label="RAM"
-            icon={Gauge}
-            value={
-              metricsQuery.isLoading
-                ? "Chargement…"
-                : metrics
-                  ? formatPercent(metrics.memory.usagePercent)
-                  : undefined
-            }
-            caption={
-              metrics
-                ? `${formatBytes(metrics.memory.usedBytes)} / ${formatBytes(metrics.memory.totalBytes)}`
-                : "Métriques indisponibles"
-            }
-          />
-          <MetricCard
-            label="Stockage"
-            icon={HardDrive}
-            value={
-              metricsQuery.isLoading
-                ? "Chargement…"
-                : metrics
-                  ? formatPercent(metrics.storage.usagePercent)
-                  : undefined
-            }
-            caption={
-              metrics
-                ? `${formatBytes(metrics.storage.usedBytes)} / ${formatBytes(metrics.storage.totalBytes)}`
-                : "Métriques indisponibles"
-            }
-          />
-        </div>
-      </section>
-
       <HomePanel />
       <HomeLightsPanel />
       <MatchdayPanel />

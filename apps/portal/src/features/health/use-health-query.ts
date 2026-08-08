@@ -7,5 +7,7 @@ export function useHealthQuery() {
   return useQuery({
     queryKey: healthQueryKey,
     queryFn: fetchHealth,
+    refetchInterval: 60_000,
+    staleTime: 30_000,
   });
 }

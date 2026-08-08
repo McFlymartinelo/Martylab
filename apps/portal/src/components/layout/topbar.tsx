@@ -1,6 +1,7 @@
 import { useAuthQuery } from "@/features/auth/use-auth-query";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsMenu } from "@/components/layout/notifications-menu";
+import { PlatformStatusIndicator } from "@/components/layout/platform-status-indicator";
 import { QuickSearch } from "@/components/layout/quick-search";
 
 function firstName(displayName: string) {
@@ -26,6 +27,7 @@ export function Topbar() {
         <QuickSearch className="hidden md:block" />
 
         <div className="flex items-center gap-2">
+          <PlatformStatusIndicator />
           <NotificationsMenu />
           <ThemeToggle />
         </div>
