@@ -100,6 +100,7 @@ const envSchema = z.object({
   HOST_ROOT_PATH: z.string().optional(),
   DOCKER_SOCKET_PATH: z.string().optional(),
   ORION_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  ORION_PUBLIC_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
   ORION_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   ORION_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
   PLUGINS_DIR: z.string().optional(),

@@ -47,6 +47,7 @@ export function createOrionRouter(orionClient: OrionClient) {
     const body: OrionStatusResponse = {
       configured: orionClient.isConfigured,
       online,
+      orionUrl: orionClient.publicUrl,
     };
     res.status(200).json(body);
   });

@@ -1,6 +1,7 @@
-import { Droplets, Home, Thermometer, Wind } from "lucide-react";
+import { Droplets, ExternalLink, Home, Thermometer, Wind } from "lucide-react";
 import { useOrionClimateQuery, useOrionStatusQuery } from "@/features/orion/use-orion-query";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -31,6 +32,7 @@ export function HomePanel() {
 
   const configured = statusQuery.data?.configured ?? false;
   const online = statusQuery.data?.online ?? false;
+  const orionUrl = statusQuery.data?.orionUrl ?? "https://orion.martylab.fr";
   const climate = climateQuery.data;
 
   if (statusQuery.isLoading) {
@@ -144,6 +146,17 @@ export function HomePanel() {
       </div>
 
       <HomeClimateHistoryPanel enabled={configured && online} />
+
+      <div className="flex justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          render={<a href={orionUrl} target="_blank" rel="noreferrer" />}
+        >
+          <ExternalLink className="size-4" />
+          Ouvrir Orion
+        </Button>
+      </div>
     </section>
   );
 }

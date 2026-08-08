@@ -10,6 +10,7 @@ Dans le `.env` du backend Martylab :
 
 ```env
 ORION_URL=https://orion.martylab.fr
+ORION_PUBLIC_URL=https://orion.martylab.fr
 ORION_API_KEY=              # optionnel — non implémenté côté Orion pour l'instant
 ORION_TIMEOUT_MS=6000
 ```

@@ -52,6 +52,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   const dockerClient = createDockerClient(env.DOCKER_SOCKET_PATH);
   const orionClient = createOrionClient({
     baseUrl: env.ORION_URL,
+    publicUrl: env.ORION_PUBLIC_URL ?? env.ORION_URL,
     apiKey: env.ORION_API_KEY,
     timeoutMs: env.ORION_TIMEOUT_MS,
   });

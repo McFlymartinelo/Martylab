@@ -1,6 +1,7 @@
 export interface OrionStatusResponse {
   configured: boolean;
   online: boolean;
+  orionUrl: string | null;
 }
 
 export interface OrionClimateResponse {

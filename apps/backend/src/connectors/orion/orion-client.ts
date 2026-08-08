@@ -12,6 +12,7 @@ import type {
 
 export interface OrionClientConfig {
   baseUrl?: string | undefined;
+  publicUrl?: string | undefined;
   apiKey?: string | undefined;
   timeoutMs?: number | undefined;
 }
@@ -152,6 +153,7 @@ export function createOrionClient(config: OrionClientConfig) {
 
   return {
     isConfigured: Boolean(baseUrl),
+    publicUrl: config.publicUrl ?? baseUrl ?? null,
 
     async checkHealth(): Promise<boolean> {
       if (!baseUrl) {

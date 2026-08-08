@@ -1,5 +1,8 @@
 import { Bell } from "lucide-react";
-import { useOrionNotificationsQuery, useOrionStatusQuery } from "@/features/orion/use-orion-query";
+import {
+  useOrionNotificationsQuery,
+  useOrionStatusQuery,
+} from "@/features/orion/use-orion-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,50 +42,50 @@ export function NotificationsMenu() {
             size="icon"
             aria-label="Notifications"
             className="relative"
-          />
+          >
+            <Bell className="size-4" aria-hidden="true" />
+            {alertCount > 0 ? (
+              <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white">
+                {alertCount}
+              </span>
+            ) : null}
+          </Button>
         }
-      >
-        <Bell className="size-4" aria-hidden="true" />
-        {alertCount > 0 ? (
-          <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white">
-            {alertCount}
-          </span>
-        ) : null}
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
+      />
+      <DropdownMenuContent align="end" className="w-80 bg-popover p-2">
         <DropdownMenuLabel>Notifications Orion</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {notificationsQuery.isLoading ? (
-          <p className="px-1.5 py-4 text-center text-sm text-muted-foreground">
+          <p className="px-2 py-4 text-center text-sm text-muted-foreground">
             Chargement…
           </p>
         ) : null}
 
         {!statusQuery.data?.configured ? (
-          <p className="px-1.5 py-4 text-center text-sm text-muted-foreground">
+          <p className="px-2 py-4 text-center text-sm text-muted-foreground">
             Connecteur Orion non configuré.
           </p>
         ) : null}
 
         {statusQuery.data?.configured && !statusQuery.data.online ? (
-          <p className="px-1.5 py-4 text-center text-sm text-muted-foreground">
+          <p className="px-2 py-4 text-center text-sm text-muted-foreground">
             Orion hors ligne.
           </p>
         ) : null}
 
         {statusQuery.data?.online && items.length === 0 ? (
-          <p className="px-1.5 py-4 text-center text-sm text-muted-foreground">
+          <p className="px-2 py-4 text-center text-sm text-muted-foreground">
             Aucune notification pour le moment.
           </p>
         ) : null}
 
         {items.length > 0 ? (
-          <ul className="max-h-72 space-y-2 overflow-y-auto px-1.5 py-2">
+          <ul className="max-h-72 space-y-2 overflow-y-auto px-1 py-1">
             {items.map((item) => (
               <li
                 key={item.id}
-                className="rounded-lg border border-border px-3 py-2 text-sm"
+                className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <p className="font-medium">{item.title}</p>
