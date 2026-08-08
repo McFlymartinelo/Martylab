@@ -6,6 +6,7 @@ import {
   Server,
   Settings,
   Trophy,
+  Tv,
   Users,
   Workflow,
   type LucideIcon,
@@ -64,6 +65,16 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Matchs du jour, classement, pronostics et messages du groupe.",
+    mobilePrimary: true,
+  },
+  {
+    id: "jellyfin",
+    label: "Jellyfin",
+    to: "/jellyfin",
+    icon: Tv,
+    status: "ready",
+    description:
+      "Bibliothèques, lecture en cours, films, séries et statut du serveur.",
     mobilePrimary: true,
   },
   {

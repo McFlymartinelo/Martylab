@@ -21,6 +21,7 @@ try {
         databaseConfigured: Boolean(env.DATABASE_URL),
         orionConfigured: Boolean(env.ORION_URL),
         matchdayConfigured: Boolean(env.MATCHDAY_URL && env.MATCHDAY_GROUP_ID),
+        jellyfinConfigured: Boolean(env.JELLYFIN_URL && env.JELLYFIN_API_KEY),
       },
       "Martylab backend listening",
     );

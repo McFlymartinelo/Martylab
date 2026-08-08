@@ -134,6 +134,11 @@ const envSchema = z.object({
   NAS_API_TOKEN: z.preprocess(trimEnvString, z.string().optional()),
   NAS_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
   NAS_INSECURE_TLS: booleanFromEnv,
+  JELLYFIN_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  JELLYFIN_PUBLIC_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  JELLYFIN_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
+  JELLYFIN_USER_ID: z.preprocess(trimEnvString, z.string().optional()),
+  JELLYFIN_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -176,6 +181,12 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
   ) {
     console.warn(
       "[config] MATCHDAY_URL is set but service credentials are missing — summary will be unavailable.",
+    );
+  }
+
+  if (env.JELLYFIN_URL && !env.JELLYFIN_API_KEY) {
+    console.warn(
+      "[config] JELLYFIN_URL is set but JELLYFIN_API_KEY is missing — Jellyfin connector will be unavailable.",
     );
   }
 

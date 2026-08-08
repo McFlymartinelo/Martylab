@@ -1,0 +1,7 @@
+{
+  "id": "jellyfin",
+  "name": "Jellyfin",
+  "version": "0.0.0",
+  "capabilities": ["dashboard", "notifications"],
+  "enabled": false
+}

@@ -10,6 +10,7 @@ import { NotFoundPage } from "@/pages/not-found-page";
 import { ServicesPage } from "@/pages/services-page";
 import { SystemPage } from "@/pages/system-page";
 import { MatchdayPage } from "@/pages/matchday-page";
+import { JellyfinPage } from "@/pages/jellyfin-page";
 import { UsersPage } from "@/pages/users-page";
 import { navItems } from "@/lib/nav-items";
 
@@ -26,6 +27,7 @@ export function App() {
             <Route path="apps" element={<AppsPage />} />
             <Route path="system" element={<SystemPage />} />
             <Route path="matchday" element={<MatchdayPage />} />
+            <Route path="jellyfin" element={<JellyfinPage />} />
             <Route path="services" element={<ServicesPage />} />
             <Route element={<RequireAdmin />}>
               <Route path="users" element={<UsersPage />} />

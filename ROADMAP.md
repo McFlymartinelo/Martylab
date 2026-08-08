@@ -187,15 +187,15 @@ Objectif : intégrer Jellyfin.
 
 ## Jellyfin
 
-- [ ] Connecteur Jellyfin
-- [ ] Vérification de la connexion
-- [ ] Bibliothèques
-- [ ] Médias récemment ajoutés
-- [ ] Continuer la lecture
-- [ ] Films
-- [ ] Séries
-- [ ] Informations de lecture
-- [ ] Statut du serveur
+- [x] Connecteur Jellyfin
+- [x] Vérification de la connexion
+- [x] Bibliothèques
+- [x] Médias récemment ajoutés
+- [x] Continuer la lecture
+- [x] Films
+- [x] Séries
+- [x] Informations de lecture
+- [x] Statut du serveur
 
 ---
 

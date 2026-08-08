@@ -139,6 +139,7 @@ npm run db:seed        # Comptes initiaux
 - [docs/backup-postgres.md](./docs/backup-postgres.md) — sauvegarde PostgreSQL
 - [docs/orion-connector.md](./docs/orion-connector.md) — connecteur Orion
 - [docs/matchday-connector.md](./docs/matchday-connector.md) — connecteur Matchday
+- [docs/jellyfin-connector.md](./docs/jellyfin-connector.md) — connecteur Jellyfin
 - [docs/infrastructure-connectors.md](./docs/infrastructure-connectors.md) — Portainer, Cloudflare, NAS
 - [docs/production-security.md](./docs/production-security.md) — sécurisation production
 
@@ -171,6 +172,10 @@ npm run db:seed        # Comptes initiaux
 | `GET /api/matchday/summary` | session | Résumé ligue (classement, matchs, pronos) |
 | `GET /api/matchday/page` | session | Page Matchday (matchs du jour, classement, chat) |
 | `GET /api/matchday/notifications` | session | Notifications Matchday dérivées |
+| `GET /api/jellyfin/status` | session | État du connecteur Jellyfin |
+| `GET /api/jellyfin/summary` | session | Résumé média (dashboard) |
+| `GET /api/jellyfin/page` | session | Page Jellyfin (bibliothèques, médias, sessions) |
+| `GET /api/jellyfin/items/:id/image` | session | Affiche Jellyfin (proxy) |
 | `GET /api/portainer/status` | session | État Portainer |
 | `GET /api/portainer/overview` | session | Conteneurs, images, volumes (Portainer) |
 | `POST /api/portainer/containers/:id/start\|stop\|restart` | user+ | Actions conteneur via Portainer |

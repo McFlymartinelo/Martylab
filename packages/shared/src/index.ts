@@ -119,6 +119,15 @@ export interface DockerContainerLogsResponse {
 export type DockerContainerAction = "start" | "stop" | "restart";
 
 export type {
+  JellyfinLibrary,
+  JellyfinMediaItem,
+  JellyfinPageResponse,
+  JellyfinPlaybackSession,
+  JellyfinServerInfo,
+  JellyfinStatusResponse,
+  JellyfinSummaryResponse,
+} from "./jellyfin.js";
+export type {
   MatchdayChatMessage,
   MatchdayMatch,
   MatchdayNotification,

@@ -2,6 +2,7 @@ import { registerPlugin } from "./registry.js";
 import { loadPluginManifests } from "./load-manifests.js";
 import { createOrionClient } from "../connectors/orion/orion-client.js";
 import { createMatchdayClient } from "../connectors/matchday/matchday-client.js";
+import { createJellyfinClient } from "../connectors/jellyfin/jellyfin-client.js";
 import type { Env } from "../config/env.js";
 
 export async function bootstrapPlugins(env: Env): Promise<void> {
@@ -21,6 +22,13 @@ export async function bootstrapPlugins(env: Env): Promise<void> {
     userPasswordsJson: env.MATCHDAY_USER_PASSWORDS,
     timeoutMs: env.MATCHDAY_TIMEOUT_MS,
   });
+  const jellyfinClient = createJellyfinClient({
+    baseUrl: env.JELLYFIN_URL,
+    publicUrl: env.JELLYFIN_PUBLIC_URL ?? env.JELLYFIN_URL,
+    apiKey: env.JELLYFIN_API_KEY,
+    userId: env.JELLYFIN_USER_ID,
+    timeoutMs: env.JELLYFIN_TIMEOUT_MS,
+  });
 
   for (const plugin of manifests) {
     if (plugin.id === "orion" && orionClient.isConfigured) {
@@ -31,6 +39,11 @@ export async function bootstrapPlugins(env: Env): Promise<void> {
     }
 
     if (plugin.id === "matchday" && matchdayClient.isConfigured) {
+      registerPlugin({ ...plugin, enabled: true });
+      continue;
+    }
+
+    if (plugin.id === "jellyfin" && jellyfinClient.isConfigured) {
       registerPlugin({ ...plugin, enabled: true });
       continue;
     }

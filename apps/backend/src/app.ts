@@ -27,12 +27,14 @@ import { createMatchdayRouter } from "./routes/matchday.js";
 import { createPortainerRouter } from "./routes/portainer.js";
 import { createCloudflareRouter } from "./routes/cloudflare.js";
 import { createNasRouter } from "./routes/nas.js";
+import { createJellyfinRouter } from "./routes/jellyfin.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
 import { createOrionClient } from "./connectors/orion/orion-client.js";
 import { createMatchdayClient } from "./connectors/matchday/matchday-client.js";
 import { createPortainerClient } from "./connectors/portainer/portainer-client.js";
 import { createCloudflareClient } from "./connectors/cloudflare/cloudflare-client.js";
 import { createNasClient } from "./connectors/nas/nas-client.js";
+import { createJellyfinClient } from "./connectors/jellyfin/jellyfin-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
 import { createUserService } from "./users/user-service.js";
 
@@ -85,6 +87,13 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     timeoutMs: env.NAS_TIMEOUT_MS,
     allowInsecureTls: env.NAS_INSECURE_TLS ?? true,
   });
+  const jellyfinClient = createJellyfinClient({
+    baseUrl: env.JELLYFIN_URL,
+    publicUrl: env.JELLYFIN_PUBLIC_URL ?? env.JELLYFIN_URL,
+    apiKey: env.JELLYFIN_API_KEY,
+    userId: env.JELLYFIN_USER_ID,
+    timeoutMs: env.JELLYFIN_TIMEOUT_MS,
+  });
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
@@ -120,6 +129,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/portainer", createPortainerRouter(portainerClient));
   app.use("/api/cloudflare", createCloudflareRouter(cloudflareClient));
   app.use("/api/nas", createNasRouter(nasClient));
+  app.use("/api/jellyfin", createJellyfinRouter(jellyfinClient));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger, env.NODE_ENV === "production"));
