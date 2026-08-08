@@ -61,8 +61,8 @@ const envSchema = z.object({
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
-  DATABASE_URL: z.preprocess(trimEnvString, z.string().min(1)).optional(),
-  SESSION_SECRET: z.preprocess(trimEnvString, z.string().min(32)).optional(),
+  DATABASE_URL: z.preprocess(trimEnvString, z.string().min(1).optional()),
+  SESSION_SECRET: z.preprocess(trimEnvString, z.string().min(32).optional()),
   SESSION_COOKIE_NAME: z.string().min(1).default("martylab_session"),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
   COOKIE_SECURE: booleanFromEnv,
@@ -71,15 +71,7 @@ const envSchema = z.object({
   HOST_ROOT_PATH: z.string().optional(),
   DOCKER_SOCKET_PATH: z.string().optional(),
   ORION_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
-  ORION_API_KEY: z
-    .preprocess((value) => {
-      if (typeof value !== "string") {
-        return undefined;
-      }
-      const trimmed = value.trim().replace(/^["']|["']$/g, "");
-      return trimmed.length > 0 ? trimmed : undefined;
-    }, z.string())
-    .optional(),
+  ORION_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   ORION_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
   PLUGINS_DIR: z.string().optional(),
 });

@@ -15,6 +15,7 @@ Messages typiques :
 |-----|-------|--------|
 | `[martylab-migrate] password authentication failed` | `DATABASE_URL` ne correspond pas au mot de passe du volume PostgreSQL | Voir section ci-dessous |
 | `[martylab-backend] Failed to start: Invalid environment` | Variable `.env` invalide | Corriger la variable indiquée |
+| `ORION_API_KEY: Required` | `ORION_API_KEY` vide dans `.env` (bug corrigé en v0.3+) | `git pull` puis rebuild, ou supprimer la ligne `ORION_API_KEY=` |
 | `SESSION_SECRET is required` | Secret manquant ou &lt; 32 caractères | Définir un secret long dans `.env` |
 
 ### 2. Mot de passe PostgreSQL (cause la plus fréquente)
