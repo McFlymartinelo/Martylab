@@ -6,7 +6,7 @@ export function sessionCookieOptions(env: Env): CookieOptions {
 
   return {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
+    secure: Boolean(env.COOKIE_SECURE),
     sameSite: "lax",
     path: "/",
     maxAge: maxAgeMs,
@@ -24,7 +24,7 @@ export function setSessionCookie(
 export function clearSessionCookie(res: Response, env: Env): void {
   res.clearCookie(env.SESSION_COOKIE_NAME, {
     httpOnly: true,
-    secure: env.NODE_ENV === "production",
+    secure: Boolean(env.COOKIE_SECURE),
     sameSite: "lax",
     path: "/",
   });

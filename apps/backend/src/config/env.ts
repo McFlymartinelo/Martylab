@@ -13,6 +13,19 @@ dotenv.config({ path: path.join(rootDir, ".env") });
 const DEFAULT_DEV_SESSION_SECRET =
   "dev-only-martylab-session-secret-change-me";
 
+const booleanFromEnv = z.preprocess((value) => {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (value === "true" || value === "1") {
+    return true;
+  }
+  if (value === "false" || value === "0") {
+    return false;
+  }
+  return value;
+}, z.boolean().optional());
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
@@ -25,6 +38,7 @@ const envSchema = z.object({
   SESSION_SECRET: z.string().min(32).optional(),
   SESSION_COOKIE_NAME: z.string().min(1).default("martylab_session"),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
+  COOKIE_SECURE: booleanFromEnv,
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -52,5 +66,6 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
   return {
     ...env,
     SESSION_SECRET: env.SESSION_SECRET ?? DEFAULT_DEV_SESSION_SECRET,
+    COOKIE_SECURE: env.COOKIE_SECURE ?? env.NODE_ENV === "production",
   };
 }

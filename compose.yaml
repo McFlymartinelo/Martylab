@@ -1,25 +1,81 @@
-# Martylab local/production foundation.
-# PostgreSQL is intentionally not published to the public internet.
-# Future backups can mount/copy from the named volume `martylab_postgres_data`.
+# Martylab production foundation (Debian).
+#
+# - Portal is the only host-published service (:3100 by default).
+# - Backend and PostgreSQL stay on the internal Docker network.
+# - Never run: docker compose down -v
+# - Persistent DB volume: martylab_postgres_data
 
 services:
   postgres:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: martylab
-      POSTGRES_USER: martylab
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-martylab}
+      POSTGRES_DB: ${POSTGRES_DB:-martylab}
+      POSTGRES_USER: ${POSTGRES_USER:-martylab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - martylab_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U martylab -d martylab"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-martylab} -d ${POSTGRES_DB:-martylab}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
-    # Local development only. Do not expose this port publicly in production.
+    networks:
+      - martylab
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-3000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN is required}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET is required}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-martylab_session}
+      SESSION_TTL_DAYS: ${SESSION_TTL_DAYS:-7}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- http://127.0.0.1:3000/api/health >/dev/null || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 25s
+      retries: 5
+    networks:
+      - martylab
+
+  portal:
+    build:
+      context: .
+      dockerfile: docker/portal/Dockerfile
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${PORTAL_HOST_PORT:-3100}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 5
     networks:
       - martylab
 

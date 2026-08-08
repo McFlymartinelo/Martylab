@@ -21,27 +21,26 @@ npm run db:seed -w @martylab/backend
 - `GET /api/auth/me`
 - `GET /api/plugins` (authenticated)
 
-## Database
-
-1. Copy `.env.example` to `.env` at the repository root.
-2. Start PostgreSQL:
+## Database (local tooling)
 
 ```bash
-docker compose up -d postgres
-```
-
-3. Apply migrations and seed users:
-
-```bash
+# From repo root, with DATABASE_URL pointing at a reachable Postgres
 npm run db:migrate
 npm run db:seed
 ```
 
-Seeded users in development:
+Seeded users in development defaults:
 
 - `alexandre` / `changeme-alexandre` (admin)
 - `invite` / `changeme-invite` (guest)
 
-Passwords are hashed with Argon2. Change them via env vars before any shared environment.
+## Docker production
 
-The named Docker volume `martylab_postgres_data` is the future attachment point for backups/restore/rotation (not implemented in v0.1).
+Backend image:
+
+- multi-stage build
+- runs migrations on startup
+- listens on container port `3000`
+- not published on the host (reached via portal nginx `/api` proxy)
+
+See root `compose.yaml` and `.env.example`.
