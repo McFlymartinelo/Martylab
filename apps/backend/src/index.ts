@@ -4,10 +4,9 @@ import { createDatabase } from "./db/client.js";
 import { createLogger } from "./lib/logger.js";
 import { bootstrapPlugins } from "./plugins/bootstrap.js";
 
-const env = loadEnv();
-const logger = createLogger(env);
-
 try {
+  const env = loadEnv();
+  const logger = createLogger(env);
   const database = createDatabase(env, logger);
   await bootstrapPlugins(env);
   const app = createApp(env, logger, database);
@@ -52,6 +51,10 @@ try {
     void shutdown("SIGTERM");
   });
 } catch (error) {
-  logger.fatal({ err: error }, "Martylab backend failed to start");
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`[martylab-backend] Failed to start: ${message}`);
+  if (error instanceof Error && error.stack) {
+    console.error(error.stack);
+  }
   process.exit(1);
 }

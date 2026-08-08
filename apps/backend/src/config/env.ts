@@ -26,6 +26,24 @@ const booleanFromEnv = z.preprocess((value) => {
   return value;
 }, z.boolean().optional());
 
+function parseOptionalUrl(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  let trimmed = value.trim().replace(/^["']|["']$/g, "");
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (!/^https?:\/\//i.test(trimmed)) {
+    trimmed = `https://${trimmed}`;
+  }
+
+  const parsed = z.string().url().safeParse(trimmed);
+  return parsed.success ? parsed.data : undefined;
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
@@ -43,35 +61,24 @@ const envSchema = z.object({
   HOST_SYS_PREFIX: z.string().optional(),
   HOST_ROOT_PATH: z.string().optional(),
   DOCKER_SOCKET_PATH: z.string().optional(),
-  ORION_URL: z
+  ORION_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  ORION_API_KEY: z
     .preprocess((value) => {
       if (typeof value !== "string") {
         return undefined;
       }
-      const trimmed = value.trim();
-      if (!trimmed) {
-        return undefined;
-      }
-      if (!/^https?:\/\//i.test(trimmed)) {
-        return `https://${trimmed}`;
-      }
-      return trimmed;
-    }, z.string().url())
-    .optional(),
-  ORION_API_KEY: z
-    .preprocess((value) => {
-      if (value === "" || value === undefined || value === null) {
-        return undefined;
-      }
-      return value;
+      const trimmed = value.trim().replace(/^["']|["']$/g, "");
+      return trimmed.length > 0 ? trimmed : undefined;
     }, z.string())
     .optional(),
   ORION_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  PLUGINS_DIR: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
 
 export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
+  const rawOrionUrl = processEnv.ORION_URL;
   const parsed = envSchema.safeParse(processEnv);
 
   if (!parsed.success) {
@@ -82,6 +89,16 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
   }
 
   const env = parsed.data;
+
+  if (
+    typeof rawOrionUrl === "string" &&
+    rawOrionUrl.trim().length > 0 &&
+    !env.ORION_URL
+  ) {
+    console.warn(
+      `[config] Ignoring invalid ORION_URL value: ${rawOrionUrl.trim()}`,
+    );
+  }
 
   if (env.NODE_ENV === "production" && !env.DATABASE_URL) {
     throw new Error("DATABASE_URL is required in production.");

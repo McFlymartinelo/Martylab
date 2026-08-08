@@ -50,6 +50,7 @@ services:
       ORION_URL: ${ORION_URL:-}
       ORION_API_KEY: ${ORION_API_KEY:-}
       ORION_TIMEOUT_MS: ${ORION_TIMEOUT_MS:-6000}
+      PLUGINS_DIR: /app/plugins
     group_add:
       - "${DOCKER_GID:-999}"
     volumes:
