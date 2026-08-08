@@ -5,6 +5,7 @@ import {
   Puzzle,
   Server,
   Settings,
+  Trophy,
   Users,
   Workflow,
   type LucideIcon,
@@ -53,6 +54,16 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Supervision CPU, RAM, disque, uptime et conteneurs Docker.",
+    mobilePrimary: true,
+  },
+  {
+    id: "matchday",
+    label: "Matchday",
+    to: "/matchday",
+    icon: Trophy,
+    status: "ready",
+    description:
+      "Matchs du jour, classement, pronostics et messages du groupe.",
     mobilePrimary: true,
   },
   {

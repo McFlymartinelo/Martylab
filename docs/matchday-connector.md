@@ -6,6 +6,9 @@ indépendant : Martylab ne touche jamais à la base SQLite de Matchday.
 Le widget dashboard (option C) affiche un résumé personnalisé : classement,
 top 5, prochains matchs et pronostics en attente.
 
+La page `/matchday` (option B) agrège matchs du jour, prochains matchs,
+classement complet, messages récents du chat et notifications dérivées.
+
 ## Configuration
 
 Dans le `.env` du backend Martylab :
@@ -45,6 +48,8 @@ Ce compte sert à lire le classement et les matchs via l'API Matchday.
 |-------|-------------|
 | `GET /api/matchday/status` | Connecteur configuré + Matchday joignable |
 | `GET /api/matchday/summary` | Résumé du groupe (classement, matchs, pronos) |
+| `GET /api/matchday/page` | Page Matchday (matchs du jour, classement, chat) |
+| `GET /api/matchday/notifications` | Alertes dérivées (pronos en attente, matchs du jour) |
 
 Les deux routes requièrent une session Martylab valide.
 
@@ -57,6 +62,7 @@ Les deux routes requièrent une session Martylab valide.
 | `GET /api/groups/:id` | Nom du groupe, membres |
 | `GET /api/groups/:id/standings` | Classement |
 | `GET /api/groups/:id/matches` | Matchs à pronostiquer + prédictions |
+| `GET /api/groups/:id/chat` | Messages récents du groupe |
 
 ## Comportement
 

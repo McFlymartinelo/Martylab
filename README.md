@@ -169,6 +169,8 @@ npm run db:seed        # Comptes initiaux
 | `PUT /api/orion/lights/:id` | user+ | Allumer / éteindre une lumière Hue |
 | `GET /api/matchday/status` | session | État du connecteur Matchday |
 | `GET /api/matchday/summary` | session | Résumé ligue (classement, matchs, pronos) |
+| `GET /api/matchday/page` | session | Page Matchday (matchs du jour, classement, chat) |
+| `GET /api/matchday/notifications` | session | Notifications Matchday dérivées |
 | `GET /api/portainer/status` | session | État Portainer |
 | `GET /api/portainer/overview` | session | Conteneurs, images, volumes (Portainer) |
 | `POST /api/portainer/containers/:id/start\|stop\|restart` | user+ | Actions conteneur via Portainer |

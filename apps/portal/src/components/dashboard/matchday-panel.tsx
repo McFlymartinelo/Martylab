@@ -1,4 +1,5 @@
 import { ExternalLink, Trophy } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   useMatchdayStatusQuery,
   useMatchdaySummaryQuery,
@@ -208,7 +209,10 @@ export function MatchdayPanel() {
         </Card>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button variant="outline" size="sm" render={<Link to="/matchday" />}>
+          Voir la page Matchday
+        </Button>
         <Button
           variant="outline"
           size="sm"

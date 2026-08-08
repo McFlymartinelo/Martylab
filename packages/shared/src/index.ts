@@ -119,6 +119,12 @@ export interface DockerContainerLogsResponse {
 export type DockerContainerAction = "start" | "stop" | "restart";
 
 export type {
+  MatchdayChatMessage,
+  MatchdayMatch,
+  MatchdayNotification,
+  MatchdayNotificationsResponse,
+  MatchdayNotificationSeverity,
+  MatchdayPageResponse,
   MatchdayStandingEntry,
   MatchdayStatusResponse,
   MatchdaySummaryResponse,

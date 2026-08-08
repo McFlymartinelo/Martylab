@@ -1,4 +1,9 @@
 import type {
+  MatchdayChatMessage,
+  MatchdayMatch,
+  MatchdayNotification,
+  MatchdayNotificationsResponse,
+  MatchdayPageResponse,
   MatchdayStandingEntry,
   MatchdayStatusResponse,
   MatchdaySummaryResponse,
@@ -43,6 +48,9 @@ interface MatchdayMatchRow {
   away_team: string;
   kickoff_at: string;
   comp_nom?: string;
+  status?: string;
+  home_score?: number | null;
+  away_score?: number | null;
   prediction?: { home_score: number; away_score: number } | null;
   isLocked?: boolean;
 }
@@ -53,8 +61,59 @@ interface MatchdayGroupPayload {
   members?: Array<{ id: number; display_name: string }>;
 }
 
+interface MatchdayChatRow {
+  id: number;
+  content: string;
+  created_at: string;
+  display_name: string;
+}
+
 function normalizeBaseUrl(baseUrl: string): string {
   return baseUrl.replace(/\/+$/, "");
+}
+
+function isTodayInParis(iso: string): boolean {
+  const formatter = new Intl.DateTimeFormat("fr-CA", {
+    timeZone: "Europe/Paris",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  const today = formatter.format(new Date());
+  const matchDay = formatter.format(new Date(iso));
+  return today === matchDay;
+}
+
+function mapMatchRow(match: MatchdayMatchRow): MatchdayMatch {
+  return {
+    id: match.id,
+    homeTeam: match.home_team,
+    awayTeam: match.away_team,
+    kickoffAt: match.kickoff_at,
+    competitionName: match.comp_nom ?? "Compétition",
+    hasPrediction: match.prediction !== null && match.prediction !== undefined,
+    isLocked: Boolean(match.isLocked),
+    status: match.status ?? "scheduled",
+    predictionHome: match.prediction?.home_score ?? null,
+    predictionAway: match.prediction?.away_score ?? null,
+    actualHome:
+      typeof match.home_score === "number" ? match.home_score : null,
+    actualAway:
+      typeof match.away_score === "number" ? match.away_score : null,
+  };
+}
+
+function mapUpcomingMatch(match: MatchdayMatch): MatchdayUpcomingMatch {
+  return {
+    id: match.id,
+    homeTeam: match.homeTeam,
+    awayTeam: match.awayTeam,
+    kickoffAt: match.kickoffAt,
+    competitionName: match.competitionName,
+    hasPrediction: match.hasPrediction,
+    isLocked: match.isLocked,
+  };
 }
 
 function parseUserPasswords(
@@ -190,6 +249,82 @@ export function createMatchdayClient(config: MatchdayClientConfig) {
     return { token: serviceToken, personalized: false };
   }
 
+  async function fetchGroupData(input: {
+    martylabUsername: string;
+    martylabDisplayName: string;
+  }) {
+    if (!baseUrl || !config.groupId) {
+      return null;
+    }
+
+    const auth = await resolveUserToken(input.martylabUsername);
+    if (!auth) {
+      return null;
+    }
+
+    const groupId = config.groupId;
+    const [group, standings, matches, chat] = await Promise.all([
+      request<MatchdayGroupPayload>(`/api/groups/${groupId}`, {
+        token: auth.token,
+      }),
+      request<MatchdayStandingRow[]>(`/api/groups/${groupId}/standings`, {
+        token: auth.token,
+      }),
+      request<MatchdayMatchRow[]>(`/api/groups/${groupId}/matches`, {
+        token: auth.token,
+      }),
+      request<MatchdayChatRow[]>(`/api/groups/${groupId}/chat`, {
+        token: auth.token,
+      }).catch(() => [] as MatchdayChatRow[]),
+    ]);
+
+    const normalizedUsername = input.martylabUsername.trim().toLowerCase();
+    const normalizedDisplayName = input.martylabDisplayName
+      .trim()
+      .toLowerCase();
+
+    const userRow =
+      standings.find(
+        (row) => row.displayName.trim().toLowerCase() === normalizedDisplayName,
+      ) ??
+      standings.find((row) =>
+        row.displayName.trim().toLowerCase().includes(normalizedUsername),
+      );
+
+    const mappedMatches = matches.map(mapMatchRow);
+    const pendingPredictions = auth.personalized
+      ? mappedMatches.filter((match) => !match.isLocked && !match.hasPrediction)
+          .length
+      : null;
+
+    const fullStandings: MatchdayStandingEntry[] = standings.map((row) => ({
+      rank: row.rank,
+      displayName: row.displayName,
+      totalPoints: row.totalPoints,
+    }));
+
+    const recentMessages: MatchdayChatMessage[] = chat
+      .slice(-5)
+      .reverse()
+      .map((message) => ({
+        id: message.id,
+        author: message.display_name,
+        content: message.content,
+        createdAt: message.created_at,
+      }));
+
+    return {
+      auth,
+      group,
+      groupId,
+      userRow,
+      mappedMatches,
+      pendingPredictions,
+      fullStandings,
+      recentMessages,
+    };
+  }
+
   return {
     isConfigured: Boolean(baseUrl && config.groupId),
     hasServiceCredentials: Boolean(
@@ -251,78 +386,160 @@ export function createMatchdayClient(config: MatchdayClientConfig) {
         return empty;
       }
 
-      const auth = await resolveUserToken(input.martylabUsername);
-      if (!auth) {
-        return empty;
-      }
-
       try {
-        const groupId = config.groupId;
-        const [group, standings, matches] = await Promise.all([
-          request<MatchdayGroupPayload>(`/api/groups/${groupId}`, {
-            token: auth.token,
-          }),
-          request<MatchdayStandingRow[]>(`/api/groups/${groupId}/standings`, {
-            token: auth.token,
-          }),
-          request<MatchdayMatchRow[]>(`/api/groups/${groupId}/matches`, {
-            token: auth.token,
-          }),
-        ]);
+        const data = await fetchGroupData(input);
+        if (!data) {
+          return empty;
+        }
 
-        const topStandings: MatchdayStandingEntry[] = standings
-          .slice(0, 5)
-          .map((row) => ({
-            rank: row.rank,
-            displayName: row.displayName,
-            totalPoints: row.totalPoints,
-          }));
-
-        const normalizedUsername = input.martylabUsername.trim().toLowerCase();
-        const normalizedDisplayName = input.martylabDisplayName
-          .trim()
-          .toLowerCase();
-
-        const userRow =
-          standings.find(
-            (row) => row.displayName.trim().toLowerCase() === normalizedDisplayName,
-          ) ??
-          standings.find((row) =>
-            row.displayName.trim().toLowerCase().includes(normalizedUsername),
-          );
-
-        const upcomingMatches: MatchdayUpcomingMatch[] = matches
+        const upcomingMatches = data.mappedMatches
           .filter((match) => !match.isLocked)
           .slice(0, 5)
-          .map((match) => ({
-            id: match.id,
-            homeTeam: match.home_team,
-            awayTeam: match.away_team,
-            kickoffAt: match.kickoff_at,
-            competitionName: match.comp_nom ?? "Compétition",
-            hasPrediction: match.prediction !== null && match.prediction !== undefined,
-            isLocked: Boolean(match.isLocked),
-          }));
-
-        const pendingPredictions = auth.personalized
-          ? matches.filter((match) => !match.isLocked && !match.prediction).length
-          : null;
+          .map(mapUpcomingMatch);
 
         return {
           available: true,
-          groupId,
-          groupName: group.name ?? null,
-          userRank: userRow?.rank ?? null,
-          userTotalPoints: userRow?.totalPoints ?? null,
-          memberCount: standings.length,
-          pendingPredictions,
-          personalized: auth.personalized,
-          topStandings,
+          groupId: data.groupId,
+          groupName: data.group.name ?? null,
+          userRank: data.userRow?.rank ?? null,
+          userTotalPoints: data.userRow?.totalPoints ?? null,
+          memberCount: data.fullStandings.length,
+          pendingPredictions: data.pendingPredictions,
+          personalized: data.auth.personalized,
+          topStandings: data.fullStandings.slice(0, 5),
           upcomingMatches,
           matchdayUrl: publicUrl ?? null,
         };
       } catch {
         return { ...empty, available: false };
+      }
+    },
+
+    async getPage(input: {
+      martylabUsername: string;
+      martylabDisplayName: string;
+    }): Promise<MatchdayPageResponse> {
+      const empty: MatchdayPageResponse = {
+        available: false,
+        groupId: config.groupId ?? null,
+        groupName: null,
+        matchdayUrl: publicUrl ?? null,
+        personalized: false,
+        userRank: null,
+        userTotalPoints: null,
+        pendingPredictions: null,
+        todayMatches: [],
+        upcomingMatches: [],
+        standings: [],
+        recentMessages: [],
+      };
+
+      if (!baseUrl || !config.groupId) {
+        return empty;
+      }
+
+      try {
+        const data = await fetchGroupData(input);
+        if (!data) {
+          return empty;
+        }
+
+        const todayMatches = data.mappedMatches.filter((match) =>
+          isTodayInParis(match.kickoffAt),
+        );
+        const upcomingMatches = data.mappedMatches
+          .filter((match) => !match.isLocked)
+          .slice(0, 20);
+
+        return {
+          available: true,
+          groupId: data.groupId,
+          groupName: data.group.name ?? null,
+          matchdayUrl: publicUrl ?? null,
+          personalized: data.auth.personalized,
+          userRank: data.userRow?.rank ?? null,
+          userTotalPoints: data.userRow?.totalPoints ?? null,
+          pendingPredictions: data.pendingPredictions,
+          todayMatches,
+          upcomingMatches,
+          standings: data.fullStandings,
+          recentMessages: data.recentMessages,
+        };
+      } catch {
+        return empty;
+      }
+    },
+
+    async getNotifications(input: {
+      martylabUsername: string;
+      martylabDisplayName: string;
+    }): Promise<MatchdayNotificationsResponse> {
+      const empty: MatchdayNotificationsResponse = {
+        available: false,
+        items: [],
+      };
+
+      if (!baseUrl || !config.groupId) {
+        return empty;
+      }
+
+      try {
+        const data = await fetchGroupData(input);
+        if (!data) {
+          return empty;
+        }
+
+        const now = new Date().toISOString();
+        const items: MatchdayNotification[] = [];
+
+        if (
+          data.pendingPredictions !== null &&
+          data.pendingPredictions > 0
+        ) {
+          items.push({
+            id: "matchday-pending-predictions",
+            severity: "warning",
+            title: "Pronostics en attente",
+            message: `${data.pendingPredictions} match(s) à pronostiquer.`,
+            at: now,
+          });
+        }
+
+        const todayCount = data.mappedMatches.filter((match) =>
+          isTodayInParis(match.kickoffAt),
+        ).length;
+
+        if (todayCount > 0) {
+          items.push({
+            id: "matchday-today-matches",
+            severity: "info",
+            title: "Matchs du jour",
+            message: `${todayCount} match(s) aujourd'hui dans la ligue.`,
+            at: now,
+          });
+        }
+
+        const startingSoon = data.mappedMatches.filter((match) => {
+          if (match.isLocked || match.hasPrediction) {
+            return false;
+          }
+          const diffMs = new Date(match.kickoffAt).getTime() - Date.now();
+          return diffMs > 0 && diffMs <= 60 * 60 * 1000;
+        });
+
+        if (data.auth.personalized && startingSoon.length > 0) {
+          items.push({
+            id: "matchday-starting-soon",
+            severity: "warning",
+            title: "Coup d'envoi imminent",
+            message: `${startingSoon.length} match(s) dans l'heure sans pronostic.`,
+            at: now,
+          });
+        }
+
+        return { available: true, items };
+      } catch {
+        return empty;
       }
     },
   };

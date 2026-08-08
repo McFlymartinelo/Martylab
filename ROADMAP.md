@@ -170,12 +170,12 @@ Objectif : intégrer Matchday à Martylab.
 - [x] Pronostics en attente (personnalisés via `MATCHDAY_USER_PASSWORDS`)
 - [x] Dashboard Matchday (panneau résumé)
 
-## Suite v0.4.x
+## Suite v0.4.x ✅
 
-- [ ] Matchs du jour (vue dédiée)
-- [ ] Informations importantes (annonces groupe)
-- [ ] Notifications Matchday
-- [ ] Page `/matchday` (lanceur — option B)
+- [x] Matchs du jour (vue dédiée)
+- [x] Informations importantes (messages chat groupe)
+- [x] Notifications Matchday
+- [x] Page `/matchday` (lanceur — option B)
 
 Matchday doit rester totalement indépendant de Martylab.
 
