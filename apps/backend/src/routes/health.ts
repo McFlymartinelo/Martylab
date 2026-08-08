@@ -7,6 +7,14 @@ type DatabaseHandle = ReturnType<typeof createDatabase>;
 export function createHealthRouter(database: DatabaseHandle) {
   const healthRouter = Router();
 
+  healthRouter.get("/live", (_req, res) => {
+    res.status(200).json({
+      status: "ok",
+      service: "martylab-backend",
+      timestamp: new Date().toISOString(),
+    });
+  });
+
   healthRouter.get("/", async (_req, res, next) => {
     try {
       const databaseStatus = await database.ping();

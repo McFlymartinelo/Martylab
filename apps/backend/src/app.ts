@@ -64,7 +64,8 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     pinoHttp({
       logger,
       autoLogging: {
-        ignore: (req) => req.url === "/api/health",
+        ignore: (req) =>
+          req.url === "/api/health" || req.url === "/api/health/live",
       },
     }),
   );

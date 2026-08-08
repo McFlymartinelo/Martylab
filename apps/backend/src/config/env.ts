@@ -44,16 +44,25 @@ function parseOptionalUrl(value: unknown): string | undefined {
   return parsed.success ? parsed.data : undefined;
 }
 
+function trimEnvString(value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim().replace(/^["']|["']$/g, "");
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
   HOST: z.string().default("0.0.0.0"),
-  CORS_ORIGIN: z.string().default("http://localhost:5173"),
+  CORS_ORIGIN: z.preprocess(trimEnvString, z.string().min(1)).default("http://localhost:5173"),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
-  DATABASE_URL: z.string().min(1).optional(),
-  SESSION_SECRET: z.string().min(32).optional(),
+  DATABASE_URL: z.preprocess(trimEnvString, z.string().min(1)).optional(),
+  SESSION_SECRET: z.preprocess(trimEnvString, z.string().min(32)).optional(),
   SESSION_COOKIE_NAME: z.string().min(1).default("martylab_session"),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
   COOKIE_SECURE: booleanFromEnv,
