@@ -125,6 +125,22 @@ export type {
   MatchdayUpcomingMatch,
 } from "./matchday.js";
 export type {
+  CloudflareHostnameCheck,
+  CloudflareStatusResponse,
+} from "./cloudflare.js";
+export type {
+  NasDiskSummary,
+  NasStatusResponse,
+  NasStoragePool,
+} from "./nas.js";
+export type {
+  PortainerContainerSummary,
+  PortainerImageSummary,
+  PortainerOverviewResponse,
+  PortainerStatusResponse,
+  PortainerVolumeSummary,
+} from "./portainer.js";
+export type {
   OrionClimateResponse,
   OrionLight,
   OrionLightsResponse,

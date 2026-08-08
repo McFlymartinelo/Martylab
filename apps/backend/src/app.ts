@@ -24,9 +24,15 @@ import { createSystemRouter } from "./routes/system.js";
 import { createUsersRouter } from "./routes/users.js";
 import { createOrionRouter } from "./routes/orion.js";
 import { createMatchdayRouter } from "./routes/matchday.js";
+import { createPortainerRouter } from "./routes/portainer.js";
+import { createCloudflareRouter } from "./routes/cloudflare.js";
+import { createNasRouter } from "./routes/nas.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
 import { createOrionClient } from "./connectors/orion/orion-client.js";
 import { createMatchdayClient } from "./connectors/matchday/matchday-client.js";
+import { createPortainerClient } from "./connectors/portainer/portainer-client.js";
+import { createCloudflareClient } from "./connectors/cloudflare/cloudflare-client.js";
+import { createNasClient } from "./connectors/nas/nas-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
 import { createUserService } from "./users/user-service.js";
 
@@ -57,6 +63,26 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     servicePassword: env.MATCHDAY_SERVICE_PASSWORD,
     userPasswordsJson: env.MATCHDAY_USER_PASSWORDS,
     timeoutMs: env.MATCHDAY_TIMEOUT_MS,
+  });
+  const portainerClient = createPortainerClient({
+    baseUrl: env.PORTAINER_URL,
+    apiToken: env.PORTAINER_API_TOKEN,
+    endpointId: env.PORTAINER_ENDPOINT_ID,
+    timeoutMs: env.PORTAINER_TIMEOUT_MS,
+    allowInsecureTls: env.PORTAINER_INSECURE_TLS ?? false,
+  });
+  const cloudflareClient = createCloudflareClient({
+    apiToken: env.CLOUDFLARE_API_TOKEN,
+    accountId: env.CLOUDFLARE_ACCOUNT_ID,
+    tunnelId: env.CLOUDFLARE_TUNNEL_ID,
+    hostnames: env.CLOUDFLARE_CHECK_HOSTNAMES,
+    timeoutMs: env.CLOUDFLARE_TIMEOUT_MS,
+  });
+  const nasClient = createNasClient({
+    baseUrl: env.NAS_URL,
+    apiToken: env.NAS_API_TOKEN,
+    timeoutMs: env.NAS_TIMEOUT_MS,
+    allowInsecureTls: env.NAS_INSECURE_TLS ?? true,
   });
 
   app.disable("x-powered-by");
@@ -90,6 +116,9 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/docker", createDockerRouter(dockerClient));
   app.use("/api/orion", createOrionRouter(orionClient));
   app.use("/api/matchday", createMatchdayRouter(matchdayClient));
+  app.use("/api/portainer", createPortainerRouter(portainerClient));
+  app.use("/api/cloudflare", createCloudflareRouter(cloudflareClient));
+  app.use("/api/nas", createNasRouter(nasClient));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger, env.NODE_ENV === "production"));

@@ -139,6 +139,7 @@ npm run db:seed        # Comptes initiaux
 - [docs/backup-postgres.md](./docs/backup-postgres.md) — sauvegarde PostgreSQL
 - [docs/orion-connector.md](./docs/orion-connector.md) — connecteur Orion
 - [docs/matchday-connector.md](./docs/matchday-connector.md) — connecteur Matchday
+- [docs/infrastructure-connectors.md](./docs/infrastructure-connectors.md) — Portainer, Cloudflare, NAS
 - [docs/production-security.md](./docs/production-security.md) — sécurisation production
 
 ## API (v0.1 / v0.2)
@@ -166,6 +167,11 @@ npm run db:seed        # Comptes initiaux
 | `PUT /api/orion/lights/:id` | user+ | Allumer / éteindre une lumière Hue |
 | `GET /api/matchday/status` | session | État du connecteur Matchday |
 | `GET /api/matchday/summary` | session | Résumé ligue (classement, matchs, pronos) |
+| `GET /api/portainer/status` | session | État Portainer |
+| `GET /api/portainer/overview` | session | Conteneurs, images, volumes (Portainer) |
+| `POST /api/portainer/containers/:id/start\|stop\|restart` | user+ | Actions conteneur via Portainer |
+| `GET /api/cloudflare/status` | session | Tunnel Cloudflare + checks domaines |
+| `GET /api/nas/status` | session | État NAS UGREEN (stockage, disques) |
 
 ## Licence
 

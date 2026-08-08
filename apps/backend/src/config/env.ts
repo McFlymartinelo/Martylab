@@ -66,6 +66,22 @@ function parseOptionalPositiveInt(value: unknown): number | undefined {
   return parsed;
 }
 
+function parseHostnameList(value: unknown): string[] | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  return trimmed
+    .split(",")
+    .map((hostname) => hostname.trim())
+    .filter((hostname) => hostname.length > 0);
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
@@ -97,6 +113,26 @@ const envSchema = z.object({
   MATCHDAY_SERVICE_PASSWORD: z.preprocess(trimEnvString, z.string().optional()),
   MATCHDAY_USER_PASSWORDS: z.preprocess(trimEnvString, z.string().optional()),
   MATCHDAY_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  PORTAINER_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  PORTAINER_API_TOKEN: z.preprocess(trimEnvString, z.string().optional()),
+  PORTAINER_ENDPOINT_ID: z.preprocess(
+    parseOptionalPositiveInt,
+    z.number().int().positive().optional(),
+  ),
+  PORTAINER_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  PORTAINER_INSECURE_TLS: booleanFromEnv,
+  CLOUDFLARE_API_TOKEN: z.preprocess(trimEnvString, z.string().optional()),
+  CLOUDFLARE_ACCOUNT_ID: z.preprocess(trimEnvString, z.string().optional()),
+  CLOUDFLARE_TUNNEL_ID: z.preprocess(trimEnvString, z.string().optional()),
+  CLOUDFLARE_CHECK_HOSTNAMES: z.preprocess(
+    parseHostnameList,
+    z.array(z.string().min(1)).optional(),
+  ),
+  CLOUDFLARE_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  NAS_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  NAS_API_TOKEN: z.preprocess(trimEnvString, z.string().optional()),
+  NAS_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  NAS_INSECURE_TLS: booleanFromEnv,
 });
 
 export type Env = z.infer<typeof envSchema>;

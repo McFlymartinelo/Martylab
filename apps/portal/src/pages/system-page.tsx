@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MetricCard } from "@/components/dashboard/metric-card";
+import { InfrastructurePanels } from "@/components/system/infrastructure-panels";
 import { formatBytes, formatPercent, formatUptime } from "@/lib/format";
 
 function containerStateVariant(
@@ -31,8 +32,8 @@ export function SystemPage() {
       <section className="space-y-2">
         <h1 className="text-2xl font-semibold tracking-tight">Système</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Supervision du serveur et des conteneurs Docker. Les métriques
-          proviennent du connecteur serveur intégré au backend Martylab.
+          Supervision du serveur, de l&apos;infrastructure (Portainer, Cloudflare,
+          NAS) et des conteneurs Docker.
         </p>
       </section>
 
@@ -93,6 +94,8 @@ export function SystemPage() {
           </p>
         </>
       ) : null}
+
+      <InfrastructurePanels />
 
       <section className="space-y-4">
         <div className="flex items-center gap-2">

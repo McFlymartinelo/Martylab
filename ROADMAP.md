@@ -5,6 +5,15 @@
 > Cette roadmap évolue avec le projet. Une fonctionnalité peut être déplacée,
 > supprimée ou ajoutée si les besoins du projet changent.
 
+## Ordre d'exécution validé
+
+1. **v0.2** — Infrastructure (Portainer, NAS, Cloudflare) ✅
+2. **v0.3** — Orion notifications + historique climat
+3. **v0.4.x** — Matchday page `/matchday` + matchs du jour
+4. **v0.5** — Jellyfin
+5. **v0.6** — Assistant
+6. **v0.7** — Mobile / PWA
+
 ---
 
 # 🚀 Version 0.1 — Fondations
@@ -94,12 +103,12 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 
 ## Portainer
 
-- [ ] Connecteur Portainer
-- [ ] État de Portainer
-- [ ] Conteneurs
-- [ ] Images
-- [ ] Volumes
-- [ ] Actions principales
+- [x] Connecteur Portainer
+- [x] État de Portainer
+- [x] Conteneurs
+- [x] Images
+- [x] Volumes
+- [x] Actions principales (start/stop/restart via Portainer)
 
 ## Serveur
 
@@ -112,18 +121,18 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 
 ## NAS
 
-- [ ] Connexion au NAS UGREEN
-- [ ] Espace disponible
-- [ ] Utilisation des volumes
-- [ ] État général
-- [ ] Informations SMART si disponibles
+- [x] Connexion au NAS UGREEN (API UGOS)
+- [x] Espace disponible (pools de stockage)
+- [x] Utilisation des volumes
+- [x] État général (CPU, RAM, température)
+- [x] Informations disques (température / statut)
 
 ## Cloudflare
 
-- [ ] Connecteur Cloudflare
-- [ ] État du tunnel
-- [ ] État des domaines
-- [ ] Vérification des services
+- [x] Connecteur Cloudflare
+- [x] État du tunnel
+- [x] État des domaines (checks HTTP configurables)
+- [x] Vérification des services
 
 ---
 
