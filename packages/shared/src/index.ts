@@ -50,3 +50,12 @@ export interface PluginsResponse {
   plugins: PluginManifest[];
 }
 
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  user: SessionUser;
+}
+

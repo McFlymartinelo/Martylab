@@ -16,7 +16,10 @@ npm run db:seed -w @martylab/backend
 ## Endpoints (v0.1 foundation)
 
 - `GET /api/health`
-- `GET /api/plugins`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `GET /api/plugins` (authenticated)
 
 ## Database
 

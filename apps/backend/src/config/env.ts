@@ -10,6 +10,9 @@ const rootDir = path.resolve(
 
 dotenv.config({ path: path.join(rootDir, ".env") });
 
+const DEFAULT_DEV_SESSION_SECRET =
+  "dev-only-martylab-session-secret-change-me";
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
@@ -19,6 +22,9 @@ const envSchema = z.object({
     .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
     .default("info"),
   DATABASE_URL: z.string().min(1).optional(),
+  SESSION_SECRET: z.string().min(32).optional(),
+  SESSION_COOKIE_NAME: z.string().min(1).default("martylab_session"),
+  SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -33,9 +39,18 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
     throw new Error(`Invalid environment configuration: ${details}`);
   }
 
-  if (parsed.data.NODE_ENV === "production" && !parsed.data.DATABASE_URL) {
+  const env = parsed.data;
+
+  if (env.NODE_ENV === "production" && !env.DATABASE_URL) {
     throw new Error("DATABASE_URL is required in production.");
   }
 
-  return parsed.data;
+  if (env.NODE_ENV === "production" && !env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET is required in production.");
+  }
+
+  return {
+    ...env,
+    SESSION_SECRET: env.SESSION_SECRET ?? DEFAULT_DEV_SESSION_SECRET,
+  };
 }

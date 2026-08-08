@@ -29,18 +29,41 @@ async function parseError(response: Response): Promise<ApiClientError> {
   }
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
+async function request<T>(
+  path: string,
+  init: RequestInit,
+): Promise<T> {
+  const headers = new Headers(init.headers);
+  headers.set("Accept", "application/json");
+
+  if (init.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
   const response = await fetch(path, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
+    ...init,
+    headers,
     credentials: "include",
   });
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
 
   if (!response.ok) {
     throw await parseError(response);
   }
 
   return (await response.json()) as T;
+}
+
+export function apiGet<T>(path: string): Promise<T> {
+  return request<T>(path, { method: "GET" });
+}
+
+export function apiPost<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "POST",
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
 }

@@ -1,6 +1,9 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Boxes, LogIn } from "lucide-react";
+import { Boxes, LayoutDashboard, LogIn, LogOut } from "lucide-react";
+import { useAuthQuery } from "@/features/auth/use-auth-query";
+import { useLogoutMutation } from "@/features/auth/use-logout-mutation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +13,10 @@ const navItems = [
 ] as const;
 
 export function AppShell() {
+  const authQuery = useAuthQuery();
+  const logoutMutation = useLogoutMutation();
+  const user = authQuery.data?.user;
+
   return (
     <div className="flex min-h-svh flex-col bg-background">
       <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur">
@@ -47,14 +54,34 @@ export function AppShell() {
 
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
-            <Button
-              variant="outline"
-              size="sm"
-              render={<NavLink to="/login" />}
-            >
-              <LogIn className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Connexion</span>
-            </Button>
+            {user ? (
+              <>
+                <div className="hidden items-center gap-2 sm:flex">
+                  <span className="text-sm text-muted-foreground">
+                    {user.displayName}
+                  </span>
+                  <Badge variant="secondary">{user.role}</Badge>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={logoutMutation.isPending}
+                  onClick={() => logoutMutation.mutate()}
+                >
+                  <LogOut className="size-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Déconnexion</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                render={<NavLink to="/login" />}
+              >
+                <LogIn className="size-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Connexion</span>
+              </Button>
+            )}
           </div>
         </div>
       </header>

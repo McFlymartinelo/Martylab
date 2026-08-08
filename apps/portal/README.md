@@ -16,9 +16,9 @@ Portail web Martylab.
 
 ## Routes
 
-- `/` — Dashboard
-- `/apps` — Registre des plugins
-- `/login` — Fondation UI de connexion (auth backend à venir)
+- `/login` — Connexion (session cookie HttpOnly)
+- `/` — Dashboard (authentifié)
+- `/apps` — Registre des plugins (authentifié)
 
 ## Scripts
 
