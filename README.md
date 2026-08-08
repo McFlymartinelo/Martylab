@@ -153,6 +153,10 @@ npm run db:seed        # Comptes initiaux
 | `DELETE /api/users/:id` | admin | Supprimer un utilisateur |
 | `GET /api/system/metrics` | session | CPU, RAM, disque, uptime |
 | `GET /api/docker/containers` | session | Liste des conteneurs Docker |
+| `GET /api/docker/containers/:id/logs` | session | Logs d'un conteneur |
+| `POST /api/docker/containers/:id/start` | user+ | Démarrer un conteneur |
+| `POST /api/docker/containers/:id/stop` | user+ | Arrêter un conteneur |
+| `POST /api/docker/containers/:id/restart` | user+ | Redémarrer un conteneur |
 
 ## Licence
 

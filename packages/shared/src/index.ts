@@ -112,3 +112,9 @@ export interface DockerContainersResponse {
   containers: DockerContainerSummary[];
 }
 
+export interface DockerContainerLogsResponse {
+  logs: string;
+}
+
+export type DockerContainerAction = "start" | "stop" | "restart";
+

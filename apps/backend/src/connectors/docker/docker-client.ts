@@ -16,18 +16,19 @@ interface DockerContainerApiRow {
   Status: string;
 }
 
-function dockerRequest<T>(
+function dockerRequest(
   socketPath: string,
   apiPath: string,
-): Promise<T> {
+  method: "GET" | "POST" = "GET",
+): Promise<{ statusCode: number; body: string }> {
   return new Promise((resolve, reject) => {
     const request = http.request(
       {
         socketPath,
         path: apiPath,
-        method: "GET",
+        method,
         headers: {
-          Accept: "application/json",
+          Accept: method === "GET" ? "application/json" : "*/*",
         },
       },
       (response) => {
@@ -37,20 +38,10 @@ function dockerRequest<T>(
           body += chunk;
         });
         response.on("end", () => {
-          if ((response.statusCode ?? 500) >= 400) {
-            reject(
-              new Error(
-                `Docker API error ${response.statusCode ?? "unknown"}: ${body}`,
-              ),
-            );
-            return;
-          }
-
-          try {
-            resolve(JSON.parse(body) as T);
-          } catch (error) {
-            reject(error);
-          }
+          resolve({
+            statusCode: response.statusCode ?? 500,
+            body,
+          });
         });
       },
     );
@@ -58,6 +49,12 @@ function dockerRequest<T>(
     request.on("error", reject);
     request.end();
   });
+}
+
+function assertDockerSuccess(statusCode: number, body: string) {
+  if (statusCode >= 400) {
+    throw new Error(`Docker API error ${statusCode}: ${body}`);
+  }
 }
 
 export function createDockerClient(socketPath: string | undefined) {
@@ -70,11 +67,13 @@ export function createDockerClient(socketPath: string | undefined) {
         return [];
       }
 
-      const rows = await dockerRequest<DockerContainerApiRow[]>(
+      const { statusCode, body } = await dockerRequest(
         socketPath,
         "/containers/json?all=true",
       );
+      assertDockerSuccess(statusCode, body);
 
+      const rows = JSON.parse(body) as DockerContainerApiRow[];
       return rows.map((row) => ({
         id: row.Id.slice(0, 12),
         name: (row.Names[0] ?? "unknown").replace(/^\//, ""),
@@ -82,6 +81,61 @@ export function createDockerClient(socketPath: string | undefined) {
         state: row.State,
         status: row.Status,
       }));
+    },
+
+    async startContainer(containerId: string): Promise<void> {
+      if (!socketPath) {
+        throw new Error("Docker socket is not configured.");
+      }
+
+      const { statusCode, body } = await dockerRequest(
+        socketPath,
+        `/containers/${containerId}/start`,
+        "POST",
+      );
+      assertDockerSuccess(statusCode, body);
+    },
+
+    async stopContainer(containerId: string): Promise<void> {
+      if (!socketPath) {
+        throw new Error("Docker socket is not configured.");
+      }
+
+      const { statusCode, body } = await dockerRequest(
+        socketPath,
+        `/containers/${containerId}/stop`,
+        "POST",
+      );
+      assertDockerSuccess(statusCode, body);
+    },
+
+    async restartContainer(containerId: string): Promise<void> {
+      if (!socketPath) {
+        throw new Error("Docker socket is not configured.");
+      }
+
+      const { statusCode, body } = await dockerRequest(
+        socketPath,
+        `/containers/${containerId}/restart`,
+        "POST",
+      );
+      assertDockerSuccess(statusCode, body);
+    },
+
+    async getContainerLogs(
+      containerId: string,
+      tail = 100,
+    ): Promise<string> {
+      if (!socketPath) {
+        throw new Error("Docker socket is not configured.");
+      }
+
+      const { statusCode, body } = await dockerRequest(
+        socketPath,
+        `/containers/${containerId}/logs?stdout=true&stderr=true&tail=${tail}&timestamps=true`,
+      );
+      assertDockerSuccess(statusCode, body);
+      return body;
     },
   };
 }

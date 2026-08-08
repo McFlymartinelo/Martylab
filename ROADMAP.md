@@ -87,10 +87,10 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 - [x] Connecteur Docker (lecture via socket Unix)
 - [x] Liste des conteneurs
 - [x] État des conteneurs
-- [ ] Redémarrage d'un conteneur
-- [ ] Arrêt d'un conteneur
-- [ ] Démarrage d'un conteneur
-- [ ] Consultation des logs
+- [x] Redémarrage d'un conteneur
+- [x] Arrêt d'un conteneur
+- [x] Démarrage d'un conteneur
+- [x] Consultation des logs
 
 ## Portainer
 

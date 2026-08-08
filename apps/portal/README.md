@@ -20,6 +20,7 @@ Portail web Martylab.
 - `/` — Dashboard (authentifié)
 - `/apps` — Registre des plugins (authentifié)
 - `/system` — Métriques serveur et conteneurs Docker (authentifié)
+- `/services` — Gestion Docker (actions user+, logs pour tous)
 - `/users` — Gestion des utilisateurs (admin)
 
 ## Scripts

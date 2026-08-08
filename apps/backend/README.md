@@ -26,6 +26,10 @@ npm run db:seed -w @martylab/backend
 - `DELETE /api/users/:userId` (admin)
 - `GET /api/system/metrics` (authenticated)
 - `GET /api/docker/containers` (authenticated)
+- `GET /api/docker/containers/:containerId/logs` (authenticated)
+- `POST /api/docker/containers/:containerId/start` (user+)
+- `POST /api/docker/containers/:containerId/stop` (user+)
+- `POST /api/docker/containers/:containerId/restart` (user+)
 
 ## Database (local Windows dev)
 

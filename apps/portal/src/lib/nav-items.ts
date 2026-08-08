@@ -60,7 +60,7 @@ export const navItems: NavItem[] = [
     label: "Services",
     to: "/services",
     icon: Workflow,
-    status: "soon",
+    status: "ready",
     description:
       "Gestion des conteneurs Docker (démarrage, arrêt, logs) via le connecteur Docker.",
   },

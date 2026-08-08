@@ -78,3 +78,7 @@ export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
 export function apiDelete(path: string): Promise<void> {
   return request<void>(path, { method: "DELETE" });
 }
+
+export function apiPostVoid(path: string): Promise<void> {
+  return request<void>(path, { method: "POST" });
+}

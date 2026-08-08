@@ -7,6 +7,7 @@ import { ComingSoonPage } from "@/pages/coming-soon-page";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { LoginPage } from "@/pages/login-page";
 import { NotFoundPage } from "@/pages/not-found-page";
+import { ServicesPage } from "@/pages/services-page";
 import { SystemPage } from "@/pages/system-page";
 import { UsersPage } from "@/pages/users-page";
 import { navItems } from "@/lib/nav-items";
@@ -23,6 +24,7 @@ export function App() {
             <Route index element={<DashboardPage />} />
             <Route path="apps" element={<AppsPage />} />
             <Route path="system" element={<SystemPage />} />
+            <Route path="services" element={<ServicesPage />} />
             <Route element={<RequireAdmin />}>
               <Route path="users" element={<UsersPage />} />
             </Route>
