@@ -119,6 +119,23 @@ export interface DockerContainerLogsResponse {
 export type DockerContainerAction = "start" | "stop" | "restart";
 
 export type {
+  AssistantActionLogEntry,
+  AssistantActionLogsResponse,
+  AssistantActionStatus,
+  AssistantConfirmationResponse,
+  AssistantConversation,
+  AssistantConversationDetail,
+  AssistantConversationsResponse,
+  AssistantMessage,
+  AssistantMessageMetadata,
+  AssistantMessageRole,
+  AssistantSendMessageRequest,
+  AssistantSendMessageResponse,
+  AssistantToolDefinition,
+  AssistantToolRisk,
+  AssistantToolsResponse,
+} from "./assistant.js";
+export type {
   JellyfinLibrary,
   JellyfinMediaItem,
   JellyfinPageResponse,

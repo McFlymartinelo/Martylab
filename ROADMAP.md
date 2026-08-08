@@ -205,30 +205,30 @@ Objectif : créer le véritable assistant de Martylab.
 
 ## Interface
 
-- [ ] Interface de conversation
-- [ ] Historique des conversations
-- [ ] Interface responsive
-- [ ] Accès rapide depuis le Dashboard
-- [ ] Panneau Assistant
+- [x] Interface de conversation
+- [x] Historique des conversations
+- [x] Interface responsive
+- [x] Accès rapide depuis le Dashboard
+- [x] Panneau Assistant
 
 ## Système d'outils
 
-- [ ] Système de Tools
-- [ ] Système de permissions
-- [ ] Intégration des plugins
-- [ ] Outils en lecture seule
-- [ ] Outils permettant des actions
-- [ ] Confirmation des actions sensibles
-- [ ] Journal des actions
+- [x] Système de Tools
+- [x] Système de permissions
+- [x] Intégration des plugins
+- [x] Outils en lecture seule
+- [x] Outils permettant des actions
+- [x] Confirmation des actions sensibles
+- [x] Journal des actions
 
 ## Intégrations
 
-- [ ] Tool Orion
-- [ ] Tool Matchday
-- [ ] Tool Jellyfin
-- [ ] Tool Docker
-- [ ] Tool NAS
-- [ ] Tool Cloudflare
+- [x] Tool Orion
+- [x] Tool Matchday
+- [x] Tool Jellyfin
+- [x] Tool Docker
+- [x] Tool NAS
+- [x] Tool Cloudflare
 
 ---
 

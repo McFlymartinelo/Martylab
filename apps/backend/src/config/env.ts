@@ -139,6 +139,10 @@ const envSchema = z.object({
   JELLYFIN_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   JELLYFIN_USER_ID: z.preprocess(trimEnvString, z.string().optional()),
   JELLYFIN_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  ASSISTANT_LLM_BASE_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  ASSISTANT_LLM_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
+  ASSISTANT_LLM_MODEL: z.preprocess(trimEnvString, z.string().optional()),
+  ASSISTANT_LLM_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
 });
 
 export type Env = z.infer<typeof envSchema>;

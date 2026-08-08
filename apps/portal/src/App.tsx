@@ -11,6 +11,7 @@ import { ServicesPage } from "@/pages/services-page";
 import { SystemPage } from "@/pages/system-page";
 import { MatchdayPage } from "@/pages/matchday-page";
 import { JellyfinPage } from "@/pages/jellyfin-page";
+import { AssistantPage } from "@/pages/assistant-page";
 import { UsersPage } from "@/pages/users-page";
 import { navItems } from "@/lib/nav-items";
 
@@ -24,6 +25,7 @@ export function App() {
         <Route element={<AppShell />}>
           <Route element={<RequireAuth />}>
             <Route index element={<DashboardPage />} />
+            <Route path="assistant" element={<AssistantPage />} />
             <Route path="apps" element={<AppsPage />} />
             <Route path="system" element={<SystemPage />} />
             <Route path="matchday" element={<MatchdayPage />} />

@@ -28,6 +28,7 @@ import { createPortainerRouter } from "./routes/portainer.js";
 import { createCloudflareRouter } from "./routes/cloudflare.js";
 import { createNasRouter } from "./routes/nas.js";
 import { createJellyfinRouter } from "./routes/jellyfin.js";
+import { createAssistantRouter } from "./routes/assistant.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
 import { createOrionClient } from "./connectors/orion/orion-client.js";
 import { createMatchdayClient } from "./connectors/matchday/matchday-client.js";
@@ -37,6 +38,10 @@ import { createNasClient } from "./connectors/nas/nas-client.js";
 import { createJellyfinClient } from "./connectors/jellyfin/jellyfin-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
 import { createUserService } from "./users/user-service.js";
+import { createAssistantRepository } from "./assistant/assistant-repository.js";
+import { createAssistantService } from "./assistant/assistant-service.js";
+import { createAssistantToolRegistry } from "./assistant/tools/create-registry.js";
+import { createLlmPlanner } from "./assistant/llm-planner.js";
 
 type DatabaseHandle = ReturnType<typeof createDatabase>;
 
@@ -94,6 +99,32 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     userId: env.JELLYFIN_USER_ID,
     timeoutMs: env.JELLYFIN_TIMEOUT_MS,
   });
+  const assistantService = database.db
+    ? createAssistantService({
+        repository: createAssistantRepository(database.db),
+        tools: createAssistantToolRegistry({
+          orionClient,
+          matchdayClient,
+          jellyfinClient,
+          dockerClient,
+          portainerClient,
+          cloudflareClient,
+          nasClient,
+          serverMetrics,
+        }),
+        llmPlanner:
+          env.ASSISTANT_LLM_BASE_URL &&
+          env.ASSISTANT_LLM_API_KEY &&
+          env.ASSISTANT_LLM_MODEL
+            ? createLlmPlanner({
+                baseUrl: env.ASSISTANT_LLM_BASE_URL,
+                apiKey: env.ASSISTANT_LLM_API_KEY,
+                model: env.ASSISTANT_LLM_MODEL,
+                timeoutMs: env.ASSISTANT_LLM_TIMEOUT_MS,
+              })
+            : null,
+      })
+    : null;
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
@@ -130,6 +161,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/cloudflare", createCloudflareRouter(cloudflareClient));
   app.use("/api/nas", createNasRouter(nasClient));
   app.use("/api/jellyfin", createJellyfinRouter(jellyfinClient));
+  app.use("/api/assistant", createAssistantRouter(assistantService));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger, env.NODE_ENV === "production"));

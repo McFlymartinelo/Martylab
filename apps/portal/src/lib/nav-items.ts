@@ -1,5 +1,6 @@
 import {
   Blocks,
+  Bot,
   History,
   LayoutDashboard,
   Puzzle,
@@ -36,6 +37,16 @@ export const navItems: NavItem[] = [
     icon: LayoutDashboard,
     status: "ready",
     description: "Vue d'ensemble de ton laboratoire personnel.",
+    mobilePrimary: true,
+  },
+  {
+    id: "assistant",
+    label: "Assistant",
+    to: "/assistant",
+    icon: Bot,
+    status: "ready",
+    description:
+      "Conversation avec l'assistant Martylab et accès aux outils des plugins.",
     mobilePrimary: true,
   },
   {
@@ -108,7 +119,6 @@ export const navItems: NavItem[] = [
     icon: Settings,
     status: "soon",
     description: "Préférences du portail et configuration générale.",
-    mobilePrimary: true,
   },
   {
     id: "matchday",

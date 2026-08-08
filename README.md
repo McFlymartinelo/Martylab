@@ -140,6 +140,7 @@ npm run db:seed        # Comptes initiaux
 - [docs/orion-connector.md](./docs/orion-connector.md) — connecteur Orion
 - [docs/matchday-connector.md](./docs/matchday-connector.md) — connecteur Matchday
 - [docs/jellyfin-connector.md](./docs/jellyfin-connector.md) — connecteur Jellyfin
+- [docs/assistant.md](./docs/assistant.md) — Assistant Martylab et outils
 - [docs/infrastructure-connectors.md](./docs/infrastructure-connectors.md) — Portainer, Cloudflare, NAS
 - [docs/production-security.md](./docs/production-security.md) — sécurisation production
 
@@ -176,6 +177,13 @@ npm run db:seed        # Comptes initiaux
 | `GET /api/jellyfin/summary` | session | Résumé média (dashboard) |
 | `GET /api/jellyfin/page` | session | Page Jellyfin (bibliothèques, médias, sessions) |
 | `GET /api/jellyfin/items/:id/image` | session | Affiche Jellyfin (proxy) |
+| `GET /api/assistant/tools` | session | Outils assistant disponibles |
+| `GET /api/assistant/conversations` | session | Conversations assistant |
+| `POST /api/assistant/conversations` | session | Nouvelle conversation |
+| `GET /api/assistant/conversations/:id` | session | Messages d'une conversation |
+| `POST /api/assistant/conversations/:id/messages` | session | Envoyer un message |
+| `POST /api/assistant/confirmations/:id/approve` | user+ | Confirmer une action sensible |
+| `GET /api/assistant/actions` | session | Journal des actions assistant |
 | `GET /api/portainer/status` | session | État Portainer |
 | `GET /api/portainer/overview` | session | Conteneurs, images, volumes (Portainer) |
 | `POST /api/portainer/containers/:id/start\|stop\|restart` | user+ | Actions conteneur via Portainer |
