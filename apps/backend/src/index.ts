@@ -2,10 +2,12 @@ import { loadEnv } from "./config/env.js";
 import { createApp } from "./app.js";
 import { createDatabase } from "./db/client.js";
 import { createLogger } from "./lib/logger.js";
+import { bootstrapPlugins } from "./plugins/bootstrap.js";
 
 const env = loadEnv();
 const logger = createLogger(env);
 const database = createDatabase(env, logger);
+bootstrapPlugins();
 const app = createApp(env, logger, database);
 
 const server = app.listen(env.PORT, env.HOST, () => {

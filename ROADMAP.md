@@ -13,22 +13,22 @@ Objectif : construire le socle technique de Martylab.
 
 ## Dépôt et architecture
 
-- [ ] Mettre en place le monorepo
-- [ ] Organiser `apps/`
-- [ ] Organiser `packages/`
-- [ ] Organiser `plugins/`
-- [ ] Mettre en place la documentation
-- [ ] Définir les conventions de développement
+- [x] Mettre en place le monorepo
+- [x] Organiser `apps/`
+- [x] Organiser `packages/`
+- [ ] Organiser `plugins/` (manifests déclaratifs ; registre in-memory pour l'instant)
+- [x] Mettre en place la documentation
+- [x] Définir les conventions de développement
 
 ## Frontend
 
-- [ ] Initialiser le portail React
-- [ ] Configurer TypeScript
-- [ ] Configurer Vite
-- [ ] Configurer Tailwind CSS
-- [ ] Configurer shadcn/ui
-- [ ] Mettre en place React Router
-- [ ] Mettre en place TanStack Query
+- [x] Initialiser le portail React
+- [x] Configurer TypeScript
+- [x] Configurer Vite
+- [x] Configurer Tailwind CSS
+- [x] Configurer shadcn/ui
+- [x] Mettre en place React Router
+- [x] Mettre en place TanStack Query
 - [x] Créer le système de navigation
 - [x] Créer le thème sombre
 - [x] Créer le Design System Martylab
@@ -36,45 +36,45 @@ Objectif : construire le socle technique de Martylab.
 
 ## Backend
 
-- [ ] Initialiser le backend Node.js
-- [ ] Configurer Express
-- [ ] Configurer TypeScript
-- [ ] Créer l'API de base
-- [ ] Mettre en place la gestion des erreurs
-- [ ] Mettre en place les logs
-- [ ] Créer le système de configuration
+- [x] Initialiser le backend Node.js
+- [x] Configurer Express
+- [x] Configurer TypeScript
+- [x] Créer l'API de base
+- [x] Mettre en place la gestion des erreurs
+- [x] Mettre en place les logs
+- [x] Créer le système de configuration
 
 ## Base de données
 
-- [ ] Ajouter PostgreSQL
-- [ ] Configurer la connexion
-- [ ] Mettre en place les migrations
-- [ ] Créer les premiers modèles
+- [x] Ajouter PostgreSQL
+- [x] Configurer la connexion
+- [x] Mettre en place les migrations
+- [x] Créer les premiers modèles
 - [ ] Créer le système de sauvegarde
 
 ## Docker
 
-- [ ] Créer `compose.yaml`
-- [ ] Conteneuriser le frontend
-- [ ] Conteneuriser le backend
-- [ ] Ajouter PostgreSQL
-- [ ] Ajouter les healthchecks
-- [ ] Configurer les volumes persistants
-- [ ] Préparer la configuration de production
+- [x] Créer `compose.yaml`
+- [x] Conteneuriser le frontend
+- [x] Conteneuriser le backend
+- [x] Ajouter PostgreSQL
+- [x] Ajouter les healthchecks
+- [x] Configurer les volumes persistants
+- [x] Préparer la configuration de production
 
 ## Authentification
 
-- [ ] Créer la connexion
-- [ ] Créer la déconnexion
-- [ ] Gérer les sessions
-- [ ] Créer le rôle administrateur
-- [ ] Créer le rôle utilisateur
-- [ ] Créer le rôle invité
-- [ ] Ajouter Alexandre
-- [ ] Ajouter Invité
-- [ ] Permettre la création de nouveaux utilisateurs
-- [ ] Protéger les routes
-- [ ] Ajouter la gestion des permissions
+- [x] Créer la connexion
+- [x] Créer la déconnexion
+- [x] Gérer les sessions
+- [x] Créer le rôle administrateur
+- [x] Créer le rôle utilisateur
+- [x] Créer le rôle invité
+- [x] Ajouter Alexandre
+- [x] Ajouter Invité
+- [x] Permettre la création de nouveaux utilisateurs
+- [x] Protéger les routes
+- [ ] Ajouter la gestion des permissions (rôles différenciés côté API)
 
 ---
 
@@ -84,9 +84,9 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 
 ## Docker
 
-- [ ] Connecteur Docker
-- [ ] Liste des conteneurs
-- [ ] État des conteneurs
+- [x] Connecteur Docker (lecture via socket Unix)
+- [x] Liste des conteneurs
+- [x] État des conteneurs
 - [ ] Redémarrage d'un conteneur
 - [ ] Arrêt d'un conteneur
 - [ ] Démarrage d'un conteneur
@@ -103,12 +103,12 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 
 ## Serveur
 
-- [ ] Utilisation CPU
-- [ ] Utilisation RAM
-- [ ] Utilisation disque
-- [ ] Température
-- [ ] Uptime
-- [ ] État général du serveur
+- [x] Utilisation CPU
+- [x] Utilisation RAM
+- [x] Utilisation disque
+- [x] Température (si capteur disponible sur l'hôte)
+- [x] Uptime
+- [x] État général du serveur
 
 ## NAS
 

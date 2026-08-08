@@ -67,3 +67,14 @@ export function apiPost<T>(path: string, body?: unknown): Promise<T> {
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
+
+export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: "PATCH",
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+}
+
+export function apiDelete(path: string): Promise<void> {
+  return request<void>(path, { method: "DELETE" });
+}

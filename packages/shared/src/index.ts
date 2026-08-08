@@ -59,3 +59,56 @@ export interface AuthResponse {
   user: SessionUser;
 }
 
+export interface UsersResponse {
+  users: User[];
+}
+
+export interface CreateUserRequest {
+  username: string;
+  displayName: string;
+  password: string;
+  role: UserRole;
+}
+
+export interface UpdateUserRequest {
+  displayName?: string;
+  password?: string;
+  role?: UserRole;
+}
+
+export interface SystemMetricsResponse {
+  source: "host" | "container";
+  timestamp: string;
+  cpu: {
+    usagePercent: number;
+    cores: number;
+    history: number[];
+  };
+  memory: {
+    usedBytes: number;
+    totalBytes: number;
+    usagePercent: number;
+  };
+  storage: {
+    usedBytes: number;
+    totalBytes: number;
+    usagePercent: number;
+    path: string;
+  };
+  uptimeSeconds: number;
+  temperatureCelsius: number | null;
+}
+
+export interface DockerContainerSummary {
+  id: string;
+  name: string;
+  image: string;
+  state: string;
+  status: string;
+}
+
+export interface DockerContainersResponse {
+  available: boolean;
+  containers: DockerContainerSummary[];
+}
+

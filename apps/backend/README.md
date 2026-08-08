@@ -20,6 +20,12 @@ npm run db:seed -w @martylab/backend
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
 - `GET /api/plugins` (authenticated)
+- `GET /api/users` (admin)
+- `POST /api/users` (admin)
+- `PATCH /api/users/:userId` (admin)
+- `DELETE /api/users/:userId` (admin)
+- `GET /api/system/metrics` (authenticated)
+- `GET /api/docker/containers` (authenticated)
 
 ## Database (local Windows dev)
 

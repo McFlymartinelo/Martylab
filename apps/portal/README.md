@@ -19,6 +19,8 @@ Portail web Martylab.
 - `/login` — Connexion (session cookie HttpOnly)
 - `/` — Dashboard (authentifié)
 - `/apps` — Registre des plugins (authentifié)
+- `/system` — Métriques serveur et conteneurs Docker (authentifié)
+- `/users` — Gestion des utilisateurs (admin)
 
 ## Scripts
 

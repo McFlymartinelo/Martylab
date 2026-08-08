@@ -39,6 +39,10 @@ const envSchema = z.object({
   SESSION_COOKIE_NAME: z.string().min(1).default("martylab_session"),
   SESSION_TTL_DAYS: z.coerce.number().int().positive().default(7),
   COOKIE_SECURE: booleanFromEnv,
+  HOST_PROC_PREFIX: z.string().optional(),
+  HOST_SYS_PREFIX: z.string().optional(),
+  HOST_ROOT_PATH: z.string().optional(),
+  DOCKER_SOCKET_PATH: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -62,15 +62,13 @@ export function requireRole(...roles: UserRole[]) {
   };
 }
 
-export function requireDatabaseConfigured(
-  sessionService: SessionService | null,
-) {
+export function requireDatabaseConfigured(service: unknown | null) {
   return function databaseMiddleware(
     _req: Request,
     _res: Response,
     next: NextFunction,
   ): void {
-    if (!sessionService) {
+    if (!service) {
       next(
         new AppError(
           503,

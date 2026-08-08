@@ -337,3 +337,47 @@ sparklines) pour le panneau "Système" du tableau de bord.
 - Le composant `SystemPanel` (qui embarque `recharts`) est chargé en lazy
   loading (`React.lazy`) pour ne pas alourdir le chargement initial du
   tableau de bord.
+
+---
+
+# ADR-016 — Connecteurs serveur et Docker (v0.2)
+
+**Statut : Acceptée**
+
+## Décision
+
+Martylab expose deux connecteurs d'infrastructure intégrés au backend :
+
+1. **Connecteur serveur** — `GET /api/system/metrics` lit CPU, RAM, disque,
+   uptime et température (si capteur disponible) via `/proc` et `/sys`.
+2. **Connecteur Docker** — `GET /api/docker/containers` interroge l'API
+   Engine via un socket Unix (`DOCKER_SOCKET_PATH`).
+
+En production Debian, le `compose.yaml` monte `/proc`, `/sys`, `/` (lecture
+seule) et `/var/run/docker.sock` dans le conteneur backend, avec
+`group_add` pour l'accès au socket Docker.
+
+Sans ces montages, le backend remonte les métriques du **conteneur** lui-même
+(comportement honnête, sans données inventées).
+
+## Raisons
+
+- Permet d'alimenter le dashboard et la page Système avec de vraies métriques.
+- Préserve l'indépendance des applications : pas d'accès direct à leurs bases.
+- Le socket Docker en lecture seule est un compromis courant pour la supervision.
+
+## Alternatives considérées
+
+- Agent séparé sur l'hôte : plus propre mais plus complexe pour v0.2.
+- Bibliothèque `dockerode` : rejetée, l'API HTTP native via socket Unix suffit
+  pour la lecture.
+- `systeminformation` npm : rejetée, lecture directe de `/proc` plus légère et
+  prévisible.
+
+## Conséquences
+
+- Variables d'environnement : `HOST_PROC_PREFIX`, `HOST_SYS_PREFIX`,
+  `HOST_ROOT_PATH`, `DOCKER_SOCKET_PATH`, `DOCKER_GID`.
+- Plugins Orion et Matchday enregistrés comme stubs (`enabled: false`) au
+  démarrage du backend.
+- Actions Docker (start/stop/restart/logs) restent hors scope pour l'instant.

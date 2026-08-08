@@ -43,6 +43,17 @@ services:
       SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-martylab_session}
       SESSION_TTL_DAYS: ${SESSION_TTL_DAYS:-7}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      HOST_PROC_PREFIX: /host/proc
+      HOST_SYS_PREFIX: /host/sys
+      HOST_ROOT_PATH: /host/root
+      DOCKER_SOCKET_PATH: /var/run/docker.sock
+    group_add:
+      - "${DOCKER_GID:-999}"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       postgres:
         condition: service_healthy

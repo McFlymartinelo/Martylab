@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useHealthQuery } from "@/features/health/use-health-query";
 import { usePluginsQuery } from "@/features/plugins/use-plugins-query";
+import { useSystemMetricsQuery } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import {
 } from "@/components/ui/card";
 import { AppIcon } from "@/components/dashboard/app-icon";
 import { MetricCard } from "@/components/dashboard/metric-card";
+import { formatBytes, formatPercent } from "@/lib/format";
 
 const SystemPanel = lazy(() =>
   import("@/components/dashboard/system-panel").then((module) => ({
@@ -44,9 +46,11 @@ function databaseLabel(status: string | undefined) {
 export function DashboardPage() {
   const healthQuery = useHealthQuery();
   const pluginsQuery = usePluginsQuery();
+  const metricsQuery = useSystemMetricsQuery();
 
   const isHealthy = healthQuery.data?.status === "ok";
   const apps = pluginsQuery.data?.plugins.slice(0, 6) ?? [];
+  const metrics = metricsQuery.data;
 
   return (
     <div className="space-y-6">
@@ -87,17 +91,50 @@ export function DashboardPage() {
           <MetricCard
             label="CPU"
             icon={Cpu}
-            caption="Connecteur serveur non configuré"
+            value={
+              metricsQuery.isLoading
+                ? "Chargement…"
+                : metrics
+                  ? formatPercent(metrics.cpu.usagePercent)
+                  : undefined
+            }
+            caption={
+              metrics
+                ? `${metrics.cpu.cores} cœurs · source ${metrics.source === "host" ? "hôte" : "conteneur"}`
+                : "Métriques indisponibles"
+            }
           />
           <MetricCard
             label="RAM"
             icon={Gauge}
-            caption="Connecteur serveur non configuré"
+            value={
+              metricsQuery.isLoading
+                ? "Chargement…"
+                : metrics
+                  ? formatPercent(metrics.memory.usagePercent)
+                  : undefined
+            }
+            caption={
+              metrics
+                ? `${formatBytes(metrics.memory.usedBytes)} / ${formatBytes(metrics.memory.totalBytes)}`
+                : "Métriques indisponibles"
+            }
           />
           <MetricCard
             label="Stockage"
             icon={HardDrive}
-            caption="Connecteur serveur non configuré"
+            value={
+              metricsQuery.isLoading
+                ? "Chargement…"
+                : metrics
+                  ? formatPercent(metrics.storage.usagePercent)
+                  : undefined
+            }
+            caption={
+              metrics
+                ? `${formatBytes(metrics.storage.usedBytes)} / ${formatBytes(metrics.storage.totalBytes)}`
+                : "Métriques indisponibles"
+            }
           />
         </div>
       </section>

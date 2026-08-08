@@ -47,9 +47,9 @@ export const navItems: NavItem[] = [
     label: "Système",
     to: "/system",
     icon: Server,
-    status: "soon",
+    status: "ready",
     description:
-      "Supervision CPU, RAM, disque et température du serveur. Nécessite le connecteur serveur.",
+      "Supervision CPU, RAM, disque, uptime et conteneurs Docker.",
     mobilePrimary: true,
   },
   {
@@ -66,7 +66,7 @@ export const navItems: NavItem[] = [
     label: "Utilisateurs",
     to: "/users",
     icon: Users,
-    status: "soon",
+    status: "ready",
     description:
       "Gestion des comptes et des rôles (admin, utilisateur, invité).",
   },
