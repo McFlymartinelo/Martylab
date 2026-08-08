@@ -42,3 +42,8 @@ export interface PluginManifest {
   capabilities: PluginCapability[];
   enabled: boolean;
 }
+
+export interface PluginsResponse {
+  plugins: PluginManifest[];
+}
+

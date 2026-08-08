@@ -9,8 +9,16 @@ Portail web Martylab.
 - Vite
 - Tailwind CSS v4
 - shadcn/ui (style `base-nova`, primitives Base UI)
+- React Router
+- TanStack Query
 - Lucide React
 - Dark mode via classe `.dark`
+
+## Routes
+
+- `/` — Dashboard
+- `/apps` — Registre des plugins
+- `/login` — Fondation UI de connexion (auth backend à venir)
 
 ## Scripts
 
