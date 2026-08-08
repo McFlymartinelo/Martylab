@@ -9,7 +9,12 @@ try {
   const logger = createLogger(env);
   const database = createDatabase(env, logger);
   await bootstrapPlugins(env);
-  const app = createApp(env, logger, database);
+  const { app, startBackgroundJobs, stopBackgroundJobs } = createApp(
+    env,
+    logger,
+    database,
+  );
+  startBackgroundJobs();
 
   const server = app.listen(env.PORT, env.HOST, () => {
     logger.info(
@@ -22,6 +27,9 @@ try {
         orionConfigured: Boolean(env.ORION_URL),
         matchdayConfigured: Boolean(env.MATCHDAY_URL && env.MATCHDAY_GROUP_ID),
         jellyfinConfigured: Boolean(env.JELLYFIN_URL && env.JELLYFIN_API_KEY),
+        pushConfigured: Boolean(
+          env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT,
+        ),
       },
       "Martylab backend listening",
     );
@@ -29,6 +37,7 @@ try {
 
   async function shutdown(signal: string) {
     logger.info({ signal }, "Shutting down backend");
+    stopBackgroundJobs();
 
     await new Promise<void>((resolve, reject) => {
       server.close((error) => {

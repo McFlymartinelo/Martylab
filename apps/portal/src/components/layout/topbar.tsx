@@ -13,7 +13,7 @@ export function Topbar() {
   const user = authQuery.data?.user;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur">
+    <header className="pt-safe sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-lg font-semibold tracking-tight">
@@ -31,6 +31,10 @@ export function Topbar() {
           <NotificationsMenu />
           <ThemeToggle />
         </div>
+      </div>
+
+      <div className="border-t border-border/60 px-4 pb-3 md:hidden">
+        <QuickSearch />
       </div>
     </header>
   );

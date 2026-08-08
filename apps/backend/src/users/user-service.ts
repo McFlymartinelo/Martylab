@@ -46,6 +46,22 @@ export function createUserService(db: NonNullable<Database>) {
       return rows.map(toUser);
     },
 
+    async findUserProfile(
+      userId: string,
+    ): Promise<{ id: string; username: string; displayName: string } | null> {
+      const [row] = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          displayName: users.displayName,
+        })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      return row ?? null;
+    },
+
     async createUser(input: {
       username: string;
       displayName: string;

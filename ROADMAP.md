@@ -236,13 +236,13 @@ Objectif : créer le véritable assistant de Martylab.
 
 Objectif : rendre Martylab parfaitement utilisable sur mobile.
 
-- [ ] Responsive complet
-- [ ] Navigation mobile
-- [ ] PWA
-- [ ] Installation sur smartphone
-- [ ] Notifications push
-- [ ] Optimisation des performances
-- [ ] Interface tactile
+- [x] Responsive complet
+- [x] Navigation mobile
+- [x] PWA
+- [x] Installation sur smartphone
+- [x] Notifications push
+- [x] Optimisation des performances
+- [x] Interface tactile
 
 ---
 

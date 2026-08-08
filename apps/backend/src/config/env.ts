@@ -143,6 +143,14 @@ const envSchema = z.object({
   ASSISTANT_LLM_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   ASSISTANT_LLM_MODEL: z.preprocess(trimEnvString, z.string().optional()),
   ASSISTANT_LLM_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  VAPID_PUBLIC_KEY: z.preprocess(trimEnvString, z.string().optional()),
+  VAPID_PRIVATE_KEY: z.preprocess(trimEnvString, z.string().optional()),
+  VAPID_SUBJECT: z.preprocess(trimEnvString, z.string().optional()),
+  PUSH_NOTIFICATION_INTERVAL_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(300_000),
 });
 
 export type Env = z.infer<typeof envSchema>;

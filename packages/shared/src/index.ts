@@ -136,6 +136,12 @@ export type {
   AssistantToolsResponse,
 } from "./assistant.js";
 export type {
+  PushPublicKeyResponse,
+  PushStatusResponse,
+  PushSubscribeRequest,
+  PushSubscribeResponse,
+} from "./push.js";
+export type {
   JellyfinLibrary,
   JellyfinMediaItem,
   JellyfinPageResponse,

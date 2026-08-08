@@ -117,8 +117,8 @@ export const navItems: NavItem[] = [
     label: "Paramètres",
     to: "/settings",
     icon: Settings,
-    status: "soon",
-    description: "Préférences du portail et configuration générale.",
+    status: "ready",
+    description: "Préférences du portail, PWA et notifications push.",
   },
   {
     id: "matchday",

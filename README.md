@@ -141,6 +141,7 @@ npm run db:seed        # Comptes initiaux
 - [docs/matchday-connector.md](./docs/matchday-connector.md) — connecteur Matchday
 - [docs/jellyfin-connector.md](./docs/jellyfin-connector.md) — connecteur Jellyfin
 - [docs/assistant.md](./docs/assistant.md) — Assistant Martylab et outils
+- [docs/mobile-pwa.md](./docs/mobile-pwa.md) — PWA, installation mobile et notifications push
 - [docs/infrastructure-connectors.md](./docs/infrastructure-connectors.md) — Portainer, Cloudflare, NAS
 - [docs/production-security.md](./docs/production-security.md) — sécurisation production
 

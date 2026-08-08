@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Bot, Loader2, Plus, Send, Trash2 } from "lucide-react";
+import { Bot, List, Loader2, Plus, Send, Trash2 } from "lucide-react";
 import type { AssistantMessage } from "@martylab/shared";
 import {
   useAssistantConfirmationMutation,
@@ -154,6 +154,7 @@ export function AssistantPage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(
     null,
   );
+  const [showConversations, setShowConversations] = useState(false);
 
   useEffect(() => {
     if (!activeConversationId && conversationsQuery.data?.conversations[0]) {
@@ -176,7 +177,12 @@ export function AssistantPage() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <Card className="h-fit">
+        <Card
+          className={cn(
+            "h-fit lg:block",
+            showConversations ? "block" : "hidden",
+          )}
+        >
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Conversations</CardTitle>
             <CardDescription>Historique persistant par utilisateur.</CardDescription>
@@ -209,7 +215,10 @@ export function AssistantPage() {
                       }
                       size="sm"
                       className="min-w-0 flex-1 justify-start"
-                      onClick={() => setActiveConversationId(conversation.id)}
+                      onClick={() => {
+                        setActiveConversationId(conversation.id);
+                        setShowConversations(false);
+                      }}
                     >
                       <span className="truncate">{conversation.title}</span>
                     </Button>
@@ -237,12 +246,23 @@ export function AssistantPage() {
           </CardContent>
         </Card>
 
-        <Card className="min-h-[70vh]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Bot className="size-4" />
-              Conversation
-            </CardTitle>
+        <Card className="min-h-[60vh] lg:min-h-[70vh]">
+          <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Bot className="size-4" />
+                Conversation
+              </CardTitle>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="lg:hidden"
+              onClick={() => setShowConversations((value) => !value)}
+            >
+              <List className="size-4" />
+              Conversations
+            </Button>
           </CardHeader>
           <CardContent>
             {activeConversationId ? (

@@ -42,6 +42,9 @@ import { createAssistantRepository } from "./assistant/assistant-repository.js";
 import { createAssistantService } from "./assistant/assistant-service.js";
 import { createAssistantToolRegistry } from "./assistant/tools/create-registry.js";
 import { createLlmPlanner } from "./assistant/llm-planner.js";
+import { createPushService } from "./push/push-service.js";
+import { createPushNotificationWorker } from "./push/push-notification-worker.js";
+import { createPushRouter } from "./routes/push.js";
 
 type DatabaseHandle = ReturnType<typeof createDatabase>;
 
@@ -125,6 +128,25 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
             : null,
       })
     : null;
+  const pushService = database.db
+    ? createPushService(database.db, {
+        publicKey: env.VAPID_PUBLIC_KEY,
+        privateKey: env.VAPID_PRIVATE_KEY,
+        subject: env.VAPID_SUBJECT ?? "mailto:admin@martylab.fr",
+      })
+    : null;
+  const pushWorker =
+    database.db && pushService && userService
+      ? createPushNotificationWorker({
+          db: database.db,
+          pushService,
+          orionClient,
+          matchdayClient,
+          lookupUser: (userId) => userService.findUserProfile(userId),
+          logger,
+          intervalMs: env.PUSH_NOTIFICATION_INTERVAL_MS,
+        })
+      : null;
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
@@ -162,9 +184,18 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/nas", createNasRouter(nasClient));
   app.use("/api/jellyfin", createJellyfinRouter(jellyfinClient));
   app.use("/api/assistant", createAssistantRouter(assistantService));
+  app.use("/api/push", createPushRouter(pushService));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger, env.NODE_ENV === "production"));
 
-  return app;
+  return {
+    app,
+    startBackgroundJobs() {
+      pushWorker?.start();
+    },
+    stopBackgroundJobs() {
+      pushWorker?.stop();
+    },
+  };
 }
