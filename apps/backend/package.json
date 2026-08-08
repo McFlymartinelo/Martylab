@@ -4,12 +4,27 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "echo \"Backend scaffold pending (Express + TypeScript)\"",
-    "build": "echo \"Backend scaffold pending (Express + TypeScript)\"",
-    "typecheck": "echo \"Backend scaffold pending (Express + TypeScript)\"",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "echo \"No lint configured yet for @martylab/backend\""
   },
   "dependencies": {
-    "@martylab/shared": "0.1.0"
+    "@martylab/shared": "0.1.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "pino": "^9.9.0",
+    "pino-http": "^10.5.0",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.13.3",
+    "pino-pretty": "^13.1.1",
+    "tsx": "^4.20.4",
+    "typescript": "~5.9.2"
   }
 }
