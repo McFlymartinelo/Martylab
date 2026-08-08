@@ -8,13 +8,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLogoutMutation } from "@/features/auth/use-logout-mutation";
+import { useAuthQuery } from "@/features/auth/use-auth-query";
 import { navItems } from "@/lib/nav-items";
+import { canAccessNavItem } from "@/lib/nav-access";
 import { cn } from "@/lib/utils";
 
 export function MobileNav() {
   const logoutMutation = useLogoutMutation();
-  const primaryItems = navItems.filter((item) => item.mobilePrimary);
-  const secondaryItems = navItems.filter((item) => !item.mobilePrimary);
+  const authQuery = useAuthQuery();
+  const role = authQuery.data?.user?.role;
+  const visibleNavItems = navItems.filter((item) => canAccessNavItem(role, item));
+  const primaryItems = visibleNavItems.filter((item) => item.mobilePrimary);
+  const secondaryItems = visibleNavItems.filter((item) => !item.mobilePrimary);
 
   return (
     <nav

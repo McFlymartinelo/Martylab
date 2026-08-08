@@ -14,6 +14,7 @@ RUN npm ci
 
 COPY packages/shared ./packages/shared
 COPY apps/backend ./apps/backend
+COPY plugins ./plugins
 
 RUN npm run build -w @martylab/shared \
   && npm run build -w @martylab/backend \
@@ -34,6 +35,7 @@ COPY --from=build /app/packages/shared ./packages/shared
 COPY --from=build /app/apps/backend/package.json ./apps/backend/package.json
 COPY --from=build /app/apps/backend/dist ./apps/backend/dist
 COPY --from=build /app/apps/backend/drizzle ./apps/backend/drizzle
+COPY --from=build /app/plugins ./plugins
 COPY docker/backend/docker-entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \

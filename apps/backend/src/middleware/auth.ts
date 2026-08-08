@@ -3,6 +3,7 @@ import type { UserRole } from "@martylab/shared";
 import type { Env } from "../config/env.js";
 import type { SessionService } from "../auth/session-service.js";
 import { AppError } from "../lib/errors.js";
+import { hasMinRole } from "../lib/permissions.js";
 
 export function createSessionMiddleware(
   env: Env,
@@ -54,6 +55,27 @@ export function requireRole(...roles: UserRole[]) {
     }
 
     if (!roles.includes(req.user.role)) {
+      next(new AppError(403, "forbidden", "Insufficient permissions."));
+      return;
+    }
+
+    next();
+  };
+}
+
+/** Requires at least the given role (admin > user > guest). */
+export function requireMinRole(minRole: UserRole) {
+  return function minRoleMiddleware(
+    req: Request,
+    _res: Response,
+    next: NextFunction,
+  ): void {
+    if (!req.user) {
+      next(new AppError(401, "unauthenticated", "Authentication required."));
+      return;
+    }
+
+    if (!hasMinRole(req.user.role, minRole)) {
       next(new AppError(403, "forbidden", "Insufficient permissions."));
       return;
     }

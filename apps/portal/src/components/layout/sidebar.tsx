@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { navItems } from "@/lib/nav-items";
+import { canAccessNavItem } from "@/lib/nav-access";
 import { cn } from "@/lib/utils";
 
 function initials(name: string) {
@@ -28,6 +29,9 @@ export function Sidebar() {
   const authQuery = useAuthQuery();
   const logoutMutation = useLogoutMutation();
   const user = authQuery.data?.user;
+  const visibleNavItems = navItems.filter((item) =>
+    canAccessNavItem(user?.role, item),
+  );
 
   return (
     <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
@@ -42,7 +46,7 @@ export function Sidebar() {
         aria-label="Navigation principale"
         className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2"
       >
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavLink
             key={item.id}
             to={item.to}

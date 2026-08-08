@@ -1,0 +1,7 @@
+{
+  "id": "matchday",
+  "name": "Matchday",
+  "version": "0.0.0",
+  "capabilities": ["dashboard", "notifications"],
+  "enabled": false
+}

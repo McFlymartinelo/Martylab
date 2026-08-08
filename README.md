@@ -136,6 +136,7 @@ npm run db:seed        # Comptes initiaux
 - [DECISIONS.md](./DECISIONS.md) — décisions d'architecture (ADR)
 - [AGENTS.md](./AGENTS.md) — règles de développement
 - [docs/cloudflare-tunnel.md](./docs/cloudflare-tunnel.md) — tunnel Cloudflare
+- [docs/backup-postgres.md](./docs/backup-postgres.md) — sauvegarde PostgreSQL
 
 ## API (v0.1 / v0.2)
 

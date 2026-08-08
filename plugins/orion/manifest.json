@@ -1,0 +1,7 @@
+{
+  "id": "orion",
+  "name": "Orion",
+  "version": "0.0.0",
+  "capabilities": ["dashboard", "health", "actions"],
+  "enabled": false
+}

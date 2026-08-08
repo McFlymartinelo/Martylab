@@ -9,6 +9,7 @@ import {
   Workflow,
   type LucideIcon,
 } from "lucide-react";
+import type { UserRole } from "@martylab/shared";
 
 export interface NavItem {
   id: string;
@@ -21,6 +22,8 @@ export interface NavItem {
   description: string;
   /** Included in the condensed mobile bottom bar. */
   mobilePrimary?: boolean;
+  /** Minimum role required to see this entry. */
+  minRole?: UserRole;
 }
 
 export const navItems: NavItem[] = [
@@ -67,6 +70,7 @@ export const navItems: NavItem[] = [
     to: "/users",
     icon: Users,
     status: "ready",
+    minRole: "admin",
     description:
       "Gestion des comptes et des rôles (admin, utilisateur, invité).",
   },

@@ -16,7 +16,7 @@ Objectif : construire le socle technique de Martylab.
 - [x] Mettre en place le monorepo
 - [x] Organiser `apps/`
 - [x] Organiser `packages/`
-- [ ] Organiser `plugins/` (manifests déclaratifs ; registre in-memory pour l'instant)
+- [x] Organiser `plugins/` (manifests déclaratifs ; registre in-memory pour l'instant)
 - [x] Mettre en place la documentation
 - [x] Définir les conventions de développement
 
@@ -50,7 +50,7 @@ Objectif : construire le socle technique de Martylab.
 - [x] Configurer la connexion
 - [x] Mettre en place les migrations
 - [x] Créer les premiers modèles
-- [ ] Créer le système de sauvegarde
+- [x] Créer le système de sauvegarde
 
 ## Docker
 
@@ -74,7 +74,7 @@ Objectif : construire le socle technique de Martylab.
 - [x] Ajouter Invité
 - [x] Permettre la création de nouveaux utilisateurs
 - [x] Protéger les routes
-- [ ] Ajouter la gestion des permissions (rôles différenciés côté API)
+- [x] Ajouter la gestion des permissions (rôles différenciés côté API)
 
 ---
 

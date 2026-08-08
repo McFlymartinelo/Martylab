@@ -1,25 +1,10 @@
-import type { PluginManifest } from "@martylab/shared";
 import { registerPlugin } from "./registry.js";
+import { loadPluginManifests } from "./load-manifests.js";
 
-const builtinPlugins: PluginManifest[] = [
-  {
-    id: "orion",
-    name: "Orion",
-    version: "0.0.0",
-    capabilities: ["dashboard", "health", "actions"],
-    enabled: false,
-  },
-  {
-    id: "matchday",
-    name: "Matchday",
-    version: "0.0.0",
-    capabilities: ["dashboard", "notifications"],
-    enabled: false,
-  },
-];
+export async function bootstrapPlugins(): Promise<void> {
+  const manifests = await loadPluginManifests();
 
-export function bootstrapPlugins(): void {
-  for (const plugin of builtinPlugins) {
+  for (const plugin of manifests) {
     registerPlugin(plugin);
   }
 }
