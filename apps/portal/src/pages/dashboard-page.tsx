@@ -99,6 +99,11 @@ export function DashboardPage() {
         ) : null}
       </section>
 
+      <AssistantPanel />
+
+      <MatchdayPanel />
+      <JellyfinPanel />
+
       <Card>
         <CardHeader>
           <CardTitle>Activité récente</CardTitle>
@@ -114,12 +119,8 @@ export function DashboardPage() {
         </CardContent>
       </Card>
 
-      <AssistantPanel />
-
       <HomePanel />
       <HomeLightsPanel />
-      <MatchdayPanel />
-      <JellyfinPanel />
     </div>
   );
 }

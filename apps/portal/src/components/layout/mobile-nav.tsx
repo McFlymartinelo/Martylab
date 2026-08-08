@@ -42,7 +42,9 @@ export function MobileNav() {
             }
           >
             <item.icon className="size-5" aria-hidden="true" />
-            <span className="truncate px-1">{item.label}</span>
+            <span className="max-w-full truncate px-0.5">
+              {item.id === "dashboard" ? "Accueil" : item.label}
+            </span>
           </NavLink>
         ))}
 

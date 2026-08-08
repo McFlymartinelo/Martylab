@@ -56,7 +56,6 @@ export const navItems: NavItem[] = [
     icon: Blocks,
     status: "ready",
     description: "Registre des plugins Martylab connectés à tes applications.",
-    mobilePrimary: true,
   },
   {
     id: "system",
@@ -66,6 +65,25 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Supervision CPU, RAM, disque, uptime et conteneurs Docker.",
+  },
+  {
+    id: "matchday",
+    label: "Matchday",
+    to: "/matchday",
+    icon: Trophy,
+    status: "ready",
+    description:
+      "Matchs du jour, classement, pronostics et messages du groupe.",
+    mobilePrimary: true,
+  },
+  {
+    id: "jellyfin",
+    label: "Jellyfin",
+    to: "/jellyfin",
+    icon: Tv,
+    status: "ready",
+    description:
+      "Bibliothèques, lecture en cours, films, séries et statut du serveur.",
     mobilePrimary: true,
   },
   {
@@ -78,16 +96,6 @@ export const navItems: NavItem[] = [
       "Gestion des conteneurs Docker (démarrage, arrêt, logs) via le connecteur Docker.",
   },
   {
-    id: "users",
-    label: "Utilisateurs",
-    to: "/users",
-    icon: Users,
-    status: "ready",
-    minRole: "admin",
-    description:
-      "Gestion des comptes et des rôles (admin, utilisateur, invité).",
-  },
-  {
     id: "plugins",
     label: "Plugins",
     to: "/plugins",
@@ -98,7 +106,7 @@ export const navItems: NavItem[] = [
   },
   {
     id: "automations",
-    label: "Automations",
+    label: "Automatisations",
     to: "/automations",
     icon: Workflow,
     status: "soon",
@@ -121,21 +129,13 @@ export const navItems: NavItem[] = [
     description: "Préférences du portail, PWA et notifications push.",
   },
   {
-    id: "matchday",
-    label: "Matchday",
-    to: "/matchday",
-    icon: Trophy,
+    id: "users",
+    label: "Utilisateurs",
+    to: "/users",
+    icon: Users,
     status: "ready",
+    minRole: "admin",
     description:
-      "Matchs du jour, classement, pronostics et messages du groupe.",
-  },
-  {
-    id: "jellyfin",
-    label: "Jellyfin",
-    to: "/jellyfin",
-    icon: Tv,
-    status: "ready",
-    description:
-      "Bibliothèques, lecture en cours, films, séries et statut du serveur.",
+      "Gestion des comptes et des rôles (admin, utilisateur, invité).",
   },
 ];
