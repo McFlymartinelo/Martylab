@@ -1,5 +1,9 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { DatabaseZap, Loader2, WifiOff } from "lucide-react";
 import { useAuthQuery } from "@/features/auth/use-auth-query";
+import { ApiClientError } from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { FullPageState } from "@/components/feedback/full-page-state";
 
 export function RequireAuth() {
   const location = useLocation();
@@ -7,23 +11,43 @@ export function RequireAuth() {
 
   if (authQuery.isLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm text-muted-foreground">
-        Vérification de la session…
-      </div>
+      <FullPageState
+        icon={Loader2}
+        spin
+        title="Vérification de la session…"
+      />
     );
   }
 
   if (authQuery.isError) {
+    const error = authQuery.error;
+    const isDatabaseUnavailable =
+      error instanceof ApiClientError && error.code === "database_unavailable";
+
     return (
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Authentification indisponible
-        </h1>
-        <p className="text-muted-foreground">
-          Impossible de vérifier la session. Vérifiez que le backend et
-          PostgreSQL sont démarrés.
-        </p>
-      </div>
+      <FullPageState
+        icon={isDatabaseUnavailable ? DatabaseZap : WifiOff}
+        iconClassName="bg-destructive/10 text-destructive"
+        title={
+          isDatabaseUnavailable
+            ? "Base de données indisponible"
+            : "Backend inaccessible"
+        }
+        description={
+          isDatabaseUnavailable
+            ? "Le backend tourne mais ne peut pas joindre PostgreSQL. Vérifie DATABASE_URL et que la base est démarrée."
+            : "Impossible de joindre le backend Martylab. Vérifie qu'il est démarré."
+        }
+        action={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void authQuery.refetch()}
+          >
+            Réessayer
+          </Button>
+        }
+      />
     );
   }
 

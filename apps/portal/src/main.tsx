@@ -15,7 +15,7 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system">
+      <ThemeProvider defaultTheme="dark">
         <App />
       </ThemeProvider>
     </QueryClientProvider>

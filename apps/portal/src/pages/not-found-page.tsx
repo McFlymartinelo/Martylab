@@ -1,15 +1,19 @@
 import { Link } from "react-router-dom";
+import { Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FullPageState } from "@/components/feedback/full-page-state";
 
 export function NotFoundPage() {
   return (
-    <div className="flex min-h-[50vh] flex-col items-start justify-center gap-4">
-      <p className="text-sm font-medium text-muted-foreground">404</p>
-      <h1 className="text-3xl font-semibold tracking-tight">Page introuvable</h1>
-      <p className="max-w-md text-muted-foreground">
-        La ressource demandée n&apos;existe pas dans le portail Martylab.
-      </p>
-      <Button render={<Link to="/" />}>Retour au dashboard</Button>
-    </div>
+    <FullPageState
+      icon={Compass}
+      title="Page introuvable"
+      description="La ressource demandée n'existe pas dans le portail Martylab."
+      action={
+        <Button size="sm" render={<Link to="/" />}>
+          Retour au tableau de bord
+        </Button>
+      }
+    />
   );
 }

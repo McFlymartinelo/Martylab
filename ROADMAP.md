@@ -29,10 +29,10 @@ Objectif : construire le socle technique de Martylab.
 - [ ] Configurer shadcn/ui
 - [ ] Mettre en place React Router
 - [ ] Mettre en place TanStack Query
-- [ ] Créer le système de navigation
-- [ ] Créer le thème sombre
-- [ ] Créer le Design System Martylab
-- [ ] Créer le Dashboard
+- [x] Créer le système de navigation
+- [x] Créer le thème sombre
+- [x] Créer le Design System Martylab
+- [x] Créer le Dashboard
 
 ## Backend
 

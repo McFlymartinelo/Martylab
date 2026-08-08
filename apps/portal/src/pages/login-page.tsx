@@ -17,6 +17,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+function loginErrorMessage(error: unknown): string {
+  if (error instanceof ApiClientError) {
+    if (error.status === 401 || isUnauthorized(error)) {
+      return "Identifiants invalides.";
+    }
+    if (error.code === "database_unavailable") {
+      return "Base de données indisponible. Réessaie dans un instant.";
+    }
+    return error.message;
+  }
+  return "Connexion impossible. Vérifie que le backend est démarré.";
+}
+
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,13 +51,15 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center px-4 py-10">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Connexion</CardTitle>
+    <div className="flex min-h-svh items-center justify-center bg-background px-4 py-10">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="items-center text-center">
+          <div className="brand-gradient mb-2 flex size-12 items-center justify-center rounded-2xl text-lg font-semibold text-white">
+            M
+          </div>
+          <CardTitle className="text-xl">Martylab</CardTitle>
           <CardDescription>
-            Session sécurisée par cookie HttpOnly. Autorisation vérifiée côté
-            serveur.
+            Connecte-toi à ton laboratoire personnel.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -89,13 +104,7 @@ export function LoginPage() {
 
             {loginMutation.isError ? (
               <p className="text-sm text-destructive" role="alert">
-                {loginMutation.error instanceof ApiClientError &&
-                (loginMutation.error.status === 401 ||
-                  isUnauthorized(loginMutation.error))
-                  ? "Identifiants invalides."
-                  : loginMutation.error instanceof ApiClientError
-                    ? loginMutation.error.message
-                    : "Connexion impossible."}
+                {loginErrorMessage(loginMutation.error)}
               </p>
             ) : null}
 

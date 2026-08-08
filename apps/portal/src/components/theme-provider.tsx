@@ -31,7 +31,7 @@ function getSystemTheme(): "dark" | "light" {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "dark",
   storageKey = "martylab-ui-theme",
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(() => {

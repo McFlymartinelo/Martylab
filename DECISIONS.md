@@ -285,3 +285,55 @@ Le hostname public prévu est `https://martylab.martylab.fr`.
 - `COOKIE_SECURE=true` en production HTTPS
 - Documentation opérationnelle dans `docs/cloudflare-tunnel.md`
 - Aucun token Cloudflare dans le dépôt Git
+
+---
+
+# ADR-015 — Design System v1 (sidebar responsive, palette violette, recharts)
+
+**Statut : Acceptée**
+
+## Décision
+
+Le portail adopte une disposition à sidebar (desktop/tablette ≥ `md`) avec
+barre de navigation basse dédiée sur mobile (< `md`), plutôt qu'une simple
+barre de navigation horizontale.
+
+Une palette violette (accent `oklch(... 293)`) remplace la palette neutre,
+avec le thème sombre comme thème par défaut (`ThemeProvider`
+`defaultTheme="dark"`). Le thème clair reste disponible via le sélecteur
+existant.
+
+`recharts` est ajouté comme librairie de graphiques (jauges radiales,
+sparklines) pour le panneau "Système" du tableau de bord.
+
+## Raisons
+
+- Aligné avec la maquette de référence du produit (sidebar + palette violette
+  + navigation mobile dédiée).
+- La sidebar reste utilisable en tablette comme en desktop ; le mobile garde
+  une expérience tactile dédiée (barre basse + menu "Plus").
+- `recharts` a un bon support TypeScript et s'intègre proprement avec
+  Tailwind (couleurs via variables CSS).
+
+## Alternatives considérées
+
+- Garder la barre horizontale : rejetée, ne passe pas à l'échelle avec 9+
+  entrées de navigation prévues par la roadmap.
+- Bibliothèque de graphiques plus légère (ex: SVG fait main) : rejetée pour
+  l'instant, `recharts` couvre mieux les besoins futurs (v0.2, métriques
+  serveur) sans réécriture.
+
+## Conséquences
+
+- Toutes les entrées de navigation prévues par la roadmap (`Système`,
+  `Services`, `Utilisateurs`, `Plugins`, `Automations`, `Journal d'activité`,
+  `Paramètres`) sont visibles dans la sidebar dès maintenant, mais pointent
+  vers une page générique "Bientôt disponible" tant que la fonctionnalité
+  backend correspondante n'existe pas. Aucune donnée n'y est inventée.
+- Les métriques serveur (CPU, RAM, stockage, température) affichent un état
+  vide explicite ("Connecteur serveur non configuré") tant que le connecteur
+  serveur (v0.2) n'est pas implémenté, conformément à la règle interdisant les
+  données fictives en production.
+- Le composant `SystemPanel` (qui embarque `recharts`) est chargé en lazy
+  loading (`React.lazy`) pour ne pas alourdir le chargement initial du
+  tableau de bord.
