@@ -58,26 +58,6 @@ export const navItems: NavItem[] = [
     mobilePrimary: true,
   },
   {
-    id: "matchday",
-    label: "Matchday",
-    to: "/matchday",
-    icon: Trophy,
-    status: "ready",
-    description:
-      "Matchs du jour, classement, pronostics et messages du groupe.",
-    mobilePrimary: true,
-  },
-  {
-    id: "jellyfin",
-    label: "Jellyfin",
-    to: "/jellyfin",
-    icon: Tv,
-    status: "ready",
-    description:
-      "Bibliothèques, lecture en cours, films, séries et statut du serveur.",
-    mobilePrimary: true,
-  },
-  {
     id: "services",
     label: "Services",
     to: "/services",
@@ -129,5 +109,23 @@ export const navItems: NavItem[] = [
     status: "soon",
     description: "Préférences du portail et configuration générale.",
     mobilePrimary: true,
+  },
+  {
+    id: "matchday",
+    label: "Matchday",
+    to: "/matchday",
+    icon: Trophy,
+    status: "ready",
+    description:
+      "Matchs du jour, classement, pronostics et messages du groupe.",
+  },
+  {
+    id: "jellyfin",
+    label: "Jellyfin",
+    to: "/jellyfin",
+    icon: Tv,
+    status: "ready",
+    description:
+      "Bibliothèques, lecture en cours, films, séries et statut du serveur.",
   },
 ];
