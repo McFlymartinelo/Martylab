@@ -138,6 +138,7 @@ npm run db:seed        # Comptes initiaux
 - [docs/cloudflare-tunnel.md](./docs/cloudflare-tunnel.md) — tunnel Cloudflare
 - [docs/backup-postgres.md](./docs/backup-postgres.md) — sauvegarde PostgreSQL
 - [docs/orion-connector.md](./docs/orion-connector.md) — connecteur Orion
+- [docs/production-security.md](./docs/production-security.md) — sécurisation production
 
 ## API (v0.1 / v0.2)
 
@@ -160,6 +161,8 @@ npm run db:seed        # Comptes initiaux
 | `POST /api/docker/containers/:id/restart` | user+ | Redémarrer un conteneur |
 | `GET /api/orion/status` | session | État du connecteur Orion |
 | `GET /api/orion/climate` | session | Température et humidité (via Orion) |
+| `GET /api/orion/lights` | session | Luminaires Hue (via Orion) |
+| `PUT /api/orion/lights/:id` | user+ | Allumer / éteindre une lumière Hue |
 
 ## Licence
 
