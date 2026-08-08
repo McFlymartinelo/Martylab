@@ -43,6 +43,23 @@ const envSchema = z.object({
   HOST_SYS_PREFIX: z.string().optional(),
   HOST_ROOT_PATH: z.string().optional(),
   DOCKER_SOCKET_PATH: z.string().optional(),
+  ORION_URL: z
+    .preprocess((value) => {
+      if (value === "" || value === undefined || value === null) {
+        return undefined;
+      }
+      return value;
+    }, z.string().url())
+    .optional(),
+  ORION_API_KEY: z
+    .preprocess((value) => {
+      if (value === "" || value === undefined || value === null) {
+        return undefined;
+      }
+      return value;
+    }, z.string())
+    .optional(),
+  ORION_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -118,3 +118,7 @@ export interface DockerContainerLogsResponse {
 
 export type DockerContainerAction = "start" | "stop" | "restart";
 
+export type {
+  OrionClimateResponse,
+  OrionStatusResponse,
+} from "./orion.js";

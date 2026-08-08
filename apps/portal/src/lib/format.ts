@@ -27,3 +27,17 @@ export function formatUptime(seconds: number): string {
 export function formatPercent(value: number): string {
   return `${value.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 }
+
+export function formatTemperature(celsius: number | null): string {
+  if (celsius === null) {
+    return "—";
+  }
+  return `${celsius.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} °C`;
+}
+
+export function formatHumidity(humidity: number | null): string {
+  if (humidity === null) {
+    return "—";
+  }
+  return `${humidity.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %`;
+}

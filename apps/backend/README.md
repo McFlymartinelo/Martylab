@@ -30,6 +30,8 @@ npm run db:seed -w @martylab/backend
 - `POST /api/docker/containers/:containerId/start` (user+)
 - `POST /api/docker/containers/:containerId/stop` (user+)
 - `POST /api/docker/containers/:containerId/restart` (user+)
+- `GET /api/orion/status` (authenticated)
+- `GET /api/orion/climate` (authenticated)
 
 ## Database (local Windows dev)
 

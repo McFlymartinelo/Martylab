@@ -381,3 +381,33 @@ Sans ces montages, le backend remonte les métriques du **conteneur** lui-même
 - Plugins Orion et Matchday enregistrés comme stubs (`enabled: false`) au
   démarrage du backend.
 - Actions Docker (start/stop/restart/logs) restent hors scope pour l'instant.
+
+---
+
+# ADR-017 — Connecteur Orion (v0.3, lecture seule)
+
+**Statut : Acceptée**
+
+## Décision
+
+Martylab intègre Orion uniquement via son API HTTP existante :
+
+- `GET /api/health` — disponibilité
+- `GET /api/netatmo` — température, humidité, CO₂
+
+Martylab expose `GET /api/orion/status` et `GET /api/orion/climate` au
+portail. Aucun accès direct à Netatmo, aux tokens OAuth ou à la base
+Orion.
+
+## Raisons
+
+- Orion reste indépendant et déployable sans Martylab.
+- Les secrets device (Netatmo, Hue, etc.) restent dans Orion.
+- Phase read-only conforme à la règle « pas de fausses données ».
+
+## Conséquences
+
+- Variables : `ORION_URL`, `ORION_API_KEY` (futur), `ORION_TIMEOUT_MS`.
+- Plugin Orion `enabled: true` au boot si health check OK.
+- Panneau **Maison** sur le dashboard.
+- Lumières / actions : phase ultérieure avec modèle de permissions.

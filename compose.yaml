@@ -47,6 +47,9 @@ services:
       HOST_SYS_PREFIX: /host/sys
       HOST_ROOT_PATH: /host/root
       DOCKER_SOCKET_PATH: /var/run/docker.sock
+      ORION_URL: ${ORION_URL:-}
+      ORION_API_KEY: ${ORION_API_KEY:-}
+      ORION_TIMEOUT_MS: ${ORION_TIMEOUT_MS:-6000}
     group_add:
       - "${DOCKER_GID:-999}"
     volumes:

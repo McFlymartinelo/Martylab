@@ -131,18 +131,18 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 
 Objectif : intégrer Orion à Martylab.
 
-- [ ] Connecteur Orion
-- [ ] Vérification de la connexion
-- [ ] État d'Orion
-- [ ] Température
-- [ ] Humidité
+- [x] Connecteur Orion
+- [x] Vérification de la connexion
+- [x] État d'Orion
+- [x] Température
+- [x] Humidité
 - [ ] Capteurs
 - [ ] Lumières
 - [ ] Appareils
 - [ ] Actions sur les appareils
 - [ ] Notifications
 - [ ] Historique
-- [ ] Dashboard Maison
+- [x] Dashboard Maison
 
 Orion doit rester totalement indépendant de Martylab.
 

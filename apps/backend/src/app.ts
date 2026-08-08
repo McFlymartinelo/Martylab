@@ -22,7 +22,9 @@ import { createHealthRouter } from "./routes/health.js";
 import { pluginsRouter } from "./routes/plugins.js";
 import { createSystemRouter } from "./routes/system.js";
 import { createUsersRouter } from "./routes/users.js";
+import { createOrionRouter } from "./routes/orion.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
+import { createOrionClient } from "./connectors/orion/orion-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
 import { createUserService } from "./users/user-service.js";
 
@@ -40,6 +42,11 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     hostRootPath: env.HOST_ROOT_PATH,
   });
   const dockerClient = createDockerClient(env.DOCKER_SOCKET_PATH);
+  const orionClient = createOrionClient({
+    baseUrl: env.ORION_URL,
+    apiKey: env.ORION_API_KEY,
+    timeoutMs: env.ORION_TIMEOUT_MS,
+  });
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1);
@@ -69,6 +76,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/users", createUsersRouter(userService));
   app.use("/api/system", createSystemRouter(serverMetrics));
   app.use("/api/docker", createDockerRouter(dockerClient));
+  app.use("/api/orion", createOrionRouter(orionClient));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger, env.NODE_ENV === "production"));

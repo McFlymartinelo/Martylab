@@ -7,7 +7,7 @@ import { bootstrapPlugins } from "./plugins/bootstrap.js";
 const env = loadEnv();
 const logger = createLogger(env);
 const database = createDatabase(env, logger);
-await bootstrapPlugins();
+await bootstrapPlugins(env);
 const app = createApp(env, logger, database);
 
 const server = app.listen(env.PORT, env.HOST, () => {
