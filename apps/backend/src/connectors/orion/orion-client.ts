@@ -1,4 +1,10 @@
-import type { OrionClimateResponse } from "@martylab/shared";
+import type {
+  OrionClimateResponse,
+  OrionLight,
+  OrionLightsResponse,
+  OrionSetLightRequest,
+  OrionSetLightResponse,
+} from "@martylab/shared";
 
 export interface OrionClientConfig {
   baseUrl?: string | undefined;
@@ -21,18 +27,60 @@ interface OrionNetatmoPayload {
   error?: string;
 }
 
+interface HueLightState {
+  on?: boolean;
+  bri?: number;
+  reachable?: boolean;
+}
+
+interface HueLightRow {
+  name?: string;
+  state?: HueLightState;
+}
+
+type HueLightsPayload = Record<string, HueLightRow>;
+
 function normalizeBaseUrl(baseUrl: string): string {
   return baseUrl.replace(/\/+$/, "");
+}
+
+function brightnessToHueBri(brightness: number): number {
+  const clamped = Math.max(1, Math.min(100, brightness));
+  return Math.max(1, Math.min(254, Math.round((clamped / 100) * 254)));
+}
+
+function hueBriToBrightness(bri: number | undefined): number | null {
+  if (bri === undefined) {
+    return null;
+  }
+
+  return Math.max(0, Math.min(100, Math.round((bri / 254) * 100)));
+}
+
+function normalizeLights(payload: HueLightsPayload): OrionLight[] {
+  return Object.entries(payload)
+    .map(([id, light]) => ({
+      id,
+      name: light.name ?? `Lumière ${id}`,
+      on: light.state?.on ?? false,
+      brightness: hueBriToBrightness(light.state?.bri),
+      reachable: light.state?.reachable !== false,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "fr"));
 }
 
 export function createOrionClient(config: OrionClientConfig) {
   const baseUrl = config.baseUrl ? normalizeBaseUrl(config.baseUrl) : undefined;
   const timeoutMs = config.timeoutMs ?? 6_000;
 
-  function buildHeaders(): Record<string, string> {
+  function buildHeaders(includeJson = false): Record<string, string> {
     const headers: Record<string, string> = {
       Accept: "application/json",
     };
+
+    if (includeJson) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (config.apiKey) {
       headers.Authorization = `Bearer ${config.apiKey}`;
@@ -41,7 +89,10 @@ export function createOrionClient(config: OrionClientConfig) {
     return headers;
   }
 
-  async function request<T>(path: string): Promise<T> {
+  async function request<T>(
+    path: string,
+    options: { method?: "GET" | "PUT"; body?: unknown } = {},
+  ): Promise<T> {
     if (!baseUrl) {
       throw new Error("Orion URL is not configured.");
     }
@@ -50,10 +101,17 @@ export function createOrionClient(config: OrionClientConfig) {
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      const response = await fetch(`${baseUrl}${path}`, {
-        headers: buildHeaders(),
+      const init: RequestInit = {
+        method: options.method ?? "GET",
+        headers: buildHeaders(options.body !== undefined),
         signal: controller.signal,
-      });
+      };
+
+      if (options.body !== undefined) {
+        init.body = JSON.stringify(options.body);
+      }
+
+      const response = await fetch(`${baseUrl}${path}`, init);
 
       if (!response.ok) {
         const text = await response.text().catch(() => "");
@@ -123,6 +181,48 @@ export function createOrionClient(config: OrionClientConfig) {
           co2Ppm: null,
         };
       }
+    },
+
+    async getLights(): Promise<OrionLightsResponse> {
+      if (!baseUrl) {
+        return { available: false, lights: [] };
+      }
+
+      try {
+        const payload = await request<HueLightsPayload>("/api/hue/lights");
+        return {
+          available: true,
+          lights: normalizeLights(payload),
+        };
+      } catch {
+        return { available: false, lights: [] };
+      }
+    },
+
+    async setLightState(
+      lightId: string,
+      input: OrionSetLightRequest,
+    ): Promise<OrionSetLightResponse> {
+      if (!baseUrl) {
+        throw new Error("Orion URL is not configured.");
+      }
+
+      const state: { on?: boolean; bri?: number } = {};
+
+      if (input.on !== undefined) {
+        state.on = input.on;
+      }
+
+      if (input.brightness !== undefined) {
+        state.bri = brightnessToHueBri(input.brightness);
+      }
+
+      await request<unknown>(`/api/hue/lights/${encodeURIComponent(lightId)}`, {
+        method: "PUT",
+        body: state,
+      });
+
+      return { ok: true, lightId };
     },
   };
 }

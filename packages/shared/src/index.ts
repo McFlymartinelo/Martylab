@@ -120,5 +120,9 @@ export type DockerContainerAction = "start" | "stop" | "restart";
 
 export type {
   OrionClimateResponse,
+  OrionLight,
+  OrionLightsResponse,
+  OrionSetLightRequest,
+  OrionSetLightResponse,
   OrionStatusResponse,
 } from "./orion.js";

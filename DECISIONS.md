@@ -384,9 +384,9 @@ Sans ces montages, le backend remonte les métriques du **conteneur** lui-même
 
 ---
 
-# ADR-017 — Connecteur Orion (v0.3, lecture seule)
+# ADR-017 — Connecteur Orion (v0.3)
 
-**Statut : Acceptée**
+**Statut : Acceptée (étendue v0.3.1 — lumières Hue)**
 
 ## Décision
 
@@ -394,20 +394,24 @@ Martylab intègre Orion uniquement via son API HTTP existante :
 
 - `GET /api/health` — disponibilité
 - `GET /api/netatmo` — température, humidité, CO₂
+- `GET /api/hue/lights` / `PUT /api/hue/lights/:id` — lumières Hue
 
-Martylab expose `GET /api/orion/status` et `GET /api/orion/climate` au
-portail. Aucun accès direct à Netatmo, aux tokens OAuth ou à la base
-Orion.
+Martylab expose :
+
+- `GET /api/orion/status`, `GET /api/orion/climate` (lecture)
+- `GET /api/orion/lights`, `PUT /api/orion/lights/:id` (lecture + actions Hue)
+
+Aucun accès direct à Netatmo, Hue, aux tokens OAuth ou à la base Orion.
 
 ## Raisons
 
 - Orion reste indépendant et déployable sans Martylab.
 - Les secrets device (Netatmo, Hue, etc.) restent dans Orion.
-- Phase read-only conforme à la règle « pas de fausses données ».
+- Pas de fausses données : états explicites si Orion ou Hue est indisponible.
 
 ## Conséquences
 
 - Variables : `ORION_URL`, `ORION_API_KEY` (futur), `ORION_TIMEOUT_MS`.
-- Plugin Orion `enabled: true` au boot si health check OK.
-- Panneau **Maison** sur le dashboard.
-- Lumières / actions : phase ultérieure avec modèle de permissions.
+- Plugin Orion `enabled: true` quand `ORION_URL` est configuré.
+- Panneau **Maison** (climat) + **Lumières** sur le dashboard.
+- Actions Hue : `requireMinRole("user")` — invités en lecture seule.

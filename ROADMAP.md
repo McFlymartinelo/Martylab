@@ -137,9 +137,9 @@ Objectif : intégrer Orion à Martylab.
 - [x] Température
 - [x] Humidité
 - [ ] Capteurs
-- [ ] Lumières
+- [x] Lumières
 - [ ] Appareils
-- [ ] Actions sur les appareils
+- [x] Actions sur les appareils (Hue on/off)
 - [ ] Notifications
 - [ ] Historique
 - [x] Dashboard Maison
