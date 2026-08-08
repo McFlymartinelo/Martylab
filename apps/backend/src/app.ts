@@ -3,15 +3,18 @@ import express from "express";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import type { Env } from "./config/env.js";
+import type { createDatabase } from "./db/client.js";
 import type { Logger } from "./lib/logger.js";
 import {
   createErrorHandler,
   notFoundHandler,
 } from "./middleware/error-handler.js";
-import { healthRouter } from "./routes/health.js";
+import { createHealthRouter } from "./routes/health.js";
 import { pluginsRouter } from "./routes/plugins.js";
 
-export function createApp(env: Env, logger: Logger) {
+type DatabaseHandle = ReturnType<typeof createDatabase>;
+
+export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   const app = express();
 
   app.disable("x-powered-by");
@@ -32,7 +35,7 @@ export function createApp(env: Env, logger: Logger) {
     }),
   );
 
-  app.use("/api/health", healthRouter);
+  app.use("/api/health", createHealthRouter(database));
   app.use("/api/plugins", pluginsRouter);
 
   app.use(notFoundHandler);

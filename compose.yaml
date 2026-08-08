@@ -1,0 +1,32 @@
+# Martylab local/production foundation.
+# PostgreSQL is intentionally not published to the public internet.
+# Future backups can mount/copy from the named volume `martylab_postgres_data`.
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: martylab
+      POSTGRES_USER: martylab
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-martylab}
+    volumes:
+      - martylab_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U martylab -d martylab"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Local development only. Do not expose this port publicly in production.
+    ports:
+      - "5432:5432"
+    networks:
+      - martylab
+
+volumes:
+  martylab_postgres_data:
+    name: martylab_postgres_data
+
+networks:
+  martylab:
+    name: martylab

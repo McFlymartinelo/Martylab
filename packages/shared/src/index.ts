@@ -23,10 +23,13 @@ export interface ApiError {
   };
 }
 
+export type DatabaseHealth = "up" | "down" | "not_configured";
+
 export interface HealthResponse {
-  status: "ok";
+  status: "ok" | "degraded";
   service: "martylab-backend";
   timestamp: string;
+  database: DatabaseHealth;
 }
 
 export type PluginCapability =

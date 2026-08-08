@@ -10,6 +10,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+function databaseLabel(status: string | undefined) {
+  switch (status) {
+    case "up":
+      return "Online";
+    case "down":
+      return "Down";
+    case "not_configured":
+      return "Not configured";
+    default:
+      return "Unknown";
+  }
+}
+
 export function DashboardPage() {
   const healthQuery = useHealthQuery();
 
@@ -41,15 +54,25 @@ export function DashboardPage() {
               <div className="space-y-2">
                 <Badge variant="outline">Unavailable</Badge>
                 <p className="text-sm text-muted-foreground">
-                  Backend inaccessible pour le moment. Le service sera branché
-                  à l&apos;étape suivante.
+                  Backend inaccessible pour le moment.
                 </p>
               </div>
             ) : null}
 
             {healthQuery.data ? (
               <div className="space-y-2">
-                <Badge>Online</Badge>
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    variant={
+                      healthQuery.data.status === "ok" ? "default" : "outline"
+                    }
+                  >
+                    API {healthQuery.data.status}
+                  </Badge>
+                  <Badge variant="secondary">
+                    DB {databaseLabel(healthQuery.data.database)}
+                  </Badge>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Service <code>{healthQuery.data.service}</code> —{" "}
                   {new Date(healthQuery.data.timestamp).toLocaleString("fr-FR")}
@@ -68,8 +91,7 @@ export function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Consultez le registre dès que le backend exposera{" "}
-              <code>/api/plugins</code>.
+              Consultez le registre dès que des plugins seront enregistrés.
             </p>
             <Button variant="secondary" render={<Link to="/apps" />}>
               Voir les apps
