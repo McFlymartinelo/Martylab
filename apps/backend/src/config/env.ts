@@ -53,6 +53,19 @@ function trimEnvString(value: unknown): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+function parseOptionalPositiveInt(value: unknown): number | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return undefined;
+  }
+
+  return parsed;
+}
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(3000),
@@ -76,7 +89,10 @@ const envSchema = z.object({
   PLUGINS_DIR: z.string().optional(),
   MATCHDAY_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
   MATCHDAY_PUBLIC_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
-  MATCHDAY_GROUP_ID: z.coerce.number().int().positive().optional(),
+  MATCHDAY_GROUP_ID: z.preprocess(
+    parseOptionalPositiveInt,
+    z.number().int().positive().optional(),
+  ),
   MATCHDAY_SERVICE_USERNAME: z.preprocess(trimEnvString, z.string().optional()),
   MATCHDAY_SERVICE_PASSWORD: z.preprocess(trimEnvString, z.string().optional()),
   MATCHDAY_USER_PASSWORDS: z.preprocess(trimEnvString, z.string().optional()),
