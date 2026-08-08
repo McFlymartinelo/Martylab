@@ -11,7 +11,7 @@
     "dev": "npm run dev --workspaces --if-present",
     "dev:portal": "npm run dev -w @martylab/portal",
     "dev:backend": "npm run dev -w @martylab/backend",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @martylab/shared && npm run build -w @martylab/portal && npm run build -w @martylab/backend",
     "build:shared": "npm run build -w @martylab/shared",
     "build:portal": "npm run build -w @martylab/portal",
     "build:backend": "npm run build -w @martylab/backend",
