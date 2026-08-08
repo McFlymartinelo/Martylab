@@ -8,7 +8,9 @@ COPY apps/backend/package.json ./apps/backend/
 COPY apps/portal/package.json ./apps/portal/
 COPY packages/shared/package.json ./packages/shared/
 
-RUN npm ci
+# Monorepo npm ci also installs backend deps (e.g. argon2). Portal never
+# executes them, so skip native install scripts in this image.
+RUN npm ci --ignore-scripts
 
 COPY packages/shared ./packages/shared
 COPY apps/portal ./apps/portal
