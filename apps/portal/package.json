@@ -1,0 +1,15 @@
+{
+  "name": "@martylab/portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"Portal scaffold pending (Vite + React)\"",
+    "build": "echo \"Portal scaffold pending (Vite + React)\"",
+    "typecheck": "echo \"Portal scaffold pending (Vite + React)\"",
+    "lint": "echo \"No lint configured yet for @martylab/portal\""
+  },
+  "dependencies": {
+    "@martylab/shared": "0.1.0"
+  }
+}

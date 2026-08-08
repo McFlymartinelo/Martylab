@@ -143,3 +143,118 @@ GitHub
 Debian
    ↓
 Docker
+```
+
+---
+
+# ADR-008 — npm workspaces
+
+**Statut : Acceptée**
+
+## Décision
+
+Martylab utilise npm comme gestionnaire de paquets, avec des npm workspaces.
+
+## Raisons
+
+- Le dépôt s'appuie sur `package-lock.json`.
+- Évite une migration vers pnpm ou yarn.
+- Suffisant pour un monorepo simple en v0.1.
+- Compatible avec le flux de développement Windows et le déploiement Debian.
+
+---
+
+# ADR-009 — Périmètre monorepo v0.1
+
+**Statut : Acceptée**
+
+## Décision
+
+Pour Martylab v0.1, le monorepo contient uniquement :
+
+- `apps/portal`
+- `apps/backend`
+- `packages/shared`
+
+## Raisons
+
+- Réduit la complexité initiale.
+- Évite les packages vides (`ui`, `auth`, `api-client`, etc.).
+- `packages/shared` sert aux types et contrats réellement partagés.
+- D'autres packages pourront être ajoutés plus tard selon un besoin concret.
+
+---
+
+# ADR-010 — Drizzle ORM
+
+**Statut : Acceptée**
+
+## Décision
+
+Le backend utilise Drizzle ORM avec PostgreSQL et Drizzle Kit pour les migrations.
+
+## Raisons
+
+- Approche légère.
+- Migrations SQL explicites.
+- Moins d'abstraction qu'un ORM plus lourd.
+- Adapté à une architecture simple et maintenable.
+
+---
+
+# ADR-011 — Authentification par sessions
+
+**Statut : Acceptée**
+
+## Décision
+
+L'authentification Martylab utilise des sessions stockées côté serveur avec un cookie HttpOnly sécurisé.
+
+## Raisons
+
+- Évite le stockage de JWT dans `localStorage`.
+- Meilleur contrôle de révocation des sessions.
+- Aligné avec une application web first-party.
+
+## Contraintes cookie
+
+- `HttpOnly`
+- `Secure` en production
+- `SameSite` approprié
+- expiration / durée de session explicite
+
+Les autorisations sont toujours vérifiées côté backend.
+
+---
+
+# ADR-012 — Tailwind CSS v4 et shadcn/ui (Base UI)
+
+**Statut : Acceptée**
+
+## Décision
+
+Le portail utilise Tailwind CSS v4 et shadcn/ui avec Base UI comme primitive, via des CSS variables et un thème sombre préparé.
+
+## Raisons
+
+- Configuration moderne recommandée par shadcn/ui.
+- Base UI est le choix retenu pour les primitives.
+- Les CSS variables permettent l'évolution du Design System Martylab.
+- Pas de rétrogradation vers Tailwind v3.
+
+---
+
+# ADR-013 — Sauvegardes PostgreSQL reportées
+
+**Statut : Acceptée**
+
+## Décision
+
+La sauvegarde automatique de PostgreSQL est reportée après v0.1.
+
+## Raisons
+
+- Ne doit pas bloquer les fondations.
+- L'architecture devra toutefois permettre d'ajouter plus tard sauvegarde, restauration, rotation et éventuellement copie vers le NAS.
+
+Aucun système de sauvegarde complexe n'est mis en place en v0.1.

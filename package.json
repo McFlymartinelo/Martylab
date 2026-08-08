@@ -1,0 +1,24 @@
+{
+  "name": "martylab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Martylab monorepo — personal self-hosted application hub",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:portal": "npm run dev -w @martylab/portal",
+    "dev:backend": "npm run dev -w @martylab/backend",
+    "build": "npm run build --workspaces --if-present",
+    "build:shared": "npm run build -w @martylab/shared",
+    "build:portal": "npm run build -w @martylab/portal",
+    "build:backend": "npm run build -w @martylab/backend",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

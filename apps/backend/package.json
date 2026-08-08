@@ -1,0 +1,15 @@
+{
+  "name": "@martylab/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"Backend scaffold pending (Express + TypeScript)\"",
+    "build": "echo \"Backend scaffold pending (Express + TypeScript)\"",
+    "typecheck": "echo \"Backend scaffold pending (Express + TypeScript)\"",
+    "lint": "echo \"No lint configured yet for @martylab/backend\""
+  },
+  "dependencies": {
+    "@martylab/shared": "0.1.0"
+  }
+}
