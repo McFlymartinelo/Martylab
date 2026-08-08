@@ -23,24 +23,56 @@ Martylab does not replace the applications it integrates.
                     Cloudflare Tunnel
                             │
                             ▼
-                     martylab.fr
+              https://martylab.martylab.fr
                             │
                             ▼
                   ┌───────────────────┐
                   │ Martylab Portal   │
-                  │ React + TypeScript│
+                  │ nginx + React SPA │
+                  │ host :3100        │
                   └─────────┬─────────┘
-                            │
+                            │ /api (same origin)
                             ▼
                   ┌───────────────────┐
                   │ Martylab Backend  │
                   │ Express + TS      │
+                  │ Docker internal   │
                   └─────────┬─────────┘
                             │
-             ┌──────────────┼──────────────┐
-             │              │              │
-             ▼              ▼              ▼
-        Orion Plugin   Matchday Plugin  Jellyfin Plugin
-             │              │              │
-             ▼              ▼              ▼
-           Orion         Matchday        Jellyfin
+                            ▼
+                  ┌───────────────────┐
+                  │ PostgreSQL 17     │
+                  │ Docker internal   │
+                  │ volume persisted  │
+                  └───────────────────┘
+```
+
+Future plugin integrations remain independent:
+
+```text
+Martylab Backend
+   ├─ Orion Plugin    → Orion API
+   ├─ Matchday Plugin → Matchday API
+   └─ Jellyfin Plugin → Jellyfin API
+```
+
+---
+
+## 3. Production networking (v0.1)
+
+| Service | Published on host | Notes |
+|---------|-------------------|--------|
+| portal | `3100 -> 80` | Only public entry (via Tunnel later) |
+| backend | no | Reached by portal nginx as `backend:3000` |
+| postgres | no | Reached by backend as `postgres:5432` |
+
+Details for Cloudflare Tunnel setup: [`docs/cloudflare-tunnel.md`](docs/cloudflare-tunnel.md).
+
+---
+
+## 4. Authentication
+
+- Server-side sessions stored in PostgreSQL
+- Session id delivered via HttpOnly cookie
+- `COOKIE_SECURE=true` required for HTTPS production
+- Authorization enforced in the backend

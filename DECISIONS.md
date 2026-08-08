@@ -258,3 +258,30 @@ La sauvegarde automatique de PostgreSQL est reportée après v0.1.
 - L'architecture devra toutefois permettre d'ajouter plus tard sauvegarde, restauration, rotation et éventuellement copie vers le NAS.
 
 Aucun système de sauvegarde complexe n'est mis en place en v0.1.
+
+---
+
+# ADR-014 — Entrée publique via Cloudflare Tunnel + portal :3100
+
+**Statut : Acceptée**
+
+## Décision
+
+L'accès public à Martylab passe par Cloudflare Tunnel vers le portal publié sur l'hôte en `:3100`.
+
+Le backend et PostgreSQL restent internes au réseau Docker `martylab`.
+
+Le hostname public prévu est `https://martylab.martylab.fr`.
+
+## Raisons
+
+- Évite d'exposer Matchday (`:3000`) ou d'autres services.
+- Même origine navigateur (`/` et `/api`) pour les cookies de session.
+- Cohérent avec l'architecture déjà utilisée pour les autres applications du serveur.
+
+## Conséquences
+
+- `CORS_ORIGIN=https://martylab.martylab.fr`
+- `COOKIE_SECURE=true` en production HTTPS
+- Documentation opérationnelle dans `docs/cloudflare-tunnel.md`
+- Aucun token Cloudflare dans le dépôt Git
