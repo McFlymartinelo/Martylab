@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { z } from "zod";
 import type {
+  OrionClimateHistoryResponse,
   OrionClimateResponse,
   OrionLightsResponse,
+  OrionNotificationsResponse,
   OrionSetLightResponse,
   OrionStatusResponse,
 } from "@martylab/shared";
@@ -19,6 +21,13 @@ const setLightBodySchema = z
     (value) => value.on !== undefined || value.brightness !== undefined,
     "At least one of on or brightness is required.",
   );
+
+const climateHistoryQuerySchema = z.object({
+  range: z.enum(["24h", "7d"]).default("24h"),
+  metric: z
+    .enum(["indoorTemp", "outdoorTemp", "indoorHumidity", "co2"])
+    .default("indoorTemp"),
+});
 
 function parseLightId(raw: string | string[] | undefined): string {
   if (typeof raw !== "string" || raw.length === 0) {
@@ -44,6 +53,24 @@ export function createOrionRouter(orionClient: OrionClient) {
 
   orionRouter.get("/climate", requireAuth, async (_req, res) => {
     const body: OrionClimateResponse = await orionClient.getClimate();
+    res.status(200).json(body);
+  });
+
+  orionRouter.get("/climate/history", requireAuth, async (req, res) => {
+    const parsed = climateHistoryQuerySchema.safeParse(req.query);
+    if (!parsed.success) {
+      throw new AppError(400, "invalid_query", "Invalid climate history query.");
+    }
+
+    const body: OrionClimateHistoryResponse = await orionClient.getClimateHistory(
+      parsed.data,
+    );
+    res.status(200).json(body);
+  });
+
+  orionRouter.get("/notifications", requireAuth, async (_req, res) => {
+    const body: OrionNotificationsResponse =
+      await orionClient.getNotifications();
     res.status(200).json(body);
   });
 

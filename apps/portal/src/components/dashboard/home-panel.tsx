@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MetricCard } from "@/components/dashboard/metric-card";
+import { HomeClimateHistoryPanel } from "@/components/dashboard/home-climate-history-panel";
 import { formatHumidity, formatTemperature } from "@/lib/format";
 
 function formatLastSeen(value: string | null): string {
@@ -141,6 +142,8 @@ export function HomePanel() {
           caption="Qualité de l'air"
         />
       </div>
+
+      <HomeClimateHistoryPanel enabled={configured && online} />
     </section>
   );
 }

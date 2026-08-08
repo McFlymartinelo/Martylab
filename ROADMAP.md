@@ -149,8 +149,8 @@ Objectif : intégrer Orion à Martylab.
 - [x] Lumières
 - [ ] Appareils
 - [x] Actions sur les appareils (Hue on/off)
-- [ ] Notifications
-- [ ] Historique
+- [x] Notifications (alertes climat via Orion)
+- [x] Historique (Netatmo via Orion)
 - [x] Dashboard Maison
 
 Orion doit rester totalement indépendant de Martylab.

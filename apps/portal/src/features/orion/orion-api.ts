@@ -1,6 +1,10 @@
 import type {
+  OrionClimateHistoryResponse,
   OrionClimateResponse,
+  OrionClimateMetric,
+  OrionClimateRange,
   OrionLightsResponse,
+  OrionNotificationsResponse,
   OrionSetLightRequest,
   OrionSetLightResponse,
   OrionStatusResponse,
@@ -13,6 +17,23 @@ export function fetchOrionStatus(): Promise<OrionStatusResponse> {
 
 export function fetchOrionClimate(): Promise<OrionClimateResponse> {
   return apiGet<OrionClimateResponse>("/api/orion/climate");
+}
+
+export function fetchOrionClimateHistory(input: {
+  range: OrionClimateRange;
+  metric: OrionClimateMetric;
+}): Promise<OrionClimateHistoryResponse> {
+  const params = new URLSearchParams({
+    range: input.range,
+    metric: input.metric,
+  });
+  return apiGet<OrionClimateHistoryResponse>(
+    `/api/orion/climate/history?${params.toString()}`,
+  );
+}
+
+export function fetchOrionNotifications(): Promise<OrionNotificationsResponse> {
+  return apiGet<OrionNotificationsResponse>("/api/orion/notifications");
 }
 
 export function fetchOrionLights(): Promise<OrionLightsResponse> {

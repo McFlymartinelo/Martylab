@@ -26,6 +26,8 @@ ORION_URL=http://localhost:4000
 |-------|-------------|
 | `GET /api/orion/status` | Connecteur configuré + Orion joignable |
 | `GET /api/orion/climate` | Température / humidité intérieure et extérieure |
+| `GET /api/orion/climate/history` | Historique Netatmo (`range=24h\|7d`, `metric=indoorTemp\|...`) |
+| `GET /api/orion/notifications` | Alertes climat (CO₂, station inactive, Netatmo down) |
 | `GET /api/orion/lights` | Liste des luminaires Hue |
 | `PUT /api/orion/lights/:id` | Contrôle d'une lumière (`on`, `brightness` 1–100) — rôle `user` minimum |
 
@@ -35,6 +37,8 @@ ORION_URL=http://localhost:4000
 |-------------|-------|
 | `GET /api/health` | Vérification de disponibilité |
 | `GET /api/netatmo` | Données station Netatmo (température, humidité, CO₂) |
+| `GET /api/netatmo/history` | Historique Netatmo (`getmeasure`) |
+| `GET /api/notifications` | Alertes dérivées (CO₂, station inactive) |
 | `GET /api/hue/lights` | Liste des luminaires Hue |
 | `PUT /api/hue/lights/:id` | Contrôle Hue (`on`, `bri`, etc.) |
 
@@ -46,6 +50,13 @@ ORION_URL=http://localhost:4000
 - Si Hue échoue : panneau lumières en état indisponible, sans données inventées.
 - Les invités (`guest`) voient les lumières en lecture seule ; `user` et `admin` peuvent allumer/éteindre.
 - Le plugin Orion passe à `enabled: true` quand `ORION_URL` est configuré (état live via `/api/orion/status`).
+- **Historique** : graphique sur le dashboard (24h / 7j, métriques température, humidité, CO₂).
+- **Notifications** : cloche du header alimentée par Orion (seuils CO₂, station inactive).
+
+## Prérequis Orion (v0.3.2)
+
+Déployer Orion avec les routes `GET /api/netatmo/history` et `GET /api/notifications`
+(avant cette version, l'historique et les alertes restent indisponibles côté Martylab).
 
 ## Sécurité
 

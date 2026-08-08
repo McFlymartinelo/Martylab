@@ -141,9 +141,16 @@ export type {
   PortainerVolumeSummary,
 } from "./portainer.js";
 export type {
+  OrionClimateHistoryPoint,
+  OrionClimateHistoryResponse,
+  OrionClimateMetric,
+  OrionClimateRange,
   OrionClimateResponse,
   OrionLight,
   OrionLightsResponse,
+  OrionNotification,
+  OrionNotificationsResponse,
+  OrionNotificationSeverity,
   OrionSetLightRequest,
   OrionSetLightResponse,
   OrionStatusResponse,

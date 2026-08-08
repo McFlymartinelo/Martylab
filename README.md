@@ -163,6 +163,8 @@ npm run db:seed        # Comptes initiaux
 | `POST /api/docker/containers/:id/restart` | user+ | Redémarrer un conteneur |
 | `GET /api/orion/status` | session | État du connecteur Orion |
 | `GET /api/orion/climate` | session | Température et humidité (via Orion) |
+| `GET /api/orion/climate/history` | session | Historique Netatmo (24h / 7j) |
+| `GET /api/orion/notifications` | session | Alertes climat Orion (CO₂, station inactive) |
 | `GET /api/orion/lights` | session | Luminaires Hue (via Orion) |
 | `PUT /api/orion/lights/:id` | user+ | Allumer / éteindre une lumière Hue |
 | `GET /api/matchday/status` | session | État du connecteur Matchday |

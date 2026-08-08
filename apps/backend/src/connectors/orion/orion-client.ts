@@ -1,7 +1,11 @@
 import type {
+  OrionClimateHistoryResponse,
   OrionClimateResponse,
+  OrionClimateMetric,
+  OrionClimateRange,
   OrionLight,
   OrionLightsResponse,
+  OrionNotificationsResponse,
   OrionSetLightRequest,
   OrionSetLightResponse,
 } from "@martylab/shared";
@@ -14,6 +18,26 @@ export interface OrionClientConfig {
 
 interface OrionHealthPayload {
   ok?: boolean;
+}
+
+interface OrionClimateHistoryPayload {
+  available?: boolean;
+  metric?: OrionClimateMetric;
+  range?: OrionClimateRange;
+  unit?: string | null;
+  points?: Array<{ at: string; value: number }>;
+}
+
+interface OrionNotificationsPayload {
+  available?: boolean;
+  items?: Array<{
+    id: string;
+    type: "climate" | "system";
+    severity: "info" | "warning" | "critical";
+    title: string;
+    message: string;
+    at: string;
+  }>;
 }
 
 interface OrionNetatmoPayload {
@@ -223,6 +247,62 @@ export function createOrionClient(config: OrionClientConfig) {
       });
 
       return { ok: true, lightId };
+    },
+
+    async getClimateHistory(input: {
+      range: OrionClimateRange;
+      metric: OrionClimateMetric;
+    }): Promise<OrionClimateHistoryResponse> {
+      const empty: OrionClimateHistoryResponse = {
+        available: false,
+        metric: input.metric,
+        range: input.range,
+        unit: null,
+        points: [],
+      };
+
+      if (!baseUrl) {
+        return empty;
+      }
+
+      try {
+        const params = new URLSearchParams({
+          range: input.range,
+          metric: input.metric,
+        });
+        const payload = await request<OrionClimateHistoryPayload>(
+          `/api/netatmo/history?${params.toString()}`,
+        );
+
+        return {
+          available: payload.available !== false,
+          metric: payload.metric ?? input.metric,
+          range: payload.range ?? input.range,
+          unit: payload.unit ?? null,
+          points: payload.points ?? [],
+        };
+      } catch {
+        return empty;
+      }
+    },
+
+    async getNotifications(): Promise<OrionNotificationsResponse> {
+      if (!baseUrl) {
+        return { available: false, items: [] };
+      }
+
+      try {
+        const payload = await request<OrionNotificationsPayload>(
+          "/api/notifications",
+        );
+
+        return {
+          available: payload.available !== false,
+          items: payload.items ?? [],
+        };
+      } catch {
+        return { available: false, items: [] };
+      }
     },
   };
 }

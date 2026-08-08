@@ -18,6 +18,43 @@ export interface OrionClimateResponse {
   co2Ppm: number | null;
 }
 
+export type OrionClimateMetric =
+  | "indoorTemp"
+  | "outdoorTemp"
+  | "indoorHumidity"
+  | "co2";
+
+export type OrionClimateRange = "24h" | "7d";
+
+export interface OrionClimateHistoryPoint {
+  at: string;
+  value: number;
+}
+
+export interface OrionClimateHistoryResponse {
+  available: boolean;
+  metric: OrionClimateMetric;
+  range: OrionClimateRange;
+  unit: string | null;
+  points: OrionClimateHistoryPoint[];
+}
+
+export type OrionNotificationSeverity = "info" | "warning" | "critical";
+
+export interface OrionNotification {
+  id: string;
+  type: "climate" | "system";
+  severity: OrionNotificationSeverity;
+  title: string;
+  message: string;
+  at: string;
+}
+
+export interface OrionNotificationsResponse {
+  available: boolean;
+  items: OrionNotification[];
+}
+
 export interface OrionLight {
   id: string;
   name: string;
