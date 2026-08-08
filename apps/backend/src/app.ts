@@ -23,8 +23,10 @@ import { pluginsRouter } from "./routes/plugins.js";
 import { createSystemRouter } from "./routes/system.js";
 import { createUsersRouter } from "./routes/users.js";
 import { createOrionRouter } from "./routes/orion.js";
+import { createMatchdayRouter } from "./routes/matchday.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
 import { createOrionClient } from "./connectors/orion/orion-client.js";
+import { createMatchdayClient } from "./connectors/matchday/matchday-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
 import { createUserService } from "./users/user-service.js";
 
@@ -46,6 +48,15 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     baseUrl: env.ORION_URL,
     apiKey: env.ORION_API_KEY,
     timeoutMs: env.ORION_TIMEOUT_MS,
+  });
+  const matchdayClient = createMatchdayClient({
+    baseUrl: env.MATCHDAY_URL,
+    publicUrl: env.MATCHDAY_PUBLIC_URL ?? env.MATCHDAY_URL,
+    groupId: env.MATCHDAY_GROUP_ID,
+    serviceUsername: env.MATCHDAY_SERVICE_USERNAME,
+    servicePassword: env.MATCHDAY_SERVICE_PASSWORD,
+    userPasswordsJson: env.MATCHDAY_USER_PASSWORDS,
+    timeoutMs: env.MATCHDAY_TIMEOUT_MS,
   });
 
   app.disable("x-powered-by");
@@ -78,6 +89,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/system", createSystemRouter(serverMetrics));
   app.use("/api/docker", createDockerRouter(dockerClient));
   app.use("/api/orion", createOrionRouter(orionClient));
+  app.use("/api/matchday", createMatchdayRouter(matchdayClient));
 
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger, env.NODE_ENV === "production"));

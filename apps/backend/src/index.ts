@@ -20,6 +20,7 @@ try {
         corsOrigin: env.CORS_ORIGIN,
         databaseConfigured: Boolean(env.DATABASE_URL),
         orionConfigured: Boolean(env.ORION_URL),
+        matchdayConfigured: Boolean(env.MATCHDAY_URL && env.MATCHDAY_GROUP_ID),
       },
       "Martylab backend listening",
     );

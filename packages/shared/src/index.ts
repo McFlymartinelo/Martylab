@@ -119,6 +119,12 @@ export interface DockerContainerLogsResponse {
 export type DockerContainerAction = "start" | "stop" | "restart";
 
 export type {
+  MatchdayStandingEntry,
+  MatchdayStatusResponse,
+  MatchdaySummaryResponse,
+  MatchdayUpcomingMatch,
+} from "./matchday.js";
+export type {
   OrionClimateResponse,
   OrionLight,
   OrionLightsResponse,

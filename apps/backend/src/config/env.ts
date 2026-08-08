@@ -74,6 +74,13 @@ const envSchema = z.object({
   ORION_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   ORION_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
   PLUGINS_DIR: z.string().optional(),
+  MATCHDAY_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  MATCHDAY_PUBLIC_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  MATCHDAY_GROUP_ID: z.coerce.number().int().positive().optional(),
+  MATCHDAY_SERVICE_USERNAME: z.preprocess(trimEnvString, z.string().optional()),
+  MATCHDAY_SERVICE_PASSWORD: z.preprocess(trimEnvString, z.string().optional()),
+  MATCHDAY_USER_PASSWORDS: z.preprocess(trimEnvString, z.string().optional()),
+  MATCHDAY_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -107,6 +114,16 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
 
   if (env.NODE_ENV === "production" && !env.SESSION_SECRET) {
     throw new Error("SESSION_SECRET is required in production.");
+  }
+
+  if (
+    env.MATCHDAY_URL &&
+    env.MATCHDAY_GROUP_ID &&
+    (!env.MATCHDAY_SERVICE_USERNAME || !env.MATCHDAY_SERVICE_PASSWORD)
+  ) {
+    console.warn(
+      "[config] MATCHDAY_URL is set but service credentials are missing — summary will be unavailable.",
+    );
   }
 
   return {

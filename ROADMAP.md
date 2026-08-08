@@ -152,15 +152,21 @@ Orion doit rester totalement indépendant de Martylab.
 
 Objectif : intégrer Matchday à Martylab.
 
-- [ ] Connecteur Matchday
-- [ ] Vérification de la connexion
-- [ ] Matchs du jour
-- [ ] Prochains matchs
-- [ ] Classements
-- [ ] Pronostics
-- [ ] Informations importantes
-- [ ] Notifications
-- [ ] Dashboard Matchday
+## v0.4.1 — Widget dashboard (option C) ✅
+
+- [x] Connecteur Matchday (proxy API, compte service)
+- [x] Vérification de la connexion (`/api/matchday/status`)
+- [x] Prochains matchs + pronostics (vue groupe)
+- [x] Classements (top 5 + rang utilisateur)
+- [x] Pronostics en attente (personnalisés via `MATCHDAY_USER_PASSWORDS`)
+- [x] Dashboard Matchday (panneau résumé)
+
+## Suite v0.4.x
+
+- [ ] Matchs du jour (vue dédiée)
+- [ ] Informations importantes (annonces groupe)
+- [ ] Notifications Matchday
+- [ ] Page `/matchday` (lanceur — option B)
 
 Matchday doit rester totalement indépendant de Martylab.
 

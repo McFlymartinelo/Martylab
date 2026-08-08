@@ -415,3 +415,41 @@ Aucun accès direct à Netatmo, Hue, aux tokens OAuth ou à la base Orion.
 - Plugin Orion `enabled: true` quand `ORION_URL` est configuré.
 - Panneau **Maison** (climat) + **Lumières** sur le dashboard.
 - Actions Hue : `requireMinRole("user")` — invités en lecture seule.
+
+---
+
+# ADR-018 — Connecteur Matchday (v0.4.1)
+
+**Statut : Acceptée**
+
+## Décision
+
+Martylab intègre Matchday via son API HTTP avec authentification JWT :
+
+- Compte **service** (`MATCHDAY_SERVICE_*`) pour lire groupe, classement et matchs.
+- Optionnel : `MATCHDAY_USER_PASSWORDS` pour authentifier chaque utilisateur
+  Martylab et calculer ses pronostics en attente.
+
+Martylab expose :
+
+- `GET /api/matchday/status` — disponibilité
+- `GET /api/matchday/summary` — résumé dashboard (top 5, rang, prochains matchs)
+
+Le widget dashboard (option C) affiche des données personnalisées sans iframe
+ni redirection obligatoire vers Matchday.
+
+## Raisons
+
+- Matchday reste indépendant (base SQLite, déploiement, auth propres).
+- Les mots de passe Matchday ne transitent jamais vers le frontend.
+- Correspondance `displayName` / `username` Martylab → pseudo Matchday pour le rang.
+- Pas de fausses données : états explicites si non configuré ou hors ligne.
+
+## Conséquences
+
+- Variables : `MATCHDAY_URL`, `MATCHDAY_PUBLIC_URL`, `MATCHDAY_GROUP_ID`,
+  `MATCHDAY_SERVICE_USERNAME`, `MATCHDAY_SERVICE_PASSWORD`,
+  `MATCHDAY_USER_PASSWORDS`, `MATCHDAY_TIMEOUT_MS`.
+- Plugin Matchday `enabled: true` quand URL + groupe sont configurés.
+- Panneau **Matchday** sur le dashboard.
+- Page dédiée `/matchday` et notifications : hors scope v0.4.1.

@@ -23,6 +23,7 @@ import {
 import { AppIcon } from "@/components/dashboard/app-icon";
 import { HomeLightsPanel } from "@/components/dashboard/home-lights-panel";
 import { HomePanel } from "@/components/dashboard/home-panel";
+import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { formatBytes, formatPercent } from "@/lib/format";
 
@@ -143,6 +144,7 @@ export function DashboardPage() {
 
       <HomePanel />
       <HomeLightsPanel />
+      <MatchdayPanel />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="space-y-4 lg:col-span-2">
