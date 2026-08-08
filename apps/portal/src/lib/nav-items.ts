@@ -56,6 +56,7 @@ export const navItems: NavItem[] = [
     icon: Blocks,
     status: "ready",
     description: "Registre des plugins Martylab connectés à tes applications.",
+    mobilePrimary: true,
   },
   {
     id: "system",
@@ -65,6 +66,7 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Supervision CPU, RAM, disque, uptime et conteneurs Docker.",
+    mobilePrimary: true,
   },
   {
     id: "matchday",
@@ -74,7 +76,6 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Matchs du jour, classement, pronostics et messages du groupe.",
-    mobilePrimary: true,
   },
   {
     id: "jellyfin",
@@ -84,7 +85,6 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Bibliothèques, lecture en cours, films, séries et statut du serveur.",
-    mobilePrimary: true,
   },
   {
     id: "services",
