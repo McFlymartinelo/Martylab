@@ -3,6 +3,7 @@ import { loadPluginManifests } from "./load-manifests.js";
 import { createOrionClient } from "../connectors/orion/orion-client.js";
 import { createMatchdayClient } from "../connectors/matchday/matchday-client.js";
 import { createJellyfinClient } from "../connectors/jellyfin/jellyfin-client.js";
+import { createImmichClient } from "../connectors/immich/immich-client.js";
 import type { Env } from "../config/env.js";
 
 export async function bootstrapPlugins(env: Env): Promise<void> {
@@ -29,6 +30,19 @@ export async function bootstrapPlugins(env: Env): Promise<void> {
     userId: env.JELLYFIN_USER_ID,
     timeoutMs: env.JELLYFIN_TIMEOUT_MS,
   });
+  const immichClient = createImmichClient({
+    photos: {
+      baseUrl: env.PHOTOS_URL,
+      publicUrl: env.PHOTOS_PUBLIC_URL ?? env.PHOTOS_URL,
+      apiKey: env.PHOTOS_API_KEY,
+    },
+    photosShared: {
+      baseUrl: env.PHOTOSSHARED_URL,
+      publicUrl: env.PHOTOSSHARED_PUBLIC_URL ?? env.PHOTOSSHARED_URL,
+      apiKey: env.PHOTOSSHARED_API_KEY,
+    },
+    timeoutMs: env.IMMICH_TIMEOUT_MS,
+  });
 
   for (const plugin of manifests) {
     if (plugin.id === "orion" && orionClient.isConfigured) {
@@ -44,6 +58,11 @@ export async function bootstrapPlugins(env: Env): Promise<void> {
     }
 
     if (plugin.id === "jellyfin" && jellyfinClient.isConfigured) {
+      registerPlugin({ ...plugin, enabled: true });
+      continue;
+    }
+
+    if (plugin.id === "immich" && immichClient.isConfigured) {
       registerPlugin({ ...plugin, enabled: true });
       continue;
     }

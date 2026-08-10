@@ -151,6 +151,16 @@ export type {
   JellyfinSummaryResponse,
 } from "./jellyfin.js";
 export type {
+  ImmichAlbumSummary,
+  ImmichAssetStats,
+  ImmichInstanceId,
+  ImmichInstanceStatus,
+  ImmichInstanceSummary,
+  ImmichPageResponse,
+  ImmichStatusResponse,
+  ImmichSummaryResponse,
+} from "./immich.js";
+export type {
   MatchdayChatMessage,
   MatchdayMatch,
   MatchdayNotification,

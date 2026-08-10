@@ -28,6 +28,7 @@ import { createPortainerRouter } from "./routes/portainer.js";
 import { createCloudflareRouter } from "./routes/cloudflare.js";
 import { createNasRouter } from "./routes/nas.js";
 import { createJellyfinRouter } from "./routes/jellyfin.js";
+import { createImmichRouter } from "./routes/immich.js";
 import { createAssistantRouter } from "./routes/assistant.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
 import { createOrionClient } from "./connectors/orion/orion-client.js";
@@ -36,6 +37,7 @@ import { createPortainerClient } from "./connectors/portainer/portainer-client.j
 import { createCloudflareClient } from "./connectors/cloudflare/cloudflare-client.js";
 import { createNasClient } from "./connectors/nas/nas-client.js";
 import { createJellyfinClient } from "./connectors/jellyfin/jellyfin-client.js";
+import { createImmichClient } from "./connectors/immich/immich-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
 import { createUserService } from "./users/user-service.js";
 import { createAssistantRepository } from "./assistant/assistant-repository.js";
@@ -101,6 +103,19 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     apiKey: env.JELLYFIN_API_KEY,
     userId: env.JELLYFIN_USER_ID,
     timeoutMs: env.JELLYFIN_TIMEOUT_MS,
+  });
+  const immichClient = createImmichClient({
+    photos: {
+      baseUrl: env.PHOTOS_URL,
+      publicUrl: env.PHOTOS_PUBLIC_URL ?? env.PHOTOS_URL,
+      apiKey: env.PHOTOS_API_KEY,
+    },
+    photosShared: {
+      baseUrl: env.PHOTOSSHARED_URL,
+      publicUrl: env.PHOTOSSHARED_PUBLIC_URL ?? env.PHOTOSSHARED_URL,
+      apiKey: env.PHOTOSSHARED_API_KEY,
+    },
+    timeoutMs: env.IMMICH_TIMEOUT_MS,
   });
   const assistantService = database.db
     ? createAssistantService({
@@ -183,6 +198,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/cloudflare", createCloudflareRouter(cloudflareClient));
   app.use("/api/nas", createNasRouter(nasClient));
   app.use("/api/jellyfin", createJellyfinRouter(jellyfinClient));
+  app.use("/api/immich", createImmichRouter(immichClient));
   app.use("/api/assistant", createAssistantRouter(assistantService));
   app.use("/api/push", createPushRouter(pushService));
 

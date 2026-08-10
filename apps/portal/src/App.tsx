@@ -36,6 +36,11 @@ const JellyfinPage = lazy(() =>
     default: module.JellyfinPage,
   })),
 );
+const PhotosPage = lazy(() =>
+  import("@/pages/photos-page").then((module) => ({
+    default: module.PhotosPage,
+  })),
+);
 const UsersPage = lazy(() =>
   import("@/pages/users-page").then((module) => ({
     default: module.UsersPage,
@@ -84,6 +89,14 @@ export function App() {
               element={
                 <LazyPage>
                   <MatchdayPage />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="photos"
+              element={
+                <LazyPage>
+                  <PhotosPage />
                 </LazyPage>
               }
             />

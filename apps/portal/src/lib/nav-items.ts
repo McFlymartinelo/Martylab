@@ -10,6 +10,7 @@ import {
   Tv,
   Users,
   Workflow,
+  Images,
   type LucideIcon,
 } from "lucide-react";
 import type { UserRole } from "@martylab/shared";
@@ -76,6 +77,15 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Matchs du jour, classement, pronostics et messages du groupe.",
+  },
+  {
+    id: "photos",
+    label: "Photos",
+    to: "/photos",
+    icon: Images,
+    status: "ready",
+    description:
+      "Bibliothèques Immich personnelles et partagées, albums et statistiques.",
   },
   {
     id: "jellyfin",

@@ -1,0 +1,7 @@
+{
+  "id": "immich",
+  "name": "Immich",
+  "version": "0.0.0",
+  "capabilities": ["dashboard"],
+  "enabled": false
+}

@@ -139,6 +139,16 @@ const envSchema = z.object({
   JELLYFIN_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   JELLYFIN_USER_ID: z.preprocess(trimEnvString, z.string().optional()),
   JELLYFIN_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
+  PHOTOS_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  PHOTOS_PUBLIC_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  PHOTOS_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
+  PHOTOSSHARED_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
+  PHOTOSSHARED_PUBLIC_URL: z.preprocess(
+    parseOptionalUrl,
+    z.string().url().optional(),
+  ),
+  PHOTOSSHARED_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
+  IMMICH_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
   ASSISTANT_LLM_BASE_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
   ASSISTANT_LLM_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
   ASSISTANT_LLM_MODEL: z.preprocess(trimEnvString, z.string().optional()),
@@ -199,6 +209,18 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
   if (env.JELLYFIN_URL && !env.JELLYFIN_API_KEY) {
     console.warn(
       "[config] JELLYFIN_URL is set but JELLYFIN_API_KEY is missing — Jellyfin connector will be unavailable.",
+    );
+  }
+
+  if (env.PHOTOS_URL && !env.PHOTOS_API_KEY) {
+    console.warn(
+      "[config] PHOTOS_URL is set but PHOTOS_API_KEY is missing — Photos connector will be unavailable.",
+    );
+  }
+
+  if (env.PHOTOSSHARED_URL && !env.PHOTOSSHARED_API_KEY) {
+    console.warn(
+      "[config] PHOTOSSHARED_URL is set but PHOTOSSHARED_API_KEY is missing — Photos partagées connector will be unavailable.",
     );
   }
 

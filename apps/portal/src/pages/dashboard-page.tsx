@@ -15,6 +15,7 @@ import { HomeLightsPanel } from "@/components/dashboard/home-lights-panel";
 import { HomePanel } from "@/components/dashboard/home-panel";
 import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
 import { JellyfinPanel } from "@/components/dashboard/jellyfin-panel";
+import { ImmichPanel } from "@/components/dashboard/immich-panel";
 import { AssistantPanel } from "@/pages/assistant-page";
 
 const SystemPanel = lazy(() =>
@@ -102,6 +103,7 @@ export function DashboardPage() {
       <AssistantPanel />
 
       <MatchdayPanel />
+      <ImmichPanel />
       <JellyfinPanel />
 
       <Card>

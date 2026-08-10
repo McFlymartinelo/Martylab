@@ -27,6 +27,10 @@ try {
         orionConfigured: Boolean(env.ORION_URL),
         matchdayConfigured: Boolean(env.MATCHDAY_URL && env.MATCHDAY_GROUP_ID),
         jellyfinConfigured: Boolean(env.JELLYFIN_URL && env.JELLYFIN_API_KEY),
+        immichConfigured: Boolean(
+          (env.PHOTOS_URL && env.PHOTOS_API_KEY) ||
+            (env.PHOTOSSHARED_URL && env.PHOTOSSHARED_API_KEY),
+        ),
         pushConfigured: Boolean(
           env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY && env.VAPID_SUBJECT,
         ),
