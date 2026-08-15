@@ -11,7 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { HomeClimateHistoryPanel } from "@/components/dashboard/home-climate-history-panel";
-import { formatHumidity, formatTemperature } from "@/lib/format";
+import {
+  computeFeelsLikeCelsius,
+  formatHumidityCompact,
+  formatTemperature,
+} from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 function formatLastSeen(value: string | null): string {
@@ -29,13 +33,13 @@ function ClimateZone({
   label,
   icon: Icon,
   temperature,
-  humidity,
+  detail,
   className,
 }: {
   label: string;
   icon: LucideIcon;
   temperature: number | null;
-  humidity: number | null;
+  detail?: string | null;
   className?: string;
 }) {
   return (
@@ -56,13 +60,20 @@ function ClimateZone({
       <p className="mt-2 text-2xl font-semibold tabular-nums sm:text-3xl">
         {formatTemperature(temperature)}
       </p>
-      {humidity !== null ? (
-        <p className="mt-1 text-xs text-muted-foreground">
-          Humidité {formatHumidity(humidity)}
-        </p>
+      {detail ? (
+        <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
       ) : null}
     </div>
   );
+}
+
+function resolveOutdoorFeelsLike(
+  temperatureCelsius: number | null,
+  humidityPercent: number | null,
+): number | null {
+  if (temperatureCelsius === null) return null;
+  if (humidityPercent === null) return temperatureCelsius;
+  return computeFeelsLikeCelsius(temperatureCelsius, humidityPercent);
 }
 
 export function HomePanel() {
@@ -144,6 +155,11 @@ export function HomePanel() {
     );
   }
 
+  const outdoorFeelsLike = resolveOutdoorFeelsLike(
+    climate.outdoor.temperatureCelsius,
+    climate.outdoor.humidityPercent,
+  );
+
   return (
     <section className="space-y-3 sm:space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -166,20 +182,24 @@ export function HomePanel() {
               label="Intérieur"
               icon={Thermometer}
               temperature={climate.indoor.temperatureCelsius}
-              humidity={climate.indoor.humidityPercent}
             />
             <ClimateZone
               label="Extérieur"
               icon={Wind}
               temperature={climate.outdoor.temperatureCelsius}
-              humidity={climate.outdoor.humidityPercent}
+              detail={
+                outdoorFeelsLike !== null
+                  ? `Ressenti ${formatTemperature(outdoorFeelsLike)}`
+                  : null
+              }
             />
           </div>
 
           <div className="flex flex-wrap gap-2 border-t border-border pt-3">
             <Badge variant="outline" className="tabular-nums">
               <Droplets className="mr-1 size-3" aria-hidden="true" />
-              Int. {formatHumidity(climate.indoor.humidityPercent)}
+              Int {formatHumidityCompact(climate.indoor.humidityPercent)} / Ext{" "}
+              {formatHumidityCompact(climate.outdoor.humidityPercent)}
             </Badge>
             {climate.co2Ppm !== null ? (
               <Badge variant="outline" className="tabular-nums">

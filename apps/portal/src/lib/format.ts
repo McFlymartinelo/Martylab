@@ -45,3 +45,23 @@ export function formatHumidity(humidity: number | null): string {
   }
   return `${humidity.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %`;
 }
+
+export function formatHumidityCompact(humidity: number | null): string {
+  if (humidity === null) {
+    return "—";
+  }
+  return `${humidity.toLocaleString("fr-FR", { maximumFractionDigits: 0 })}%`;
+}
+
+/** Apparent outdoor temperature from dry-bulb temp and relative humidity (humidex). */
+export function computeFeelsLikeCelsius(
+  temperatureCelsius: number,
+  humidityPercent: number,
+): number {
+  const vaporPressure =
+    6.112 *
+    10 ** ((7.5 * temperatureCelsius) / (237.7 + temperatureCelsius)) *
+    (humidityPercent / 100);
+  const feelsLike = temperatureCelsius + (5 / 9) * (vaporPressure - 10);
+  return Math.round(feelsLike * 10) / 10;
+}
