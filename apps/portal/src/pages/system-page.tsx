@@ -1,4 +1,4 @@
-import { Container, Clock, Cpu, Gauge, HardDrive } from "lucide-react";
+import { Container } from "lucide-react";
 import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
 import { useSystemMetricsQuery } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MetricCard } from "@/components/dashboard/metric-card";
 import { InfrastructurePanels } from "@/components/system/infrastructure-panels";
-import { formatBytes, formatPercent, formatUptime } from "@/lib/format";
+import { SystemInstrumentationPanel } from "@/components/system/system-instrumentation-panel";
 
 function containerStateVariant(
   state: string,
@@ -54,46 +53,7 @@ export function SystemPage() {
         </Card>
       ) : null}
 
-      {metrics ? (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricCard
-              label="CPU"
-              icon={Cpu}
-              value={formatPercent(metrics.cpu.usagePercent)}
-              caption={`${metrics.cpu.cores} cœurs`}
-            />
-            <MetricCard
-              label="RAM"
-              icon={Gauge}
-              value={formatPercent(metrics.memory.usagePercent)}
-              caption={`${formatBytes(metrics.memory.usedBytes)} / ${formatBytes(metrics.memory.totalBytes)}`}
-            />
-            <MetricCard
-              label="Stockage"
-              icon={HardDrive}
-              value={formatPercent(metrics.storage.usagePercent)}
-              caption={`${formatBytes(metrics.storage.usedBytes)} / ${formatBytes(metrics.storage.totalBytes)}`}
-            />
-            <MetricCard
-              label="Uptime"
-              icon={Clock}
-              value={formatUptime(metrics.uptimeSeconds)}
-              caption={
-                metrics.temperatureCelsius !== null
-                  ? `${metrics.temperatureCelsius} °C`
-                  : "Température indisponible"
-              }
-            />
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            Source des métriques :{" "}
-            {metrics.source === "host" ? "serveur hôte" : "conteneur backend"} ·
-            disque mesuré sur <code>{metrics.storage.path}</code>
-          </p>
-        </>
-      ) : null}
+      {metrics ? <SystemInstrumentationPanel metrics={metrics} /> : null}
 
       <InfrastructurePanels />
 
