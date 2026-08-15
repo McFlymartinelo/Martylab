@@ -20,6 +20,8 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <SystemPanel />
+
       <RecentActivityPanel />
 
       <AssistantPanel />
@@ -90,8 +92,6 @@ export function DashboardPage() {
           </div>
         ) : null}
       </section>
-
-      <SystemPanel />
     </div>
   );
 }
