@@ -1,25 +1,15 @@
 import { Container } from "lucide-react";
 import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
 import { useSystemMetricsQuery } from "@/features/system/use-system-metrics-query";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { DockerContainerGroups } from "@/components/system/docker-container-groups";
 import { InfrastructurePanels } from "@/components/system/infrastructure-panels";
 import { SystemInstrumentationPanel } from "@/components/system/system-instrumentation-panel";
-
-function containerStateVariant(
-  state: string,
-): "success" | "secondary" | "outline" | "destructive" {
-  if (state === "running") return "success";
-  if (state === "exited") return "secondary";
-  if (state === "paused") return "outline";
-  return "destructive";
-}
 
 export function SystemPage() {
   const metricsQuery = useSystemMetricsQuery();
@@ -107,26 +97,7 @@ export function SystemPage() {
         ) : null}
 
         {dockerQuery.data?.available && dockerQuery.data.containers.length > 0 ? (
-          <div className="grid gap-3">
-            {dockerQuery.data.containers.map((container) => (
-              <Card key={container.id}>
-                <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="font-medium">{container.name}</p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {container.image} · {container.id}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {container.status}
-                    </p>
-                  </div>
-                  <Badge variant={containerStateVariant(container.state)}>
-                    {container.state}
-                  </Badge>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <DockerContainerGroups containers={dockerQuery.data.containers} />
         ) : null}
       </section>
     </div>
