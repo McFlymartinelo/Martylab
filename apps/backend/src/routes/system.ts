@@ -12,13 +12,25 @@ export function createSystemRouter(serverMetrics: ServerMetricsService) {
 
   systemRouter.get("/metrics", requireAuth, async (_req, res, next) => {
     try {
-      const metrics = await serverMetrics.getMetrics();
+      const [metrics, network, processes] = await Promise.all([
+        serverMetrics.getMetrics(),
+        serverMetrics.getNetworkStats(),
+        serverMetrics.getProcessStats(),
+      ]);
       const body: SystemMetricsResponse = {
         ...metrics,
         cpu: {
           ...metrics.cpu,
           history: serverMetrics.getCpuHistory(),
         },
+        network: {
+          receiveBytesPerSecond: network.receiveBytesPerSecond,
+          transmitBytesPerSecond: network.transmitBytesPerSecond,
+          receiveHistory: network.receiveHistory,
+          transmitHistory: network.transmitHistory,
+          interfaces: network.interfaces,
+        },
+        processes: processes.processes,
       };
       res.status(200).json(body);
     } catch (error) {

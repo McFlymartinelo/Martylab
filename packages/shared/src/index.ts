@@ -97,6 +97,14 @@ export interface SystemMetricsResponse {
   };
   uptimeSeconds: number;
   temperatureCelsius: number | null;
+  network?: {
+    receiveBytesPerSecond: number;
+    transmitBytesPerSecond: number;
+    receiveHistory: number[];
+    transmitHistory: number[];
+    interfaces: SystemNetworkInterface[];
+  };
+  processes?: SystemProcessEntry[];
 }
 
 export interface SystemNetworkInterface {

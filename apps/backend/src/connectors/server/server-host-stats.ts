@@ -188,46 +188,44 @@ async function readTopProcesses(
   ]);
 
   const processes: ProcessStatsSnapshot["processes"] = [];
+  const pids = entries
+    .filter((entry) => /^\d+$/.test(entry))
+    .map((entry) => Number.parseInt(entry, 10))
+    .filter((pid) => Number.isFinite(pid))
+    .slice(0, 250);
 
-  await Promise.all(
-    entries
-      .filter((entry) => /^\d+$/.test(entry))
-      .map(async (entry) => {
-        const pid = Number.parseInt(entry, 10);
-        if (!Number.isFinite(pid)) return;
+  for (const pid of pids) {
+    try {
+      const status = await fs.readFile(
+        path.join(root, String(pid), "status"),
+        "utf8",
+      );
+      const name = parseStatusField(status, "Name");
+      const rssKb = parseStatusField(status, "VmRSS");
+      const state = parseStatusField(status, "State")?.charAt(0) ?? "?";
 
-        try {
-          const status = await fs.readFile(
-            path.join(root, entry, "status"),
-            "utf8",
-          );
-          const name = parseStatusField(status, "Name");
-          const rssKb = parseStatusField(status, "VmRSS");
-          const state = parseStatusField(status, "State")?.charAt(0) ?? "?";
+      if (!name || !rssKb) continue;
 
-          if (!name || !rssKb) return;
+      const memoryKb = Number.parseInt(rssKb.replace(/\D/g, ""), 10);
+      if (!Number.isFinite(memoryKb) || memoryKb <= 0) continue;
 
-          const memoryKb = Number.parseInt(rssKb.replace(/\D/g, ""), 10);
-          if (!Number.isFinite(memoryKb) || memoryKb <= 0) return;
+      const memoryBytes = memoryKb * 1024;
+      const memoryPercent =
+        totalMemoryBytes > 0
+          ? Math.round((memoryBytes / totalMemoryBytes) * 1000) / 10
+          : 0;
 
-          const memoryBytes = memoryKb * 1024;
-          const memoryPercent =
-            totalMemoryBytes > 0
-              ? Math.round((memoryBytes / totalMemoryBytes) * 1000) / 10
-              : 0;
-
-          processes.push({
-            pid,
-            name,
-            memoryBytes,
-            memoryPercent,
-            state,
-          });
-        } catch {
-          // Process may have exited between readdir and read.
-        }
-      }),
-  );
+      processes.push({
+        pid,
+        name,
+        memoryBytes,
+        memoryPercent,
+        state,
+      });
+    } catch {
+      // Process may have exited between readdir and read.
+    }
+  }
 
   return processes
     .sort((a, b) => b.memoryBytes - a.memoryBytes)

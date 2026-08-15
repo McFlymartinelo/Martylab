@@ -1,13 +1,9 @@
-import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { Blocks } from "lucide-react";
 import { usePluginsQuery } from "@/features/plugins/use-plugins-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { AppIcon } from "@/components/dashboard/app-icon";
 import { HomeLightsPanel } from "@/components/dashboard/home-lights-panel";
 import { HomePanel } from "@/components/dashboard/home-panel";
@@ -15,13 +11,8 @@ import { ImmichPanel } from "@/components/dashboard/immich-panel";
 import { JellyfinPanel } from "@/components/dashboard/jellyfin-panel";
 import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
 import { RecentActivityPanel } from "@/components/dashboard/recent-activity-panel";
+import { SystemPanel } from "@/components/dashboard/system-panel";
 import { AssistantPanel } from "@/pages/assistant-page";
-
-const SystemPanel = lazy(() =>
-  import("@/components/dashboard/system-panel").then((module) => ({
-    default: module.SystemPanel,
-  })),
-);
 
 export function DashboardPage() {
   const pluginsQuery = usePluginsQuery();
@@ -100,15 +91,7 @@ export function DashboardPage() {
         ) : null}
       </section>
 
-      <Suspense
-        fallback={
-          <Card className="h-64 animate-pulse">
-            <CardContent className="h-full" />
-          </Card>
-        }
-      >
-        <SystemPanel />
-      </Suspense>
+      <SystemPanel />
     </div>
   );
 }
