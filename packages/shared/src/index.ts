@@ -99,6 +99,36 @@ export interface SystemMetricsResponse {
   temperatureCelsius: number | null;
 }
 
+export interface SystemNetworkInterface {
+  name: string;
+  receiveBytesPerSecond: number;
+  transmitBytesPerSecond: number;
+}
+
+export interface SystemNetworkResponse {
+  source: "host" | "container";
+  timestamp: string;
+  receiveBytesPerSecond: number;
+  transmitBytesPerSecond: number;
+  receiveHistory: number[];
+  transmitHistory: number[];
+  interfaces: SystemNetworkInterface[];
+}
+
+export interface SystemProcessEntry {
+  pid: number;
+  name: string;
+  memoryBytes: number;
+  memoryPercent: number;
+  state: string;
+}
+
+export interface SystemProcessesResponse {
+  source: "host" | "container";
+  timestamp: string;
+  processes: SystemProcessEntry[];
+}
+
 export interface DockerContainerSummary {
   id: string;
   name: string;

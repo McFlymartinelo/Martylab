@@ -1,6 +1,10 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import {
+  collectNetworkStats,
+  collectProcessStats,
+} from "./server-host-stats.js";
 
 export interface ServerMetricsSnapshot {
   source: "host" | "container";
@@ -213,6 +217,8 @@ export function createServerMetricsService(config: ServerMetricsConfig) {
   return {
     getMetrics: () => collectServerMetrics(config),
     getCpuHistory,
+    getNetworkStats: () => collectNetworkStats(config),
+    getProcessStats: () => collectProcessStats(config),
   };
 }
 

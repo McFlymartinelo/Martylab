@@ -1,21 +1,20 @@
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { Blocks, History } from "lucide-react";
+import { Blocks } from "lucide-react";
 import { usePluginsQuery } from "@/features/plugins/use-plugins-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { AppIcon } from "@/components/dashboard/app-icon";
 import { HomeLightsPanel } from "@/components/dashboard/home-lights-panel";
 import { HomePanel } from "@/components/dashboard/home-panel";
-import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
-import { JellyfinPanel } from "@/components/dashboard/jellyfin-panel";
 import { ImmichPanel } from "@/components/dashboard/immich-panel";
+import { JellyfinPanel } from "@/components/dashboard/jellyfin-panel";
+import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
+import { RecentActivityPanel } from "@/components/dashboard/recent-activity-panel";
 import { AssistantPanel } from "@/pages/assistant-page";
 
 const SystemPanel = lazy(() =>
@@ -30,15 +29,16 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <Suspense
-        fallback={
-          <Card className="h-64 animate-pulse">
-            <CardContent className="h-full" />
-          </Card>
-        }
-      >
-        <SystemPanel />
-      </Suspense>
+      <RecentActivityPanel />
+
+      <AssistantPanel />
+
+      <HomePanel />
+      <HomeLightsPanel />
+
+      <MatchdayPanel />
+      <ImmichPanel />
+      <JellyfinPanel />
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
@@ -100,29 +100,15 @@ export function DashboardPage() {
         ) : null}
       </section>
 
-      <AssistantPanel />
-
-      <MatchdayPanel />
-      <ImmichPanel />
-      <JellyfinPanel />
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Activité récente</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-2 py-8 text-center">
-          <History className="size-5 text-muted-foreground" aria-hidden="true" />
-          <p className="text-sm text-muted-foreground">
-            Aucune activité récente.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Le journal d&apos;activité sera bientôt disponible.
-          </p>
-        </CardContent>
-      </Card>
-
-      <HomePanel />
-      <HomeLightsPanel />
+      <Suspense
+        fallback={
+          <Card className="h-64 animate-pulse">
+            <CardContent className="h-full" />
+          </Card>
+        }
+      >
+        <SystemPanel />
+      </Suspense>
     </div>
   );
 }

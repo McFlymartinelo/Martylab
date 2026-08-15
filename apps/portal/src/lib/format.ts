@@ -10,6 +10,10 @@ export function formatBytes(bytes: number): string {
   return `${Math.round(value * 10) / 10} ${units[unitIndex]}`;
 }
 
+export function formatBytesPerSecond(bytes: number): string {
+  return `${formatBytes(bytes)}/s`;
+}
+
 export function formatUptime(seconds: number): string {
   const days = Math.floor(seconds / 86_400);
   const hours = Math.floor((seconds % 86_400) / 3600);
