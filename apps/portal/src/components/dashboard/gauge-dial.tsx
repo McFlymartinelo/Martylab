@@ -11,6 +11,8 @@ interface GaugeDialProps {
   color?: string;
   size?: number;
   className?: string;
+  /** Hide the caption on small screens to save vertical space. */
+  compact?: boolean;
 }
 
 const ARC_DEGREES = 270;
@@ -25,6 +27,7 @@ export function GaugeDial({
   color,
   size = 120,
   className,
+  compact = false,
 }: GaugeDialProps) {
   const gradientId = useId();
   const [animatedRatio, setAnimatedRatio] = useState(0);
@@ -104,16 +107,25 @@ export function GaugeDial({
         </svg>
 
         <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-          <span className="text-xl font-semibold tabular-nums sm:text-2xl">
+          <span className="text-base font-semibold tabular-nums sm:text-xl md:text-2xl">
             {formatPercent(clamped)}
           </span>
         </div>
       </div>
 
       <div className="text-center">
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <p className="text-[11px] font-medium text-muted-foreground sm:text-xs">
+          {label}
+        </p>
         {caption ? (
-          <p className="mt-0.5 text-[11px] text-muted-foreground/80">{caption}</p>
+          <p
+            className={cn(
+              "mt-0.5 text-[10px] text-muted-foreground/80 sm:text-[11px]",
+              compact && "hidden sm:block",
+            )}
+          >
+            {caption}
+          </p>
         ) : null}
       </div>
     </div>

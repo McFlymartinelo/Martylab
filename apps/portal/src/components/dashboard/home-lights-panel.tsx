@@ -7,7 +7,6 @@ import {
 } from "@/features/orion/use-orion-query";
 import { hasMinRole } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export function HomeLightsPanel() {
   const authQuery = useAuthQuery();
@@ -67,14 +67,16 @@ export function HomeLightsPanel() {
     );
   }
 
+  const onCount = lights.lights.filter((light) => light.on).length;
+
   return (
-    <section className="space-y-4">
+    <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-sm font-medium text-muted-foreground">Lumières</h2>
           <p className="text-xs text-muted-foreground">
-            Philips Hue via Orion · {lights.lights.length} appareil
-            {lights.lights.length > 1 ? "s" : ""}
+            Philips Hue · {onCount}/{lights.lights.length} allumée
+            {onCount > 1 ? "s" : ""}
           </p>
         </div>
         {!canControl ? (
@@ -82,73 +84,69 @@ export function HomeLightsPanel() {
         ) : null}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {lights.lights.map((light) => (
-          <Card key={light.id}>
-            <CardContent className="space-y-4 py-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{light.name}</p>
-                  <p className="text-xs text-muted-foreground">ID Hue {light.id}</p>
+      <Card className="overflow-hidden">
+        <CardContent className="divide-y divide-border p-0">
+          {lights.lights.map((light) => {
+            const disabled =
+              !canControl || !light.reachable || lightMutation.isPending;
+
+            return (
+              <div
+                key={light.id}
+                className="flex items-center gap-3 px-3 py-2.5 sm:px-4 sm:py-3"
+              >
+                <button
+                  type="button"
+                  className={cn(
+                    "flex size-10 shrink-0 items-center justify-center rounded-full transition-colors",
+                    light.on
+                      ? "bg-chart-1/20 text-chart-1"
+                      : "bg-muted text-muted-foreground",
+                    disabled && "opacity-50",
+                  )}
+                  disabled={disabled}
+                  aria-label={
+                    light.on
+                      ? `Éteindre ${light.name}`
+                      : `Allumer ${light.name}`
+                  }
+                  onClick={() =>
+                    lightMutation.mutate({
+                      lightId: light.id,
+                      body: { on: !light.on },
+                    })
+                  }
+                >
+                  {light.on ? (
+                    <Lightbulb className="size-4" aria-hidden="true" />
+                  ) : (
+                    <LightbulbOff className="size-4" aria-hidden="true" />
+                  )}
+                </button>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{light.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {light.on
+                      ? light.brightness !== null
+                        ? `${light.brightness} %`
+                        : "Allumée"
+                      : "Éteinte"}
+                    {!light.reachable ? " · hors ligne" : ""}
+                  </p>
                 </div>
-                <Badge variant={light.on ? "success" : "secondary"}>
-                  {light.on ? "Allumée" : "Éteinte"}
+
+                <Badge
+                  variant={light.on ? "success" : "secondary"}
+                  className="shrink-0 text-[10px] sm:text-xs"
+                >
+                  {light.on ? "ON" : "OFF"}
                 </Badge>
               </div>
-
-              <p className="text-sm text-muted-foreground">
-                {light.brightness !== null
-                  ? `Luminosité ${light.brightness} %`
-                  : "Luminosité inconnue"}
-                {!light.reachable ? " · hors ligne" : ""}
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={
-                    !canControl ||
-                    !light.reachable ||
-                    light.on ||
-                    lightMutation.isPending
-                  }
-                  onClick={() =>
-                    lightMutation.mutate({
-                      lightId: light.id,
-                      body: { on: true },
-                    })
-                  }
-                >
-                  <Lightbulb className="size-4" />
-                  Allumer
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  disabled={
-                    !canControl ||
-                    !light.reachable ||
-                    !light.on ||
-                    lightMutation.isPending
-                  }
-                  onClick={() =>
-                    lightMutation.mutate({
-                      lightId: light.id,
-                      body: { on: false },
-                    })
-                  }
-                >
-                  <LightbulbOff className="size-4" />
-                  Éteindre
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            );
+          })}
+        </CardContent>
+      </Card>
     </section>
   );
 }
