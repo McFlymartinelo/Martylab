@@ -54,6 +54,54 @@ function formatVersion(version: ImmichVersionInfo | null): string | null {
   return `${version.major}.${version.minor}.${version.patch}`;
 }
 
+function isImmichPingResponse(payload: string): boolean {
+  const trimmed = payload.trim();
+  if (trimmed.toLowerCase() === "pong") {
+    return true;
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed) as { res?: unknown };
+    return (
+      typeof parsed.res === "string" &&
+      parsed.res.trim().toLowerCase() === "pong"
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function pingImmich(
+  request: <T>(
+    path: string,
+    options?: {
+      authenticated?: boolean;
+      accept?: string;
+      responseType?: "json" | "text";
+    },
+  ) => Promise<T>,
+): Promise<boolean> {
+  try {
+    const json = await request<{ res?: string }>("/server/ping", {
+      authenticated: false,
+      accept: "application/json",
+      responseType: "json",
+    });
+    return json.res?.trim().toLowerCase() === "pong";
+  } catch {
+    try {
+      const text = await request<string>("/server/ping", {
+        authenticated: false,
+        accept: "text/plain",
+        responseType: "text",
+      });
+      return isImmichPingResponse(text);
+    } catch {
+      return false;
+    }
+  }
+}
+
 function mapAlbum(
   album: ImmichAlbumResponse,
   instanceId: ImmichInstanceId,
@@ -191,14 +239,9 @@ export function createImmichInstanceClient(config: ImmichInstanceClientConfig) {
       }
 
       try {
-        const ping = await request<string>("/server/ping", {
-          authenticated: false,
-          accept: "text/plain",
-          responseType: "text",
-        });
-
-        if (ping.trim().toLowerCase() !== "pong") {
-          throw new Error("Unexpected Immich ping response.");
+        const reachable = await pingImmich(request);
+        if (!reachable) {
+          throw new Error("Immich ping failed.");
         }
 
         if (!config.apiKey) {
@@ -218,7 +261,7 @@ export function createImmichInstanceClient(config: ImmichInstanceClientConfig) {
           id: config.id,
           label: config.label,
           configured: true,
-          online: version !== null,
+          online: true,
           version,
           immichUrl: publicUrl ?? null,
         };

@@ -116,9 +116,14 @@ function mapUpcomingMatch(match: MatchdayMatch): MatchdayUpcomingMatch {
   };
 }
 
-function parseUserPasswords(
+interface MatchdayUserCredential {
+  password: string;
+  matchdayUsername: string;
+}
+
+function parseUserCredentials(
   raw: string | undefined,
-): Record<string, string> | undefined {
+): Record<string, MatchdayUserCredential> | undefined {
   if (!raw) {
     return undefined;
   }
@@ -129,11 +134,39 @@ function parseUserPasswords(
       return undefined;
     }
 
-    const result: Record<string, string> = {};
+    const result: Record<string, MatchdayUserCredential> = {};
     for (const [key, value] of Object.entries(parsed)) {
-      if (typeof value === "string" && value.length > 0) {
-        result[key.toLowerCase()] = value;
+      const martylabUsername = key.trim().toLowerCase();
+      if (!martylabUsername) {
+        continue;
       }
+
+      if (typeof value === "string" && value.length > 0) {
+        result[martylabUsername] = {
+          password: value,
+          matchdayUsername: martylabUsername,
+        };
+        continue;
+      }
+
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        continue;
+      }
+
+      const record = value as { username?: unknown; password?: unknown };
+      if (typeof record.password !== "string" || record.password.length === 0) {
+        continue;
+      }
+
+      const matchdayUsername =
+        typeof record.username === "string" && record.username.trim().length > 0
+          ? record.username.trim()
+          : martylabUsername;
+
+      result[martylabUsername] = {
+        password: record.password,
+        matchdayUsername,
+      };
     }
     return result;
   } catch {
@@ -147,7 +180,7 @@ export function createMatchdayClient(config: MatchdayClientConfig) {
     ? normalizeBaseUrl(config.publicUrl)
     : baseUrl;
   const timeoutMs = config.timeoutMs ?? 6_000;
-  const userPasswords = parseUserPasswords(config.userPasswordsJson);
+  const userCredentials = parseUserCredentials(config.userPasswordsJson);
 
   const tokenCache = new Map<string, string>();
 
@@ -232,11 +265,14 @@ export function createMatchdayClient(config: MatchdayClientConfig) {
     martylabUsername: string,
   ): Promise<{ token: string; personalized: boolean } | null> {
     const normalized = martylabUsername.trim().toLowerCase();
-    const userPassword = userPasswords?.[normalized];
+    const userCredential = userCredentials?.[normalized];
 
-    if (userPassword) {
+    if (userCredential) {
       return {
-        token: await login(normalized, userPassword),
+        token: await login(
+          userCredential.matchdayUsername,
+          userCredential.password,
+        ),
         personalized: true,
       };
     }

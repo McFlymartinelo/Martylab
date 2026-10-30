@@ -199,9 +199,21 @@ export function createJellyfinClient(config: JellyfinClientConfig) {
       return cachedUserId;
     }
 
-    const user = await request<JellyfinUser>("/Users/Me");
-    cachedUserId = user.Id;
-    return user.Id;
+    // Prefer an explicitly configured user id when provided.
+    if (config.userId) {
+      cachedUserId = config.userId;
+      return config.userId;
+    }
+
+    try {
+      const user = await request<JellyfinUser>("/Users/Me");
+      cachedUserId = user.Id;
+      return user.Id;
+    } catch {
+      throw new Error(
+        "Jellyfin user unavailable: /Users/Me failed. Set JELLYFIN_USER_ID to a valid account id.",
+      );
+    }
   }
 
   async function fetchSystemInfo(): Promise<JellyfinSystemInfo | null> {
