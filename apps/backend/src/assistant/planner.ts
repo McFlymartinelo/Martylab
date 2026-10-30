@@ -26,7 +26,9 @@ export function planToolCalls(message: string): AssistantToolCall[] {
     lower.includes("éteint") ||
     lower.includes("eteint")
   ) {
-    const lightMatch = message.match(/lumière\s+(\d+)/i) ?? message.match(/light\s+(\d+)/i);
+    const lightMatch =
+      message.match(/lumière\s+([a-zA-Z0-9_.-]+)/i) ??
+      message.match(/light\s+([a-zA-Z0-9_.-]+)/i);
     if (lightMatch?.[1]) {
       const on = !lower.includes("éteint") && !lower.includes("eteint");
       return [

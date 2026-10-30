@@ -41,7 +41,7 @@ export function createLlmPlanner(config: LlmPlannerConfig) {
       message: string;
       tools: AssistantTool[];
       history: Array<{ role: "user" | "assistant"; content: string }>;
-    }): Promise<LlmToolCall[]> {
+    }): Promise<{ calls: LlmToolCall[]; error?: string }> {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
 
@@ -74,7 +74,7 @@ export function createLlmPlanner(config: LlmPlannerConfig) {
         });
 
         if (!response.ok) {
-          return [];
+          return { calls: [], error: `LLM HTTP ${response.status}` };
         }
 
         const payload = (await response.json()) as {
@@ -92,7 +92,7 @@ export function createLlmPlanner(config: LlmPlannerConfig) {
 
         const toolCalls = payload.choices?.[0]?.message?.tool_calls ?? [];
 
-        return toolCalls
+        const calls = toolCalls
           .map((call) => {
             const name = call.function?.name;
             if (!name) {
@@ -115,8 +115,13 @@ export function createLlmPlanner(config: LlmPlannerConfig) {
             };
           })
           .filter((call): call is LlmToolCall => call !== null);
-      } catch {
-        return [];
+
+        return { calls };
+      } catch (error) {
+        return {
+          calls: [],
+          error: error instanceof Error ? error.message : "LLM request failed.",
+        };
       } finally {
         clearTimeout(timeout);
       }

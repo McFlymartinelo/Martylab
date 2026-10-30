@@ -262,9 +262,9 @@ export function createAssistantToolRegistry(
         ["containerId"],
       ),
       async execute(_context, parameters) {
-        const containerId = String(parameters.containerId ?? "");
-        if (!containerId) {
-          return { success: false, summary: "containerId requis." };
+        const containerId = String(parameters.containerId ?? "").trim();
+        if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/.test(containerId)) {
+          return { success: false, summary: "containerId invalide." };
         }
 
         await deps.dockerClient.restartContainer(containerId);

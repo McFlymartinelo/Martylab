@@ -64,7 +64,7 @@ export function createAssistantService(input: {
     user: SessionUser,
     conversationId: string,
     message: string,
-  ) {
+  ): Promise<{ calls: ReturnType<typeof planToolCalls>; llmError?: string }> {
     const availableTools = tools
       .list()
       .filter((tool) => hasMinRole(user.role, tool.minRole));
@@ -78,18 +78,29 @@ export function createAssistantService(input: {
           content: entry.content,
         }));
 
-      const llmCalls = await llmPlanner.planToolCalls({
-        message,
-        tools: availableTools,
-        history,
-      });
+      try {
+        const llmResult = await llmPlanner.planToolCalls({
+          message,
+          tools: availableTools,
+          history,
+        });
 
-      if (llmCalls.length > 0) {
-        return llmCalls;
+        if (llmResult.error) {
+          return { calls: planToolCalls(message), llmError: llmResult.error };
+        }
+
+        if (llmResult.calls.length > 0) {
+          return { calls: llmResult.calls };
+        }
+      } catch (error) {
+        return {
+          calls: planToolCalls(message),
+          llmError: error instanceof Error ? error.message : "LLM request failed.",
+        };
       }
     }
 
-    return planToolCalls(message);
+    return { calls: planToolCalls(message) };
   }
 
   async function executeToolCall(input: {
@@ -220,13 +231,18 @@ export function createAssistantService(input: {
         );
       }
 
-      const plannedCalls = await resolvePlannedCalls(user, conversationId, trimmed);
+      const planned = await resolvePlannedCalls(user, conversationId, trimmed);
+      const plannedCalls = planned.calls;
       let assistantContent = "";
       let pendingConfirmationId: string | null = null;
       let metadata: Record<string, unknown> | null = null;
 
+      if (planned.llmError) {
+        assistantContent = `⚠️ LLM indisponible (${planned.llmError}) — repli sur le planificateur local.\n\n`;
+      }
+
       if (plannedCalls.length === 0) {
-        assistantContent = buildHelpMessage();
+        assistantContent += buildHelpMessage();
       } else {
         const summaries: string[] = [];
 
