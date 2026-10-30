@@ -13,8 +13,13 @@ const logsQuerySchema = z.object({
   tail: z.coerce.number().int().min(10).max(500).optional(),
 });
 
+const CONTAINER_ID_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
+
 function parseContainerId(raw: string | string[] | undefined): string {
   if (typeof raw !== "string" || raw.length === 0) {
+    throw new AppError(400, "invalid_container_id", "Invalid container id.");
+  }
+  if (!CONTAINER_ID_PATTERN.test(raw)) {
     throw new AppError(400, "invalid_container_id", "Invalid container id.");
   }
   return raw;
