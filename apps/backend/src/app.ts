@@ -16,6 +16,10 @@ import {
   createSessionMiddleware,
   requireAuth,
 } from "./middleware/auth.js";
+import {
+  createAuthRateLimiter,
+  createGlobalRateLimiter,
+} from "./middleware/rate-limit.js";
 import { createAuthRouter } from "./routes/auth.js";
 import { createDockerRouter } from "./routes/docker.js";
 import { createHealthRouter } from "./routes/health.js";
@@ -175,6 +179,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use(express.json({ limit: "1mb" }));
   app.use(cookieParser());
   app.use(createOriginGuard(env));
+  app.use(createGlobalRateLimiter());
   app.use(
     pinoHttp({
       logger,
@@ -187,7 +192,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use(createSessionMiddleware(env, sessionService));
 
   app.use("/api/health", createHealthRouter(database));
-  app.use("/api/auth", createAuthRouter(env, sessionService));
+  app.use("/api/auth", createAuthRateLimiter(), createAuthRouter(env, sessionService));
   app.use("/api/plugins", requireAuth, pluginsRouter);
   app.use("/api/users", createUsersRouter(userService));
   app.use("/api/system", createSystemRouter(serverMetrics));

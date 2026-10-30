@@ -116,9 +116,11 @@ export function createOriginGuard(env: Env) {
     }
 
     const origin = req.get("origin");
+    // Strict same-origin policy: every mutating request must carry an Origin
+    // header matching CORS_ORIGIN. This closes the previous bypass where
+    // requests without Origin were silently allowed.
     if (!origin) {
-      // Non-browser clients may omit Origin; allow for now.
-      next();
+      next(new AppError(403, "origin_required", "Origin header is required."));
       return;
     }
 
