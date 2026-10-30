@@ -63,7 +63,7 @@ Toutes les routes requièrent une session Martylab valide.
 
 | Route Immich | Usage |
 |--------------|-------|
-| `GET /api/server/ping` | Vérification de disponibilité |
+| `GET /api/server/ping` | Vérification de disponibilité (`pong` ou `{"res":"pong"}`) |
 | `GET /api/server/version` | Version du serveur |
 | `GET /api/assets/statistics` | Statistiques photos/vidéos |
 | `GET /api/albums/statistics` | Statistiques albums |

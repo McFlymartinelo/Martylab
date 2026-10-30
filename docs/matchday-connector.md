@@ -33,6 +33,12 @@ MATCHDAY_USER_PASSWORDS={"alexandre":"mot-de-passe-matchday"}
 
 Les clés JSON correspondent au `username` Martylab (insensible à la casse).
 
+Si le compte Matchday a un autre identifiant (ex. Martylab `alexandre` → Matchday `Marty`) :
+
+```env
+MATCHDAY_USER_PASSWORDS={"alexandre":{"username":"Marty","password":"mot-de-passe-matchday"}}
+```
+
 Sans cette variable, le widget affiche le classement via correspondance du
 `displayName` Martylab avec le pseudo Matchday, mais `pendingPredictions`
 reste `null`.

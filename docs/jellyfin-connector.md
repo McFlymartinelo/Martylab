@@ -17,6 +17,33 @@ JELLYFIN_API_KEY=your-api-key-here
 JELLYFIN_TIMEOUT_MS=6000
 ```
 
+### Jellyfin sur un autre stack Docker (ex. `/srv/docker/jellyfin`)
+
+Martylab et Jellyfin tournent souvent dans des `docker compose` séparés. Deux URLs :
+
+| Variable | Usage |
+|----------|-------|
+| `JELLYFIN_URL` | Appels API **depuis le conteneur backend** Martylab |
+| `JELLYFIN_PUBLIC_URL` | Lien « Ouvrir Jellyfin » dans le navigateur |
+
+Si `https://jellyfin.martylab.fr` n'est pas joignable depuis le backend, utilise
+l'URL interne (même réseau Docker) ou l'IP de l'hôte :
+
+```env
+# Réseau Docker partagé (recommandé) — voir ci-dessous
+JELLYFIN_URL=http://jellyfin:8096
+JELLYFIN_PUBLIC_URL=https://jellyfin.martylab.fr
+```
+
+Test depuis le backend :
+
+```bash
+docker compose exec backend wget -qO- http://jellyfin:8096/System/Info/Public
+```
+
+Pour partager le réseau, ajoute le réseau `martylab` (externe) au `compose.yaml`
+de Jellyfin et attache le service au réseau `martylab`.
+
 ### Utilisateur Jellyfin (optionnel)
 
 Par défaut, Martylab résout l'utilisateur via `GET /Users/Me` avec la clé API.
