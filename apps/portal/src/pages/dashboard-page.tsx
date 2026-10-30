@@ -12,7 +12,12 @@ import { JellyfinPanel } from "@/components/dashboard/jellyfin-panel";
 import { MatchdayPanel } from "@/components/dashboard/matchday-panel";
 import { RecentActivityPanel } from "@/components/dashboard/recent-activity-panel";
 import { SystemPanel } from "@/components/dashboard/system-panel";
-import { AssistantPanel } from "@/pages/assistant-page";
+import { lazy, Suspense } from "react";
+const AssistantPanel = lazy(() =>
+  import("@/pages/assistant-page").then((module) => ({
+    default: module.AssistantPage,
+  })),
+);
 
 export function DashboardPage() {
   const pluginsQuery = usePluginsQuery();
@@ -24,7 +29,9 @@ export function DashboardPage() {
 
       <RecentActivityPanel />
 
-      <AssistantPanel />
+      <Suspense fallback={<p className="text-sm text-muted-foreground">Chargement…</p>}>
+        <AssistantPanel />
+      </Suspense>
 
       <HomePanel />
       <HomeLightsPanel />
