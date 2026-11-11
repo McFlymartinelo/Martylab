@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import { loadEnv } from "./config/env.js";
 import { createApp } from "./app.js";
 import { createDatabase } from "./db/client.js";
@@ -9,14 +10,16 @@ try {
   const logger = createLogger(env);
   const database = createDatabase(env, logger);
   await bootstrapPlugins(env);
-  const { app, startBackgroundJobs, stopBackgroundJobs } = createApp(
-    env,
-    logger,
-    database,
-  );
+  const { app, attachConsoleTerminal, startBackgroundJobs, stopBackgroundJobs } =
+    createApp(env, logger, database);
   startBackgroundJobs();
 
-  const server = app.listen(env.PORT, env.HOST, () => {
+  // `http.createServer` (plutôt que `app.listen`) est requis pour recevoir
+  // l'événement `upgrade` du terminal conteneur.
+  const server = createServer(app);
+  attachConsoleTerminal(server);
+
+  server.listen(env.PORT, env.HOST, () => {
     logger.info(
       {
         host: env.HOST,

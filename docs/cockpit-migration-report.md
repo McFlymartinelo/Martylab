@@ -2,6 +2,9 @@
 
 > Passage du prototype `docs/redesign/` à l'application réelle.
 > Lots 1, 2, 3 et 5 livrés ; lot 4 (Console) explicitement reporté.
+>
+> Mise à jour ultérieure : la Console a finalement été livrée sous la forme
+> allowlist + terminal conteneur (ADR-021 dans `DECISIONS.md`).
 > Les écarts détaillés figurent aussi dans `docs/redesign/README.md`.
 
 ---

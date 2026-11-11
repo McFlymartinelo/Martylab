@@ -1,4 +1,5 @@
 import {
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -126,6 +127,22 @@ export const pushSubscriptions = pgTable("push_subscriptions", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
+});
+
+/** Journal d'audit de la Console : qui a exécuté quoi, et avec quel résultat. */
+export const consoleAudit = pgTable("console_audit", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  // Le compte peut être supprimé sans effacer l'historique de sécurité.
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  username: varchar("username", { length: 64 }).notNull(),
+  command: text("command").notNull(),
+  status: varchar("status", { length: 24 }).notNull(),
+  risk: varchar("risk", { length: 20 }).notNull(),
+  outputPreview: text("output_preview"),
+  durationMs: integer("duration_ms"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const pushNotificationSnapshots = pgTable("push_notification_snapshots", {

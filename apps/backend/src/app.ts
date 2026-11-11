@@ -3,6 +3,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
+import type { Server as HttpServer } from "node:http";
 import { createSessionService } from "./auth/session-service.js";
 import type { Env } from "./config/env.js";
 import type { createDatabase } from "./db/client.js";
@@ -34,7 +35,9 @@ import { createNasRouter } from "./routes/nas.js";
 import { createJellyfinRouter } from "./routes/jellyfin.js";
 import { createImmichRouter } from "./routes/immich.js";
 import { createAssistantRouter } from "./routes/assistant.js";
+import { createConsoleRouter } from "./routes/console.js";
 import { createDockerClient } from "./connectors/docker/docker-client.js";
+import { createDockerExecConnector } from "./connectors/docker/docker-exec.js";
 import { createOrionClient } from "./connectors/orion/orion-client.js";
 import { createMatchdayClient } from "./connectors/matchday/matchday-client.js";
 import { createPortainerClient } from "./connectors/portainer/portainer-client.js";
@@ -49,6 +52,9 @@ import { createAssistantRepository } from "./assistant/assistant-repository.js";
 import { createAssistantService } from "./assistant/assistant-service.js";
 import { createAssistantToolRegistry } from "./assistant/tools/create-registry.js";
 import { createLlmPlanner } from "./assistant/llm-planner.js";
+import { createConsoleRepository } from "./console/console-repository.js";
+import { createConsoleService } from "./console/console-service.js";
+import { createConsoleTerminalServer } from "./ws/console-terminal.js";
 import { createPushService } from "./push/push-service.js";
 import { createPushNotificationWorker } from "./push/push-notification-worker.js";
 import { createPushRouter } from "./routes/push.js";
@@ -72,6 +78,27 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     hostRootPath: env.HOST_ROOT_PATH,
   });
   const dockerClient = createDockerClient(env.DOCKER_SOCKET_PATH);
+  const dockerExec = createDockerExecConnector(env.DOCKER_SOCKET_PATH);
+  const consoleRepository = database.db
+    ? createConsoleRepository(database.db)
+    : null;
+  const consoleService = consoleRepository
+    ? createConsoleService({
+        dockerClient,
+        serverMetrics,
+        systemInfo,
+        repository: consoleRepository,
+        logger,
+        terminalEnabled: env.CONSOLE_TERMINAL_ENABLED !== false,
+      })
+    : null;
+  const consoleTerminal = createConsoleTerminalServer({
+    env,
+    sessionService,
+    dockerExec,
+    repository: consoleRepository,
+    logger,
+  });
   const orionClient = createOrionClient({
     baseUrl: env.ORION_URL,
     publicUrl: env.ORION_PUBLIC_URL ?? env.ORION_URL,
@@ -213,6 +240,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/users", createUsersRouter(userService));
   app.use("/api/system", createSystemRouter(serverMetrics, systemInfo));
   app.use("/api/docker", createDockerRouter(dockerClient));
+  app.use("/api/console", createConsoleRouter(consoleService));
   app.use("/api/orion", createOrionRouter(orionClient));
   app.use("/api/matchday", createMatchdayRouter(matchdayClient));
   app.use("/api/portainer", createPortainerRouter(portainerClient));
@@ -228,11 +256,15 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
 
   return {
     app,
+    attachConsoleTerminal(server: HttpServer) {
+      consoleTerminal.attach(server);
+    },
     startBackgroundJobs() {
       pushWorker?.start();
     },
     stopBackgroundJobs() {
       pushWorker?.stop();
+      consoleTerminal.close();
     },
   };
 }

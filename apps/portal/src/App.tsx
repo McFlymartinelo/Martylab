@@ -46,6 +46,11 @@ const UsersPage = lazy(() =>
     default: module.UsersPage,
   })),
 );
+const ConsolePage = lazy(() =>
+  import("@/pages/console-page").then((module) => ({
+    default: module.ConsolePage,
+  })),
+);
 
 const soonRoutes = navItems.filter((item) => item.status === "soon");
 
@@ -122,6 +127,14 @@ export function App() {
             />
             <Route path="settings" element={<SettingsPage />} />
             <Route element={<RequireAdmin />}>
+              <Route
+                path="console"
+                element={
+                  <LazyPage>
+                    <ConsolePage />
+                  </LazyPage>
+                }
+              />
               <Route
                 path="users"
                 element={

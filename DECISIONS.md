@@ -561,3 +561,74 @@ séparément.
   couverts par des tests unitaires.
 - Toute nouvelle donnée « cockpit » devra soit provenir d'un collecteur en
   lecture seule, soit être explicitement marquée non disponible.
+
+---
+
+# ADR-021 — Console : allowlist typée + terminal conteneur
+
+**Statut : Acceptée**
+
+## Contexte
+
+ADR-020 avait reporté la Console et posé la règle « pas de shell libre ».
+Le besoin exprimé ensuite est plus large : un accès direct au terminal est
+souhaité pour diagnostiquer les services, sans transformer Martylab en porte
+d'entrée vers le shell de l'hôte Debian.
+
+## Décision
+
+La Console expose **deux niveaux distincts**, tous deux réservés au rôle
+`admin` et revérifiés côté serveur :
+
+1. **Commandes typées** — allowlist de 14 commandes (`help`, `status`,
+   `containers`, `docker logs`, `disk`, `network`, `processes`, `hardware`,
+   `uname`, `uptime`, `audit`, `docker start|stop|restart`). Chaque commande
+   est résolue vers un collecteur en lecture seule ou un connecteur existant.
+   Aucun `child_process`, `spawn`, `exec`, `sudo` ou shell hôte. Les commandes
+   `write`/`destructive` exigent `confirm: true` (HTTP 428 sinon) et sont
+   journalisées dans `console_audit` (compte, commande, risque, statut,
+   aperçu, durée).
+
+2. **Terminal conteneur** — WebSocket same-origin
+   (`/api/console/terminal`) relié à un `docker exec` TTY dans un conteneur
+   explicitement choisi. Le backend vérifie le cookie de session, le rôle
+   admin et l'en-tête `Origin` (anti-CSRF WebSocket), n'accepte que les shells
+   `/bin/sh`, `/bin/bash`, `/bin/ash` et ferme la session après 30 minutes
+   d'inactivité. L'interface utilise xterm.js. `CONSOLE_TERMINAL_ENABLED=false`
+   retire complètement le canal.
+
+## Garanties
+
+- Aucun accès au shell de l'hôte : le terminal ne peut ouvrir qu'un conteneur
+  Docker existant, via le socket Docker.
+- Le socket Docker reste monté en lecture seule côté système de fichiers ;
+  les opérations `exec` passent par l'API.
+- Toute tentative de commande inconnue est refusée et auditée.
+- La Console n'apparaît dans la navigation que pour les administrateurs
+  (`minRole: admin`), et la route React est protégée par `RequireAdmin`.
+- nginx doit relayer l'`Upgrade` WebSocket ; c'est une `location` dédiée avec
+  `proxy_buffering off` et un timeout d'une heure.
+
+## Alternatives écartées
+
+- **Shell hôte via SSH** : accès total au Debian, stockage d'identifiants SSH
+  et nouvelle surface d'attaque. Non retenu ; nécessiterait son propre ADR.
+- **Exécution de commandes arbitraires via `child_process`** : viole ADR-020
+  et le principe de moindre privilège.
+- **Terminal dans le conteneur backend uniquement** : ne rend pas service pour
+  diagnostiquer les autres services.
+
+## Conséquences
+
+- Nouvelles dépendances : `ws` (backend), `@xterm/xterm` et
+  `@xterm/addon-fit` (portail, chargés uniquement avec la page Console).
+- Migration `0003_console_audit.sql` et table `console_audit`.
+- Nouvelles routes : `/api/console/commands`, `/api/console/execute`,
+  `/api/console/audit`, et le canal WebSocket `/api/console/terminal`.
+- `GET /api/system/live` expose CPU, RAM, disque, uptime et réseau sans le
+  scan des processus ; il alimente le rafraîchissement à la seconde de la page
+  Système. `/api/system/metrics` reste disponible mais n'est plus pollé par le
+  portail (les processus passent par `/api/system/processes`).
+- Les sessions de la page Paramètres sont listables et révocables
+  (`GET /api/auth/sessions`, `DELETE /api/auth/sessions/:id`,
+  `POST /api/auth/sessions/revoke-others`).

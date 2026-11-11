@@ -76,3 +76,22 @@ Details for Cloudflare Tunnel setup: [`docs/cloudflare-tunnel.md`](docs/cloudfla
 - Session id delivered via HttpOnly cookie
 - `COOKIE_SECURE=true` required for HTTPS production
 - Authorization enforced in the backend
+
+---
+
+## 5. Console (ADR-021)
+
+```text
+Admin browser
+  ├─ POST /api/console/execute   → allowlist → collecteurs / connecteurs
+  └─ WS  /api/console/terminal   → docker exec TTY → conteneur choisi
+```
+
+- Rôle `admin` obligatoire, vérifié à chaque requête et pendant la poignée de
+  main WebSocket (cookie de session + `Origin`).
+- Aucun `child_process`, aucun shell hôte, aucun `sudo`.
+- Chaque exécution et chaque session terminal sont écrites dans
+  `console_audit`.
+- Le terminal ne peut cibler qu'un conteneur Docker existant ; il ne donne pas
+  accès au shell du Debian.
+- `CONSOLE_TERMINAL_ENABLED=false` désactive le canal WebSocket.

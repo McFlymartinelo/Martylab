@@ -6,6 +6,7 @@ import {
   Puzzle,
   Server,
   Settings,
+  SquareTerminal,
   Trophy,
   Tv,
   Users,
@@ -100,6 +101,17 @@ export const navItems: NavItem[] = [
     status: "ready",
     description:
       "Gestion des conteneurs Docker (démarrage, arrêt, logs) via le connecteur Docker.",
+  },
+  {
+    id: "console",
+    label: "Console",
+    to: "/console",
+    icon: SquareTerminal,
+    group: "infrastructure",
+    status: "ready",
+    minRole: "admin",
+    description:
+      "Commandes typées avec audit et terminal conteneur réservé aux administrateurs.",
   },
   {
     id: "matchday",

@@ -47,6 +47,7 @@ services:
       HOST_SYS_PREFIX: /host/sys
       HOST_ROOT_PATH: /host/root
       DOCKER_SOCKET_PATH: /var/run/docker.sock
+      CONSOLE_TERMINAL_ENABLED: ${CONSOLE_TERMINAL_ENABLED:-true}
       ORION_URL: ${ORION_URL:-}
       ORION_PUBLIC_URL: ${ORION_PUBLIC_URL:-}
       ORION_API_KEY: ${ORION_API_KEY:-}

@@ -134,6 +134,16 @@ Objectif : permettre à Martylab de surveiller et gérer l'infrastructure.
 - [x] État des domaines (checks HTTP configurables)
 - [x] Vérification des services
 
+## Console et ergonomie (ADR-021)
+
+- [x] Console à allowlist typée (confirmation pour les actions sensibles)
+- [x] Journal d'audit `console_audit`
+- [x] Terminal conteneur (WebSocket + `docker exec`, admin uniquement)
+- [x] Page Paramètres en onglets verticaux (profil, apparence, sécurité,
+      intégrations, à propos)
+- [x] Session listables et révocables depuis les Paramètres
+- [x] Accordéons repliables pour les conteneurs (Système et Services)
+
 ---
 
 # 🏠 Version 0.3 — Orion

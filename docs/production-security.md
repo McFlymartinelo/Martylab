@@ -69,3 +69,17 @@ chmod +x scripts/rotate-production-secrets.sh
 ## 6. Sauvegardes
 
 Voir [backup-postgres.md](./backup-postgres.md) pour la sauvegarde PostgreSQL.
+
+## 7. Console et terminal conteneur
+
+La Console (ADR-021) est réservée aux administrateurs :
+
+- commandes typées : allowlist, confirmation explicite, audit en base ;
+- terminal : `docker exec` dans un conteneur, jamais le shell de l'hôte.
+
+Vérifications :
+
+- `/var/run/docker.sock` reste monté en lecture seule dans le backend ;
+- nginx relaie bien `Upgrade`/`Connection` sur `/api/console/terminal` ;
+- `CONSOLE_TERMINAL_ENABLED=false` si l'accès terminal n'est pas souhaité ;
+- les lignes `console_audit` sont conservées avec les sauvegardes PostgreSQL.

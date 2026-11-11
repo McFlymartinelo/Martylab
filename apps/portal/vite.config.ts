@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
@@ -6,6 +7,9 @@ import { defineConfig, loadEnv } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const workspacePackage = JSON.parse(
+  readFileSync(path.resolve(rootDir, "../../package.json"), "utf8"),
+) as { version: string };
 
 export default defineConfig(({ mode }) => {
   // Le port du backend vient du .env racine (PORT), pour que le proxy reste
@@ -17,6 +21,9 @@ export default defineConfig(({ mode }) => {
     `http://127.0.0.1:${fileEnv.PORT ?? "3000"}`;
 
   return {
+    define: {
+      __APP_VERSION__: JSON.stringify(workspacePackage.version),
+    },
     plugins: [
       react(),
       tailwindcss(),
@@ -114,6 +121,8 @@ export default defineConfig(({ mode }) => {
           // de dev (Next.js, par exemple) peut déjà écouter sur le même port.
           target: apiTarget,
           changeOrigin: true,
+          // Terminal conteneur : la poignée de main WebSocket doit passer.
+          ws: true,
         },
       },
     },

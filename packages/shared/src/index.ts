@@ -14,6 +14,20 @@ export interface SessionUser {
   username: string;
   displayName: string;
   role: UserRole;
+  createdAt: string;
+}
+
+export interface AuthSessionEntry {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+  userAgent: string | null;
+  ipAddress: string | null;
+  current: boolean;
+}
+
+export interface AuthSessionsResponse {
+  sessions: AuthSessionEntry[];
 }
 
 export interface ApiError {
@@ -165,6 +179,20 @@ export interface DockerContainerLogsResponse {
 }
 
 export type DockerContainerAction = "start" | "stop" | "restart";
+
+export type {
+  ConsoleAuditEntry,
+  ConsoleAuditResponse,
+  ConsoleAuditStatus,
+  ConsoleCommandDefinition,
+  ConsoleCommandsResponse,
+  ConsoleExecuteRequest,
+  ConsoleExecuteResponse,
+  ConsoleRisk,
+  ConsoleTerminalClientMessage,
+  ConsoleTerminalServerMessage,
+  ConsoleTerminalSessionRequest,
+} from "./console.js";
 
 export type {
   SystemDiskIoEntry,
