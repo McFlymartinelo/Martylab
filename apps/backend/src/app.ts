@@ -192,7 +192,11 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use(createSessionMiddleware(env, sessionService));
 
   app.use("/api/health", createHealthRouter(database));
-  app.use("/api/auth", createAuthRateLimiter(), createAuthRouter(env, sessionService));
+  // Brute-force protection applies to credential submission only. Mounting it
+  // on the whole /api/auth router used to throttle legitimate session reads
+  // (/me) and logouts after ~10 page loads.
+  app.use("/api/auth/login", createAuthRateLimiter());
+  app.use("/api/auth", createAuthRouter(env, sessionService));
   app.use("/api/plugins", requireAuth, pluginsRouter);
   app.use("/api/users", createUsersRouter(userService));
   app.use("/api/system", createSystemRouter(serverMetrics));
