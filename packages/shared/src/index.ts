@@ -284,6 +284,7 @@ export type {
 } from "./assistant.js";
 export type {
   PushPublicKeyResponse,
+  PushStatusRequest,
   PushStatusResponse,
   PushSubscribeRequest,
   PushSubscribeResponse,

@@ -47,8 +47,11 @@ docker compose logs backend --tail 30
 
 ### 3. Test manuel des migrations
 
+L'image de production ne contient pas les sources TypeScript. Pour lancer le
+script compilé sans démarrer l'entrypoint du backend :
+
 ```bash
-docker compose run --rm --no-deps backend node dist/db/migrate.js
+docker compose run --rm --no-deps --entrypoint node backend dist/db/migrate.js
 ```
 
 ### 4. Test du healthcheck

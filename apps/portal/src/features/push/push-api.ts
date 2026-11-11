@@ -1,5 +1,6 @@
 import type {
   PushPublicKeyResponse,
+  PushStatusRequest,
   PushStatusResponse,
   PushSubscribeRequest,
   PushSubscribeResponse,
@@ -10,8 +11,8 @@ export function fetchPushPublicKey() {
   return apiGet<PushPublicKeyResponse>("/api/push/public-key");
 }
 
-export function fetchPushStatus() {
-  return apiGet<PushStatusResponse>("/api/push/status");
+export function fetchPushStatus(body: PushStatusRequest) {
+  return apiPost<PushStatusResponse>("/api/push/status", body);
 }
 
 export function subscribePush(body: PushSubscribeRequest) {

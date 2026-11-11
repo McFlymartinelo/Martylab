@@ -78,11 +78,18 @@ export function createPushService(
         );
     },
 
-    async hasSubscription(userId: string): Promise<boolean> {
+    async hasSubscription(userId: string, endpoint?: string): Promise<boolean> {
       const [row] = await db
         .select({ id: pushSubscriptions.id })
         .from(pushSubscriptions)
-        .where(eq(pushSubscriptions.userId, userId))
+        .where(
+          endpoint
+            ? and(
+                eq(pushSubscriptions.userId, userId),
+                eq(pushSubscriptions.endpoint, endpoint),
+              )
+            : eq(pushSubscriptions.userId, userId),
+        )
         .limit(1);
 
       return Boolean(row);

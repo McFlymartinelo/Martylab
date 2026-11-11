@@ -35,7 +35,15 @@ async function getServiceWorkerRegistration() {
 export function usePushStatusQuery() {
   return useQuery({
     queryKey: pushStatusQueryKey,
-    queryFn: fetchPushStatus,
+    queryFn: async () => {
+      let endpoint: string | null = null;
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        const subscription = await registration?.pushManager.getSubscription();
+        endpoint = subscription?.endpoint ?? null;
+      }
+      return fetchPushStatus({ endpoint });
+    },
     staleTime: 30_000,
   });
 }

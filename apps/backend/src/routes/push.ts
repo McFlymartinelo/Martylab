@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import type {
   PushPublicKeyResponse,
+  PushStatusRequest,
   PushStatusResponse,
   PushSubscribeResponse,
 } from "@martylab/shared";
@@ -19,6 +20,10 @@ const subscribeSchema = z.object({
 
 const unsubscribeSchema = z.object({
   endpoint: z.string().url(),
+});
+
+const pushStatusSchema = z.object({
+  endpoint: z.string().url().nullable(),
 });
 
 export function createPushRouter(pushService: PushService | null) {
@@ -54,6 +59,27 @@ export function createPushRouter(pushService: PushService | null) {
     const body: PushStatusResponse = {
       configured: service.isConfigured,
       subscribed: await service.hasSubscription(req.user.id),
+    };
+    res.status(200).json(body);
+  });
+
+  pushRouter.post("/status", requireAuth, async (req, res) => {
+    const service = requirePushService();
+    if (!req.user) {
+      throw new AppError(401, "unauthenticated", "Authentication required.");
+    }
+
+    const parsed = pushStatusSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new AppError(400, "invalid_body", "Invalid push status request.");
+    }
+
+    const request: PushStatusRequest = parsed.data;
+    const body: PushStatusResponse = {
+      configured: service.isConfigured,
+      subscribed: request.endpoint
+        ? await service.hasSubscription(req.user.id, request.endpoint)
+        : false,
     };
     res.status(200).json(body);
   });

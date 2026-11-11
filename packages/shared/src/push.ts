@@ -15,6 +15,10 @@ export interface PushSubscribeResponse {
   subscribed: boolean;
 }
 
+export interface PushStatusRequest {
+  endpoint: string | null;
+}
+
 export interface PushStatusResponse {
   configured: boolean;
   subscribed: boolean;

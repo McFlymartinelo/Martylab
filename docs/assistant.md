@@ -79,10 +79,11 @@ Toutes les routes requièrent une session Martylab valide.
 
 ## Migration base de données
 
-Après déploiement :
+Les migrations en attente sont appliquées automatiquement au démarrage du
+backend. Pour vérifier le résultat après déploiement :
 
 ```bash
-docker compose exec backend npm run db:migrate -w @martylab/backend
+docker compose logs backend --tail 50
 ```
 
-Ou via le script migrate du conteneur backend selon ton flux habituel.
+Le journal doit contenir `[martylab-migrate] Migrations applied successfully.`.

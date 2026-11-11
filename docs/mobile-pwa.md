@@ -39,13 +39,14 @@ VAPID_SUBJECT=mailto:admin@martylab.fr
 PUSH_NOTIFICATION_INTERVAL_MS=300000
 ```
 
-3. Deploy and run the migration:
+3. Deploy the backend. Its entrypoint applies pending migrations automatically:
 
 ```bash
-git pull
-docker compose up -d --build
-docker compose exec backend npm run db:migrate -w @martylab/backend
+docker compose up -d --build backend
 ```
+
+Check `docker compose logs backend --tail 50` for
+`[martylab-migrate] Migrations applied successfully.`
 
 ### User flow
 
@@ -69,6 +70,7 @@ A fingerprint avoids duplicate pushes when nothing changed.
 |--------|------|-------------|
 | GET | `/api/push/public-key` | VAPID public key |
 | GET | `/api/push/status` | Server + subscription status |
+| POST | `/api/push/status` | Check whether this browser's endpoint is subscribed |
 | POST | `/api/push/subscribe` | Save browser subscription |
 | POST | `/api/push/unsubscribe` | Remove subscription |
 | POST | `/api/push/test` | Send test notification |
