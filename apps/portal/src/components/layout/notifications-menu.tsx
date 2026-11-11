@@ -1,4 +1,6 @@
-import { Bell } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Bell, CheckCheck } from "lucide-react";
+import { useAuthQuery } from "@/features/auth/use-auth-query";
 import {
   useMatchdayNotificationsQuery,
   useMatchdayStatusQuery,
@@ -13,6 +15,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -34,6 +37,38 @@ function severityVariant(
 }
 
 export function NotificationsMenu() {
+  const authQuery = useAuthQuery();
+  const userId = authQuery.data?.user.id ?? "unknown";
+  const [readIds, setReadIds] = useState<string[]>([]);
+  const [readStateLoadedFor, setReadStateLoadedFor] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(`martylab.notifications.read.v1.${userId}`);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      setReadIds(
+        Array.isArray(parsed)
+          ? parsed.filter((id): id is string => typeof id === "string")
+          : [],
+      );
+    } catch {
+      setReadIds([]);
+    }
+    setReadStateLoadedFor(userId);
+  }, [userId]);
+
+  useEffect(() => {
+    if (readStateLoadedFor !== userId) return;
+    try {
+      localStorage.setItem(
+        `martylab.notifications.read.v1.${userId}`,
+        JSON.stringify(readIds.slice(-500)),
+      );
+    } catch {
+      // Notification read state remains usable for the current visit.
+    }
+  }, [readIds, readStateLoadedFor, userId]);
+
   const orionStatusQuery = useOrionStatusQuery();
   const orionNotificationsQuery = useOrionNotificationsQuery(
     orionStatusQuery.data?.configured === true &&
@@ -67,9 +102,7 @@ export function NotificationsMenu() {
   }));
 
   const items = [...orionItems, ...matchdayItems];
-  const alertCount = items.filter(
-    (item) => item.severity === "warning" || item.severity === "critical",
-  ).length;
+  const unreadCount = items.filter((item) => !readIds.includes(item.id)).length;
 
   const isLoading =
     orionNotificationsQuery.isLoading || matchdayNotificationsQuery.isLoading;
@@ -91,17 +124,28 @@ export function NotificationsMenu() {
             className="relative"
           >
             <Bell className="size-4" aria-hidden="true" />
-            {alertCount > 0 ? (
+            {unreadCount > 0 ? (
               <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white">
-                {alertCount}
+                {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             ) : null}
           </Button>
         }
       />
       <DropdownMenuContent align="end" className="w-80 bg-popover p-2">
-        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex items-center justify-between">
+          Notifications <span className="text-2xs text-muted-foreground">{unreadCount} non lue(s)</span>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
+
+        {unreadCount > 0 ? (
+          <DropdownMenuItem
+            onClick={() => setReadIds((current) => [...new Set([...current, ...items.map((item) => item.id)])])}
+          >
+            <CheckCheck aria-hidden="true" />
+            Tout marquer comme lu
+          </DropdownMenuItem>
+        ) : null}
 
         {isLoading ? (
           <p className="px-2 py-4 text-center text-sm text-muted-foreground">
@@ -130,7 +174,17 @@ export function NotificationsMenu() {
             {items.map((item) => (
               <li
                 key={item.id}
-                className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                className={`cursor-pointer rounded-lg border px-3 py-2 text-sm ${readIds.includes(item.id) ? "border-border bg-background opacity-75" : "border-primary/30 bg-primary/5"}`}
+                role="button"
+                tabIndex={0}
+                aria-label={`${readIds.includes(item.id) ? "Marquer comme non lue" : "Marquer comme lue"} : ${item.title}`}
+                onClick={() => setReadIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setReadIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id]);
+                  }
+                }}
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <p className="font-medium">{item.title}</p>

@@ -1,4 +1,5 @@
 import { ClipboardCopy, Database, HeartPulse, Info, Package } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,10 @@ import {
 import { KeyValueList } from "@/components/cockpit/key-value-list";
 import { useHealthQuery } from "@/features/health/use-health-query";
 import { usePluginsQuery } from "@/features/plugins/use-plugins-query";
-import { useSystemOverviewQuery } from "@/features/system/use-system-metrics-query";
+import {
+  systemOverviewQueryKey,
+  useSystemOverviewQuery,
+} from "@/features/system/use-system-metrics-query";
 import { formatIsoDate } from "@/lib/format";
 import { useToast } from "@/lib/use-toast";
 
@@ -19,34 +23,50 @@ export function AboutSection() {
   const healthQuery = useHealthQuery();
   const pluginsQuery = usePluginsQuery();
   const overviewQuery = useSystemOverviewQuery();
+  const queryClient = useQueryClient();
   const toast = useToast();
 
   const health = healthQuery.data;
   const overview = overviewQuery.data;
-  const plugins = pluginsQuery.data?.plugins ?? [];
+  const facts = overview?.facts;
+  const plugins = Array.isArray(pluginsQuery.data?.plugins)
+    ? pluginsQuery.data.plugins
+    : [];
 
   const databaseLabel =
     health?.database === "up"
       ? "Connectée"
       : health?.database === "down"
         ? "Injoignable"
-        : "Non configurée";
+        : healthQuery.isError
+          ? "Indisponible"
+          : "Non configurée";
 
   function copyDiagnostics() {
     const lines = [
       `Martylab ${__APP_VERSION__}`,
       `Statut : ${health?.status ?? "inconnu"}`,
       `Base de données : ${databaseLabel}`,
-      `Hôte : ${overview?.facts.hostname ?? "—"}`,
-      `Système : ${overview?.facts.os ?? "—"}`,
-      `Noyau : ${overview?.facts.kernel ?? "—"}`,
-      `Architecture : ${overview?.facts.architecture ?? "—"}`,
+      `Hôte : ${facts?.hostname ?? "—"}`,
+      `Système : ${facts?.os ?? "—"}`,
+      `Noyau : ${facts?.kernel ?? "—"}`,
+      `Architecture : ${facts?.architecture ?? "—"}`,
       `Plugins : ${plugins.length}`,
       `Mesuré le : ${health?.timestamp ?? new Date().toISOString()}`,
       `Navigateur : ${navigator.userAgent}`,
     ];
 
-    void navigator.clipboard
+    const clipboard = navigator.clipboard;
+    if (!clipboard?.writeText) {
+      toast.show({
+        title: "Copie indisponible",
+        description: "Le navigateur ne permet pas l'accès au presse-papiers sur cette page.",
+        type: "error",
+      });
+      return;
+    }
+
+    void clipboard
       .writeText(lines.join("\n"))
       .then(() => {
         toast.show({
@@ -62,6 +82,12 @@ export function AboutSection() {
           type: "error",
         });
       });
+  }
+
+  function refreshDiagnostics() {
+    void queryClient.invalidateQueries({ queryKey: ["health"] });
+    void queryClient.invalidateQueries({ queryKey: ["plugins"] });
+    void queryClient.invalidateQueries({ queryKey: systemOverviewQueryKey });
   }
 
   return (
@@ -138,21 +164,21 @@ export function AboutSection() {
             items={[
               {
                 label: "Hôte",
-                value: overview?.facts.hostname ?? "Non disponible",
+                value: facts?.hostname ?? "Non disponible",
                 mono: true,
               },
               {
                 label: "Système",
-                value: overview?.facts.os ?? "Non disponible",
+                value: facts?.os ?? "Non disponible",
               },
               {
                 label: "Noyau",
-                value: overview?.facts.kernel ?? "Non disponible",
+                value: facts?.kernel ?? "Non disponible",
                 mono: true,
               },
               {
                 label: "Architecture",
-                value: overview?.facts.architecture ?? "Non disponible",
+                value: facts?.architecture ?? "Non disponible",
                 mono: true,
               },
               {
@@ -160,7 +186,9 @@ export function AboutSection() {
                 value:
                   overview?.source === "host"
                     ? "serveur hôte"
-                    : "conteneur backend",
+                    : overview?.source === "container"
+                      ? "conteneur backend"
+                      : "Non disponible",
               },
             ]}
           />
@@ -178,7 +206,9 @@ export function AboutSection() {
           <CardContent className="text-sm text-muted-foreground">
             {pluginsQuery.isLoading
               ? "Chargement…"
-              : `${plugins.length} plugin(s) enregistré(s), dont ${plugins.filter((plugin) => plugin.enabled).length} activé(s).`}
+              : pluginsQuery.isError
+                ? "Registre des plugins indisponible."
+                : `${plugins.length} plugin(s) enregistré(s), dont ${plugins.filter((plugin) => plugin.enabled).length} activé(s).`}
           </CardContent>
         </Card>
 
@@ -189,11 +219,25 @@ export function AboutSection() {
               Diagnostics
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Button variant="outline" size="sm" onClick={copyDiagnostics}>
-              <ClipboardCopy className="size-3.5" aria-hidden="true" />
-              Copier le rapport
-            </Button>
+          <CardContent className="space-y-3">
+            {healthQuery.isError || overviewQuery.isError ? (
+              <p className="text-sm text-muted-foreground">
+                {healthQuery.isError && overviewQuery.isError
+                  ? "La santé du backend et les informations système n'ont pas pu être chargées."
+                  : healthQuery.isError
+                    ? "La santé du backend n'a pas pu être chargée."
+                    : "Les informations système n'ont pas pu être chargées."}
+              </p>
+            ) : null}
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={refreshDiagnostics}>
+                Réessayer
+              </Button>
+              <Button variant="outline" size="sm" onClick={copyDiagnostics}>
+                <ClipboardCopy className="size-3.5" aria-hidden="true" />
+                Copier le rapport
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

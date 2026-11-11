@@ -81,6 +81,11 @@ All routes require authentication.
 - Quick search in the mobile topbar
 - Assistant: collapsible conversation list on small screens
 - Code splitting for heavier pages (assistant, system, matchday, jellyfin, …)
+- Dashboard widgets can be hidden and reordered from **Personnaliser**. These
+  layout preferences are stored locally per Martylab account and device.
+- The notification menu tracks read/unread state locally per account and
+  device. It is a lightweight inbox for current Orion and Matchday alerts, not
+  a cross-device notification archive.
 
 ## Requirements
 

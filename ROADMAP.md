@@ -5,14 +5,17 @@
 > Cette roadmap évolue avec le projet. Une fonctionnalité peut être déplacée,
 > supprimée ou ajoutée si les besoins du projet changent.
 
-## Ordre d'exécution validé
+## État actuel et prochaine étape
 
-1. **v0.2** — Infrastructure (Portainer, NAS, Cloudflare) ✅
-2. **v0.3** — Orion notifications + historique climat
-3. **v0.4.x** — Matchday page `/matchday` + matchs du jour
-4. **v0.5** — Jellyfin
-5. **v0.6** — Assistant
-6. **v0.7** — Mobile / PWA
+Les versions v0.1 à v0.7 ont été livrées : fondations, infrastructure, Orion,
+Matchday, Jellyfin, Assistant et PWA. Les fonctions Immich et Console sont
+également présentes dans le dépôt. L'ordre historique ci-dessous décrit les
+jalons accomplis, pas des travaux encore à commencer.
+
+La prochaine étape est la fiabilisation de l'ensemble : sécurité des accès
+privilégiés, sauvegarde/restauration, santé lisible des intégrations, assistant
+plus utile et préférences personnelles. Les nouvelles intégrations seront
+choisies à partir d'un besoin concret.
 
 ---
 
@@ -260,15 +263,22 @@ Objectif : rendre Martylab parfaitement utilisable sur mobile.
 
 Objectif : rendre l'Assistant réellement intelligent.
 
-- [ ] Mémoire utilisateur
-- [ ] Préférences utilisateur
-- [ ] Contexte des conversations
-- [ ] Suggestions
-- [ ] Automatisations
-- [ ] Planification d'actions
-- [ ] Exécution multi-plugins
-- [ ] Modèle IA configurable
-- [ ] Possibilité d'utiliser une IA locale
+- [ ] Réponses rédigées à partir des résultats des outils (LLM optionnel)
+- [ ] Questions de clarification lorsque la demande ou la cible est ambiguë
+- [ ] Préférences et mémoire consultables, modifiables et supprimables
+- [ ] Plan d'action visible avant les opérations sensibles
+- [ ] Automatisations limitées, auditables et désactivables
+- [x] Modèle IA configurable par variables d'environnement (API compatible OpenAI)
+- [ ] Fournisseur local validé de bout en bout
+
+## Fiabilité et expérience
+
+- [ ] Exercice régulier de restauration PostgreSQL dans une base isolée
+- [ ] Santé et erreurs de connecteurs faciles à diagnostiquer
+- [x] Préférences de visibilité et d'ordre des widgets du dashboard (par appareil)
+- [x] Centre de notifications avec état lu/non lu (par appareil)
+- [ ] Contrat commun des connecteurs pour état, capacités et erreurs
+- [ ] Vérifications automatiques de lint, types, build et parcours critiques
 
 ---
 
@@ -277,7 +287,7 @@ Objectif : rendre l'Assistant réellement intelligent.
 Ces fonctionnalités ne sont pas prioritaires et ne doivent pas être développées prématurément.
 
 - [ ] Frigate
-- [ ] Immich
+- [x] Immich — connecteur et pages présents ; continuer à compléter selon les besoins
 - [ ] Plex
 - [ ] MQTT
 - [ ] Home Assistant
