@@ -30,10 +30,11 @@ const slowSystemQueryOptions = {
  * rafraîchissement à la seconde sur la page Système tout en économisant la
  * batterie sur le tableau de bord.
  */
-export function useSystemLiveQuery(intervalMs = 1_000) {
+export function useSystemLiveQuery(intervalMs = 1_000, enabled = true) {
   return useQuery({
     queryKey: systemLiveQueryKey,
     queryFn: fetchSystemLive,
+    enabled,
     refetchInterval: intervalMs,
     staleTime: Math.min(intervalMs, 1_000),
   });

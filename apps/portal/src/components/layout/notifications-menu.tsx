@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bell, CheckCheck } from "lucide-react";
 import { useAuthQuery } from "@/features/auth/use-auth-query";
+import { useSystemLiveQuery } from "@/features/system/use-system-metrics-query";
 import {
   useMatchdayNotificationsQuery,
   useMatchdayStatusQuery,
@@ -14,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -22,7 +22,7 @@ import {
 
 type NotificationItem = {
   id: string;
-  source: "Orion" | "Matchday";
+  source: "Orion" | "Matchday" | "Serveur" | "Conteneur Martylab";
   severity: string;
   title: string;
   message: string;
@@ -80,6 +80,12 @@ export function NotificationsMenu() {
     matchdayStatusQuery.data?.configured === true &&
       matchdayStatusQuery.data.online === true,
   );
+  // Les métriques hôte ne changent pas au rythme du tableau de bord. Une
+  // lecture par minute suffit pour les alertes et évite de solliciter l'API.
+  const systemMetricsQuery = useSystemLiveQuery(
+    60_000,
+    authQuery.data?.user != null,
+  );
 
   const orionItems: NotificationItem[] = (
     orionNotificationsQuery.data?.items ?? []
@@ -101,16 +107,47 @@ export function NotificationsMenu() {
     message: item.message,
   }));
 
-  const items = [...orionItems, ...matchdayItems];
+  const metrics = systemMetricsQuery.data;
+  const metricAlert = (
+    id: string,
+    label: string,
+    value: number,
+    warningAt: number,
+    criticalAt: number,
+  ): NotificationItem | null => {
+    if (value < warningAt) return null;
+    const severity = value >= criticalAt ? "critical" : "warning";
+    return {
+      id: `system-${id}`,
+      source: metrics?.source === "host" ? "Serveur" : "Conteneur Martylab",
+      severity,
+      title: `Seuil ${label} dépassé`,
+      message: `${value.toFixed(1)} % · alerte à ${warningAt} % · critique à ${criticalAt} %.`,
+    };
+  };
+
+  const systemItems: NotificationItem[] = metrics
+    ? [
+        metricAlert("cpu", "CPU", metrics.cpu.usagePercent, 80, 90),
+        metricAlert("memory", "Mémoire", metrics.memory.usagePercent, 85, 95),
+        metricAlert("storage", "Stockage", metrics.storage.usagePercent, 85, 95),
+      ].filter((item): item is NotificationItem => item !== null)
+    : [];
+
+  const items = [...systemItems, ...orionItems, ...matchdayItems];
   const unreadCount = items.filter((item) => !readIds.includes(item.id)).length;
 
   const isLoading =
-    orionNotificationsQuery.isLoading || matchdayNotificationsQuery.isLoading;
+    orionNotificationsQuery.isLoading ||
+    matchdayNotificationsQuery.isLoading ||
+    (authQuery.data?.user != null && systemMetricsQuery.isLoading);
 
   const orionConfigured = orionStatusQuery.data?.configured ?? false;
   const matchdayConfigured = matchdayStatusQuery.data?.configured ?? false;
   const orionOnline = orionStatusQuery.data?.online ?? false;
   const matchdayOnline = matchdayStatusQuery.data?.online ?? false;
+  const externalConnectorConfigured = orionConfigured || matchdayConfigured;
+  const hasNotificationSource = externalConnectorConfigured || metrics != null;
 
   return (
     <DropdownMenu>
@@ -133,9 +170,9 @@ export function NotificationsMenu() {
         }
       />
       <DropdownMenuContent align="end" className="w-80 bg-popover p-2">
-        <DropdownMenuLabel className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-1.5 py-1 text-xs font-medium text-muted-foreground">
           Notifications <span className="text-2xs text-muted-foreground">{unreadCount} non lue(s)</span>
-        </DropdownMenuLabel>
+        </div>
         <DropdownMenuSeparator />
 
         {unreadCount > 0 ? (
@@ -153,52 +190,48 @@ export function NotificationsMenu() {
           </p>
         ) : null}
 
-        {!isLoading && !orionConfigured && !matchdayConfigured ? (
+        {!isLoading && !hasNotificationSource ? (
           <p className="px-2 py-4 text-center text-sm text-muted-foreground">
-            Aucun connecteur de notifications configuré.
+            {systemMetricsQuery.isError
+              ? "Métriques serveur indisponibles dans cet environnement. Aucun connecteur externe configuré."
+              : "Aucun connecteur de notifications configuré."}
           </p>
         ) : null}
 
         {!isLoading &&
-        (orionConfigured || matchdayConfigured) &&
+        hasNotificationSource &&
         items.length === 0 ? (
           <p className="px-2 py-4 text-center text-sm text-muted-foreground">
-            {!orionOnline && !matchdayOnline
+            {!metrics && externalConnectorConfigured && !orionOnline && !matchdayOnline
               ? "Services hors ligne."
-              : "Aucune notification pour le moment."}
+              : "Aucune alerte pour le moment."}
           </p>
         ) : null}
 
         {items.length > 0 ? (
-          <ul className="max-h-72 space-y-2 overflow-y-auto px-1 py-1">
+          <div className="max-h-72 space-y-1 overflow-y-auto">
             {items.map((item) => (
-              <li
+              <DropdownMenuItem
                 key={item.id}
-                className={`cursor-pointer rounded-lg border px-3 py-2 text-sm ${readIds.includes(item.id) ? "border-border bg-background opacity-75" : "border-primary/30 bg-primary/5"}`}
-                role="button"
-                tabIndex={0}
-                aria-label={`${readIds.includes(item.id) ? "Marquer comme non lue" : "Marquer comme lue"} : ${item.title}`}
+                className={`items-stretch rounded-lg border px-3 py-2 text-sm whitespace-normal ${readIds.includes(item.id) ? "border-border bg-background opacity-75" : "border-primary/30 bg-primary/5"}`}
                 onClick={() => setReadIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id])}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    setReadIds((current) => current.includes(item.id) ? current.filter((id) => id !== item.id) : [...current, item.id]);
-                  }
-                }}
               >
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <p className="font-medium">{item.title}</p>
-                  <Badge variant={severityVariant(item.severity)}>
-                    {item.severity}
-                  </Badge>
+                <div className="flex min-w-0 flex-col items-stretch gap-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="min-w-0 font-medium">{item.title}</p>
+                    <Badge variant={severityVariant(item.severity)}>
+                      {item.severity}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{item.source}</p>
+                  <p className="text-xs text-muted-foreground">{item.message}</p>
+                  <span className="sr-only">
+                    {readIds.includes(item.id) ? "Marquer comme non lue" : "Marquer comme lue"}
+                  </span>
                 </div>
-                <p className="mb-1 text-xs text-muted-foreground">
-                  {item.source}
-                </p>
-                <p className="text-xs text-muted-foreground">{item.message}</p>
-              </li>
+              </DropdownMenuItem>
             ))}
-          </ul>
+          </div>
         ) : null}
       </DropdownMenuContent>
     </DropdownMenu>
