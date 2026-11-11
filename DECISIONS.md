@@ -453,3 +453,111 @@ ni redirection obligatoire vers Matchday.
 - Plugin Matchday `enabled: true` quand URL + groupe sont configurés.
 - Panneau **Matchday** sur le dashboard.
 - Page dédiée `/matchday` et notifications : hors scope v0.4.1.
+
+---
+
+# ADR-019 — Refonte « Cockpit » (tokens, accent signal, shell groupé)
+
+**Statut : Acceptée**
+
+## Décision
+
+Le portail adopte l'identité « Cockpit » du prototype `docs/redesign/` :
+
+- les jetons Aura sont **remappés sur les variables shadcn existantes**
+  (`--background`, `--primary`, `--border`, etc.) ; il n'existe pas de second
+  système de CSS ;
+- l'accent par défaut devient le **vert signal** (`oklch(52% 0.135 138)` en
+  clair, `oklch(72% 0.12 138)` en sombre). Le violet n'est plus la couleur
+  primaire ; `theme_color` PWA et `meta[name=theme-color]` suivent ;
+- trois familles auto-hébergées via `@fontsource-variable` (sous-ensemble
+  latin uniquement, `font-display: swap`) : **Bricolage Grotesque** (display),
+  **Inter Tight** (UI), **JetBrains Mono** (chiffres et codes) ;
+- rayons alignés sur le prototype (panneaux 15 px, héro 21 px via
+  `--radius: 0.9375rem`) ;
+- la navigation est regroupée en **Pilotage / Infrastructure / Univers /
+  Configuration** ; la tab bar mobile garde 5 entrées avec l'Assistant en
+  action centrale surélevée et un bottom sheet « Plus » ;
+- la recherche devient une **palette de commandes** (`Ctrl/⌘ + K`) filtrée par
+  rôle.
+
+## Raisons
+
+- Alignement avec la référence visuelle validée du produit.
+- Un seul jeu de tokens : les composants shadcn continuent de fonctionner sans
+  réécriture.
+- L'accent unique et les lignes de 1 px correspondent à la direction
+  « instrument de précision » demandée.
+
+## Alternatives considérées
+
+- Conserver le violet : rejeté, le prototype définit le vert signal comme
+  accent par défaut.
+- Ajouter un fichier `aura.css` parallèle : rejeté, duplication de tokens et
+  risque de divergence avec shadcn.
+- Garder le menu déroulant mobile : rejeté, cibles trop petites et pas de zone
+  sûre iOS ; le bottom sheet est retenu.
+
+## Conséquences
+
+- Les contrastes texte/fond des couples principaux et des badges
+  `success` / `warn` / `danger` sont vérifiés AA (voir rapport de migration).
+- Les polices ne viennent plus de Google Fonts ; seuls les sous-ensembles
+  latins sont précachés.
+- « Automatisations » et « Journal d'activité » restent dans la navigation,
+  même si le prototype ne les montre pas.
+- Aucune nouvelle dépendance UI : Base UI, déjà présent, fournit le dialogue,
+  le menu et les notifications.
+
+---
+
+# ADR-020 — Télémétrie système en lecture seule, console reportée
+
+**Statut : Acceptée**
+
+## Décision
+
+La page **Système** est alimentée par des collecteurs backend en **lecture de
+fichiers uniquement** :
+
+- `GET /api/system/overview` : `/proc/loadavg`, `/proc/meminfo` (swap),
+  `/proc/stat` (btime), `/proc/cpuinfo`, `/proc/sys/kernel/*`, `os-release` ;
+- `GET /api/system/storage` : `/proc/mounts` + `statfs` (volumes et inodes),
+  `/proc/diskstats` (débits calculés par échantillonnage), `/proc/mdstat`
+  (RAID) ;
+- `GET /api/system/hardware` : `/sys/class/hwmon` (capteurs, ventilateurs) et
+  faits plateforme ;
+- `/api/system/network` expose en plus l'état, la MAC, le débit négocié, le
+  MTU, les paquets et les erreurs par interface ;
+- `/api/system/processes` expose l'UID, la ligne de commande et le temps CPU
+  cumulé.
+
+Les montages `HOST_PROC_PREFIX`, `HOST_SYS_PREFIX` et `HOST_ROOT_PATH` restent
+ceux d'ADR-016. Aucun `child_process`, `spawn`, `exec` ou `sudo` n'est utilisé.
+
+Les données qui exigeraient un processus externe restent **non disponibles**
+et sont affichées comme telles : SMART (`smartctl`), journal systemd et unités
+(`journalctl`/`systemctl`), ports en écoute (`ss`), mises à jour (`apt`),
+sauvegardes (non implémentées, ADR-013), DMI/BIOS (`dmidecode`) et
+consommation électrique.
+
+La **Console** (allowlist typée + audit) n'est pas livrée dans cette passe :
+l'entrée de navigation n'est pas affichée et le sujet reste à valider
+séparément.
+
+## Raisons
+
+- La règle « pas de shell libre » interdit les collecteurs qui dépendraient de
+  commandes arbitraires.
+- Les onglets Système devaient être utiles sans jamais inventer de valeur.
+- La console est une surface de sécurité à part entière (allowlist, audit,
+  rôle admin, tests) et mérite sa propre revue.
+
+## Conséquences
+
+- Le backend doit pouvoir lire `/host/proc` et `/host/sys` en production pour
+  remonter les métriques de l'hôte ; sinon il remonte celles du conteneur.
+- Les parseurs (`loadavg`, `diskstats`, `mdstat`, `mounts`, `os-release`) sont
+  couverts par des tests unitaires.
+- Toute nouvelle donnée « cockpit » devra soit provenir d'un collecteur en
+  lecture seule, soit être explicitement marquée non disponible.
