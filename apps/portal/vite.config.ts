@@ -88,7 +88,9 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        // 127.0.0.1 avoids resolving `localhost` to ::1 when another dev
+        // server already listens on the IPv6 port.
+        target: process.env.MARTYLAB_DEV_API_TARGET ?? "http://127.0.0.1:3000",
         changeOrigin: true,
       },
     },
