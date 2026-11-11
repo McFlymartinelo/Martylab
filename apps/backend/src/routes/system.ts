@@ -37,6 +37,35 @@ export function createSystemRouter(
 ) {
   const systemRouter = Router();
 
+  // Endpoint « live » : CPU, RAM, disque, uptime, température et réseau, sans
+  // le scan des processus (≈250 lectures /proc/[pid]). Il peut donc être
+  // interrogé chaque seconde sans charge inutile.
+  systemRouter.get("/live", requireAuth, async (_req, res, next) => {
+    try {
+      const [metrics, network] = await Promise.all([
+        serverMetrics.getMetrics(),
+        serverMetrics.getNetworkStats(),
+      ]);
+      const body: SystemMetricsResponse = {
+        ...metrics,
+        cpu: {
+          ...metrics.cpu,
+          history: serverMetrics.getCpuHistory(),
+        },
+        network: {
+          receiveBytesPerSecond: network.receiveBytesPerSecond,
+          transmitBytesPerSecond: network.transmitBytesPerSecond,
+          receiveHistory: network.receiveHistory,
+          transmitHistory: network.transmitHistory,
+          interfaces: network.interfaces,
+        },
+      };
+      res.status(200).json(body);
+    } catch (error) {
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
+    }
+  });
+
   systemRouter.get("/metrics", requireAuth, async (_req, res, next) => {
     try {
       const [metrics, network, processes] = await Promise.all([

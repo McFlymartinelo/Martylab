@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchSystemHardware,
-  fetchSystemMetrics,
+  fetchSystemLive,
   fetchSystemNetwork,
   fetchSystemOverview,
   fetchSystemProcesses,
   fetchSystemStorage,
 } from "@/features/system/system-api";
 
-export const systemMetricsQueryKey = ["system", "metrics"] as const;
+export const systemLiveQueryKey = ["system", "live"] as const;
 export const systemNetworkQueryKey = ["system", "network"] as const;
 export const systemProcessesQueryKey = ["system", "processes"] as const;
 export const systemOverviewQueryKey = ["system", "overview"] as const;
@@ -25,11 +25,17 @@ const slowSystemQueryOptions = {
   staleTime: 30_000,
 } as const;
 
-export function useSystemMetricsQuery() {
+/**
+ * Métriques « live » sans scan des processus. `intervalMs` permet de garder un
+ * rafraîchissement à la seconde sur la page Système tout en économisant la
+ * batterie sur le tableau de bord.
+ */
+export function useSystemLiveQuery(intervalMs = 1_000) {
   return useQuery({
-    queryKey: systemMetricsQueryKey,
-    queryFn: fetchSystemMetrics,
-    ...systemQueryOptions,
+    queryKey: systemLiveQueryKey,
+    queryFn: fetchSystemLive,
+    refetchInterval: intervalMs,
+    staleTime: Math.min(intervalMs, 1_000),
   });
 }
 

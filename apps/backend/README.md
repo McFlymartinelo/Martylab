@@ -25,6 +25,7 @@ npm run db:seed -w @martylab/backend
 - `PATCH /api/users/:userId` (admin)
 - `DELETE /api/users/:userId` (admin)
 - `GET /api/system/metrics` (authenticated)
+- `GET /api/system/live` (authenticated, CPU/RAM/réseau sans scan processus)
 - `GET /api/docker/containers` (authenticated)
 - `GET /api/docker/containers/:containerId/logs` (authenticated)
 - `POST /api/docker/containers/:containerId/start` (user+)

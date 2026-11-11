@@ -2,8 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 import { dockerContainersQueryKey } from "@/features/docker/use-docker-query";
 import {
-  systemMetricsQueryKey,
-  useSystemMetricsQuery,
+  systemLiveQueryKey,
+  useSystemLiveQuery,
 } from "@/features/system/use-system-metrics-query";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,7 +26,7 @@ const tabs = [
 
 export function SystemPage() {
   const queryClient = useQueryClient();
-  const metricsQuery = useSystemMetricsQuery();
+  const metricsQuery = useSystemLiveQuery(1_000);
   const measuredAt = metricsQuery.data?.timestamp;
 
   const eyebrow = measuredAt
@@ -40,7 +40,7 @@ export function SystemPage() {
   function refresh() {
     void queryClient.invalidateQueries({ queryKey: ["system"] });
     void queryClient.invalidateQueries({ queryKey: dockerContainersQueryKey });
-    void queryClient.invalidateQueries({ queryKey: systemMetricsQueryKey });
+    void queryClient.invalidateQueries({ queryKey: systemLiveQueryKey });
   }
 
   return (

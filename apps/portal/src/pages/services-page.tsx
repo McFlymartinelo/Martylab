@@ -20,6 +20,7 @@ import {
 } from "@/features/docker/use-docker-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CollapsiblePanel } from "@/components/cockpit/collapsible-panel";
 import {
   Dialog,
   DialogBackdrop,
@@ -169,8 +170,9 @@ export function ServicesPage() {
       ) : null}
 
       {groups.map((group) => (
-        <Panel
+        <CollapsiblePanel
           key={group.id}
+          panelId={`services:${group.id}`}
           title={group.label}
           icon={Container}
           hint={`${group.containers.length} conteneur(s) · ${formatGroupStateSummary(group.containers)}`}
@@ -243,7 +245,7 @@ export function ServicesPage() {
               </li>
             ))}
           </ul>
-        </Panel>
+        </CollapsiblePanel>
       ))}
 
       <LogsDialog

@@ -1,8 +1,8 @@
 import { Cpu, ListOrdered, Users } from "lucide-react";
 import type { SystemProcessEntry } from "@martylab/shared";
 import {
-  useSystemMetricsQuery,
   useSystemOverviewQuery,
+  useSystemProcessesQuery,
 } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type DataTableColumn } from "@/components/cockpit/data-table";
@@ -37,10 +37,10 @@ function processStateLabel(state: string): string {
 }
 
 export function SystemProcessesTab() {
-  const metricsQuery = useSystemMetricsQuery();
+  const processesQuery = useSystemProcessesQuery();
   const overviewQuery = useSystemOverviewQuery();
 
-  const processes = metricsQuery.data?.processes ?? [];
+  const processes = processesQuery.data?.processes ?? [];
   const load = overviewQuery.data?.load;
 
   const columns: DataTableColumn<SystemProcessEntry>[] = [
@@ -142,7 +142,7 @@ export function SystemProcessesTab() {
       </div>
 
       <Panel title="Processus" icon={Cpu} bodyClassName="p-0">
-        {metricsQuery.isError ? (
+        {processesQuery.isError ? (
           <div className="p-4">
             <InlineEmpty
               title="Processus indisponibles"
@@ -156,7 +156,7 @@ export function SystemProcessesTab() {
             rowKey={(process) => String(process.pid)}
             caption="Principaux processus par mémoire résidente"
             emptyMessage={
-              metricsQuery.isLoading
+              processesQuery.isLoading
                 ? "Chargement des processus…"
                 : "Aucun processus détecté."
             }

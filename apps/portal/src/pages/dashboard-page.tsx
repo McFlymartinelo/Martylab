@@ -17,8 +17,8 @@ import {
   usePluginsQuery,
 } from "@/features/plugins/use-plugins-query";
 import {
-  systemMetricsQueryKey,
-  useSystemMetricsQuery,
+  systemLiveQueryKey,
+  useSystemLiveQuery,
 } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,8 @@ function SectionHeading({
 
 export function DashboardPage() {
   const authQuery = useAuthQuery();
-  const metricsQuery = useSystemMetricsQuery();
+  // 5 s sur le tableau de bord : réactif sans vider la batterie mobile.
+  const metricsQuery = useSystemLiveQuery(5_000);
   const dockerQuery = useDockerContainersQuery();
   const pluginsQuery = usePluginsQuery();
   const queryClient = useQueryClient();
@@ -92,7 +93,7 @@ export function DashboardPage() {
   const apps = pluginsQuery.data?.plugins.slice(0, 6) ?? [];
 
   function refresh() {
-    void queryClient.invalidateQueries({ queryKey: systemMetricsQueryKey });
+    void queryClient.invalidateQueries({ queryKey: systemLiveQueryKey });
     void queryClient.invalidateQueries({ queryKey: dockerContainersQueryKey });
     void queryClient.invalidateQueries({ queryKey: pluginsQueryKey });
   }

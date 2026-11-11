@@ -175,6 +175,7 @@ npm run db:seed        # Comptes initiaux
 | `PATCH /api/users/:id` | admin | Modifier un utilisateur |
 | `DELETE /api/users/:id` | admin | Supprimer un utilisateur |
 | `GET /api/system/metrics` | session | CPU, RAM, disque, uptime |
+| `GET /api/system/live` | session | CPU, RAM, disque, réseau (sans scan processus, pour le live 1 s) |
 | `GET /api/docker/containers` | session | Liste des conteneurs Docker |
 | `GET /api/docker/containers/:id/logs` | session | Logs d'un conteneur |
 | `POST /api/docker/containers/:id/start` | user+ | Démarrer un conteneur |
@@ -206,6 +207,13 @@ npm run db:seed        # Comptes initiaux
 | `POST /api/portainer/containers/:id/start\|stop\|restart` | user+ | Actions conteneur via Portainer |
 | `GET /api/cloudflare/status` | session | Tunnel Cloudflare + checks domaines |
 | `GET /api/nas/status` | session | État NAS UGREEN (stockage, disques) |
+| `GET /api/auth/sessions` | session | Sessions actives de l'utilisateur |
+| `DELETE /api/auth/sessions/:id` | session | Révoquer une session |
+| `POST /api/auth/sessions/revoke-others` | session | Révoquer les autres sessions |
+| `GET /api/console/commands` | admin | Allowlist de la console |
+| `POST /api/console/execute` | admin | Exécuter une commande de l'allowlist |
+| `GET /api/console/audit` | admin | Journal d'audit de la console |
+| `WS /api/console/terminal` | admin | Terminal `docker exec` (WebSocket) |
 
 ## Licence
 

@@ -9,11 +9,12 @@ import {
 } from "lucide-react";
 import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
 import {
-  useSystemMetricsQuery,
+  useSystemLiveQuery,
   useSystemOverviewQuery,
 } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CollapsiblePanel } from "@/components/cockpit/collapsible-panel";
 import { DataTable, type DataTableColumn } from "@/components/cockpit/data-table";
 import { InlineEmpty, Unavailable } from "@/components/cockpit/feedback";
 import { KeyValueList } from "@/components/cockpit/key-value-list";
@@ -26,7 +27,7 @@ import { containerStateVariant } from "@/lib/docker-state";
 import type { DockerContainerSummary } from "@martylab/shared";
 
 export function SystemOverviewTab() {
-  const metricsQuery = useSystemMetricsQuery();
+  const metricsQuery = useSystemLiveQuery(1_000);
   const overviewQuery = useSystemOverviewQuery();
   const dockerQuery = useDockerContainersQuery();
 
@@ -184,7 +185,8 @@ export function SystemOverviewTab() {
         </Panel>
       </div>
 
-      <Panel
+      <CollapsiblePanel
+        panelId="system:containers"
         title="Conteneurs"
         icon={Container}
         hint={dockerQuery.data?.available ? `${containers.length} au total` : undefined}
@@ -224,7 +226,7 @@ export function SystemOverviewTab() {
             className="p-2"
           />
         )}
-      </Panel>
+      </CollapsiblePanel>
 
       <InfrastructurePanels />
 

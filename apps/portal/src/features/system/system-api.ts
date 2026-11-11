@@ -8,8 +8,8 @@ import type {
 } from "@martylab/shared";
 import { apiGet } from "@/lib/api-client";
 
-export function fetchSystemMetrics(): Promise<SystemMetricsResponse> {
-  return apiGet<SystemMetricsResponse>("/api/system/metrics");
+export function fetchSystemLive(): Promise<SystemMetricsResponse> {
+  return apiGet<SystemMetricsResponse>("/api/system/live");
 }
 
 export function fetchSystemNetwork(): Promise<SystemNetworkResponse> {

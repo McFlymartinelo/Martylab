@@ -4,7 +4,7 @@ import type {
   SystemNetworkInterface,
 } from "@martylab/shared";
 import { useCloudflareStatusQuery } from "@/features/cloudflare/use-cloudflare-query";
-import { useSystemMetricsQuery } from "@/features/system/use-system-metrics-query";
+import { useSystemLiveQuery } from "@/features/system/use-system-metrics-query";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type DataTableColumn } from "@/components/cockpit/data-table";
 import { InlineEmpty, Unavailable } from "@/components/cockpit/feedback";
@@ -18,10 +18,10 @@ function peak(values: number[]): number {
 }
 
 export function SystemNetworkTab() {
-  const metricsQuery = useSystemMetricsQuery();
+  const liveQuery = useSystemLiveQuery(1_000);
   const cloudflare = useCloudflareStatusQuery();
 
-  const network = metricsQuery.data?.network;
+  const network = liveQuery.data?.network;
   const interfaces = network?.interfaces ?? [];
 
   const interfaceColumns: DataTableColumn<SystemNetworkInterface>[] = [
@@ -139,7 +139,7 @@ export function SystemNetworkTab() {
         icon={Network}
         hint={network ? `${network.interfaces.length} interface(s)` : undefined}
       >
-        {metricsQuery.isError ? (
+        {liveQuery.isError ? (
           <InlineEmpty
             title="Métriques réseau indisponibles"
             description="Le backend n'a pas pu lire /proc/net/dev."
