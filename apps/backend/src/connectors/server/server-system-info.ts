@@ -53,7 +53,6 @@ const MAX_MOUNTS = 25;
 const MAX_DISK_DEVICES = 12;
 const MAX_SENSORS = 12;
 const MAX_FANS = 6;
-
 interface DiskCounters {
   readBytes: number;
   writtenBytes: number;
@@ -367,6 +366,7 @@ async function collectMounts(
 
   const seen = new Set<string>();
   const candidates = parseMountTable(content).filter((entry) => {
+    if (!entry.mountPoint.startsWith("/")) return false;
     if (!REAL_FILESYSTEMS.has(entry.fileSystem)) return false;
     if (seen.has(entry.mountPoint)) return false;
     seen.add(entry.mountPoint);
@@ -374,11 +374,23 @@ async function collectMounts(
   });
 
   const mounts: SystemMountEntry[] = [];
+  const resolvedRoot = config.hostRootPath
+    ? path.resolve(config.hostRootPath)
+    : null;
 
   for (const entry of candidates.slice(0, MAX_MOUNTS)) {
-    const target = config.hostRootPath
-      ? path.join(config.hostRootPath, entry.mountPoint)
+    // Resolve inside the mounted host root and refuse any traversal escape.
+    const target = resolvedRoot
+      ? path.resolve(resolvedRoot, `.${entry.mountPoint}`)
       : entry.mountPoint;
+
+    if (
+      resolvedRoot &&
+      target !== resolvedRoot &&
+      !target.startsWith(`${resolvedRoot}${path.sep}`)
+    ) {
+      continue;
+    }
 
     try {
       const stats = await fs.statfs(target);
