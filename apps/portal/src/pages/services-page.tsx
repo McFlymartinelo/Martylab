@@ -1,125 +1,185 @@
 import { useState } from "react";
-import { FileText, Play, RotateCcw, Square } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  Container,
+  FileText,
+  Play,
+  RefreshCw,
+  RotateCcw,
+  Square,
+} from "lucide-react";
+import type { DockerContainerSummary } from "@martylab/shared";
 import { useAuthQuery } from "@/features/auth/use-auth-query";
-import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
+import {
+  dockerContainersQueryKey,
+  useDockerContainersQuery,
+} from "@/features/docker/use-docker-query";
 import {
   useDockerContainerActionMutation,
   useDockerContainerLogsQuery,
 } from "@/features/docker/use-docker-actions";
-import { hasMinRole } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-function containerStateVariant(
-  state: string,
-): "success" | "secondary" | "outline" | "destructive" {
-  if (state === "running") return "success";
-  if (state === "exited") return "secondary";
-  if (state === "paused") return "outline";
-  return "destructive";
-}
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogPopup,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InlineEmpty, Unavailable } from "@/components/cockpit/feedback";
+import { PageHeader } from "@/components/cockpit/page-header";
+import { Panel } from "@/components/cockpit/panel";
+import {
+  containerStateLabel,
+  containerStateVariant,
+} from "@/lib/docker-state";
+import {
+  formatGroupStateSummary,
+  groupContainersByApp,
+} from "@/lib/docker-groups";
+import { hasMinRole } from "@/lib/permissions";
 
 export function ServicesPage() {
+  const queryClient = useQueryClient();
   const authQuery = useAuthQuery();
   const dockerQuery = useDockerContainersQuery();
   const actionMutation = useDockerContainerActionMutation();
-  const [logsContainerId, setLogsContainerId] = useState<string | null>(null);
-  const logsQuery = useDockerContainerLogsQuery(logsContainerId, Boolean(logsContainerId));
+  const [logsContainer, setLogsContainer] =
+    useState<DockerContainerSummary | null>(null);
 
   const role = authQuery.data?.user?.role;
   const canManage = role ? hasMinRole(role, "user") : false;
 
+  const containers = dockerQuery.data?.available
+    ? dockerQuery.data.containers
+    : [];
+  const groups = groupContainersByApp(containers);
+
+  function runAction(
+    container: DockerContainerSummary,
+    action: "start" | "stop" | "restart",
+  ) {
+    actionMutation.mutate({ containerId: container.id, action });
+  }
+
   return (
-    <div className="space-y-6">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Services</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Gestion des conteneurs Docker du serveur. Les invités peuvent
-          consulter l&apos;état et les logs ; les actions nécessitent le rôle
-          utilisateur ou administrateur.
-        </p>
-      </section>
+    <div className="space-y-5">
+      <PageHeader
+        eyebrow="Infrastructure · Docker"
+        title="Services"
+        description="Conteneurs groupés par application. Les invités consultent l'état et les logs ; démarrer, arrêter ou redémarrer exige le rôle utilisateur, et le backend revérifie toujours l'autorisation."
+        actions={
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              void queryClient.invalidateQueries({
+                queryKey: dockerContainersQueryKey,
+              })
+            }
+            disabled={dockerQuery.isFetching}
+          >
+            <RefreshCw
+              className={dockerQuery.isFetching ? "animate-spin" : undefined}
+              aria-hidden="true"
+            />
+            Actualiser
+          </Button>
+        }
+      />
 
       {!canManage ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Mode lecture seule</CardTitle>
-            <CardDescription>
-              Ton compte invité ne peut pas démarrer, arrêter ou redémarrer des
-              conteneurs.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <Panel title="Mode lecture seule" icon={Container}>
+          <p className="text-sm text-muted-foreground">
+            Ton compte invité peut consulter l&apos;état et les logs, mais pas
+            piloter les conteneurs. La restriction est appliquée par l&apos;API.
+          </p>
+        </Panel>
+      ) : null}
+
+      {actionMutation.isError ? (
+        <div
+          className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          role="alert"
+        >
+          L&apos;action a échoué. Vérifie les permissions du socket Docker côté
+          serveur.
+        </div>
       ) : null}
 
       {dockerQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">
-          Chargement des conteneurs…
-        </p>
+        <Panel title="Conteneurs" icon={Container}>
+          <p className="text-sm text-muted-foreground">
+            Chargement des conteneurs…
+          </p>
+        </Panel>
+      ) : null}
+
+      {dockerQuery.isError ? (
+        <Panel title="Conteneurs" icon={Container}>
+          <Unavailable
+            label="Docker"
+            reason="Le connecteur Docker n'a pas pu être joint."
+          />
+        </Panel>
       ) : null}
 
       {dockerQuery.data && !dockerQuery.data.available ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Connecteur Docker non configuré</CardTitle>
-            <CardDescription>
-              Monte <code>/var/run/docker.sock</code> et définis{" "}
-              <code>DOCKER_GID</code> dans le <code>.env</code> de production.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <Panel title="Conteneurs" icon={Container}>
+          <Unavailable
+            label="Docker"
+            reason="Monte /var/run/docker.sock et définis DOCKER_SOCKET_PATH (et DOCKER_GID en production)."
+          />
+        </Panel>
       ) : null}
 
-      {dockerQuery.data?.available && dockerQuery.data.containers.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Aucun conteneur</CardTitle>
-            <CardDescription>
-              Aucun conteneur Docker détecté sur ce serveur.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      {dockerQuery.data?.available && containers.length === 0 ? (
+        <InlineEmpty
+          icon={Container}
+          title="Aucun conteneur"
+          description="Aucun conteneur Docker détecté sur ce serveur."
+        />
       ) : null}
 
-      {dockerQuery.data?.available ? (
-        <div className="grid gap-3">
-          {dockerQuery.data.containers.map((container) => (
-            <Card key={container.id}>
-              <CardContent className="space-y-4 py-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="font-medium">{container.name}</p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {container.image} · {container.id}
+      {groups.map((group) => (
+        <Panel
+          key={group.id}
+          title={group.label}
+          icon={Container}
+          hint={`${group.containers.length} conteneur(s) · ${formatGroupStateSummary(group.containers)}`}
+          bodyClassName="p-0"
+        >
+          <ul className="divide-y divide-border">
+            {group.containers.map((container) => (
+              <li
+                key={container.id}
+                className="flex flex-col gap-3 px-4 py-3 lg:flex-row lg:items-center lg:justify-between"
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm font-medium">
+                      {container.name}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {container.status}
-                    </p>
+                    <Badge variant={containerStateVariant(container.state)}>
+                      {containerStateLabel(container.state)}
+                    </Badge>
                   </div>
-                  <Badge variant={containerStateVariant(container.state)}>
-                    {container.state}
-                  </Badge>
+                  <p className="truncate font-mono text-2xs text-muted-foreground">
+                    {container.image} · {container.id.slice(0, 12)}
+                  </p>
+                  <p className="text-2xs text-muted-foreground">
+                    {container.status}
+                  </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-1.5">
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     disabled={!canManage || actionMutation.isPending}
-                    onClick={() =>
-                      actionMutation.mutate({
-                        containerId: container.id,
-                        action: "start",
-                      })
-                    }
+                    onClick={() => runAction(container, "start")}
                   >
                     <Play className="size-3.5" aria-hidden="true" />
                     Démarrer
@@ -129,12 +189,7 @@ export function ServicesPage() {
                     variant="outline"
                     size="sm"
                     disabled={!canManage || actionMutation.isPending}
-                    onClick={() =>
-                      actionMutation.mutate({
-                        containerId: container.id,
-                        action: "stop",
-                      })
-                    }
+                    onClick={() => runAction(container, "stop")}
                   >
                     <Square className="size-3.5" aria-hidden="true" />
                     Arrêter
@@ -144,12 +199,7 @@ export function ServicesPage() {
                     variant="outline"
                     size="sm"
                     disabled={!canManage || actionMutation.isPending}
-                    onClick={() =>
-                      actionMutation.mutate({
-                        containerId: container.id,
-                        action: "restart",
-                      })
-                    }
+                    onClick={() => runAction(container, "restart")}
                   >
                     <RotateCcw className="size-3.5" aria-hidden="true" />
                     Redémarrer
@@ -158,47 +208,83 @@ export function ServicesPage() {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    onClick={() =>
-                      setLogsContainerId(
-                        logsContainerId === container.id ? null : container.id,
-                      )
-                    }
+                    onClick={() => setLogsContainer(container)}
                   >
                     <FileText className="size-3.5" aria-hidden="true" />
                     Logs
                   </Button>
                 </div>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ))}
 
-                {logsContainerId === container.id ? (
-                  <div className="rounded-lg border border-border bg-muted/30 p-3">
-                    {logsQuery.isLoading ? (
-                      <p className="text-sm text-muted-foreground">
-                        Chargement des logs…
-                      </p>
-                    ) : null}
-                    {logsQuery.isError ? (
-                      <p className="text-sm text-destructive">
-                        Impossible de charger les logs.
-                      </p>
-                    ) : null}
-                    {logsQuery.data ? (
-                      <pre className="max-h-64 overflow-auto text-xs whitespace-pre-wrap">
-                        {logsQuery.data.logs || "Aucun log disponible."}
-                      </pre>
-                    ) : null}
-                  </div>
-                ) : null}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : null}
-
-      {actionMutation.isError ? (
-        <p className="text-sm text-destructive">
-          L&apos;action Docker a échoué. Vérifie les permissions du socket.
-        </p>
-      ) : null}
+      <LogsDialog
+        container={logsContainer}
+        onClose={() => setLogsContainer(null)}
+      />
     </div>
+  );
+}
+
+function LogsDialog({
+  container,
+  onClose,
+}: {
+  container: DockerContainerSummary | null;
+  onClose: () => void;
+}) {
+  const logsQuery = useDockerContainerLogsQuery(
+    container?.id ?? null,
+    Boolean(container),
+  );
+
+  return (
+    <Dialog
+      open={Boolean(container)}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogBackdrop />
+      <DialogPopup className="w-[min(52rem,calc(100vw-2rem))]">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <DialogTitle className="truncate">
+              Logs · {container?.name}
+            </DialogTitle>
+            <p className="truncate font-mono text-2xs text-muted-foreground">
+              {container?.image}
+            </p>
+          </div>
+          <DialogClose
+            className="rounded-md px-2 py-1 text-xs text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+            aria-label="Fermer les logs"
+          >
+            Fermer
+          </DialogClose>
+        </div>
+
+        <div className="mt-3 max-h-[60svh] overflow-auto rounded-lg border border-border bg-muted/20 p-3">
+          {logsQuery.isLoading ? (
+            <p className="text-sm text-muted-foreground">
+              Chargement des logs…
+            </p>
+          ) : logsQuery.isError ? (
+            <p className="text-sm text-destructive">
+              Impossible de charger les logs de ce conteneur.
+            </p>
+          ) : (
+            <pre className="font-mono text-xs whitespace-pre-wrap text-foreground">
+              {logsQuery.data?.logs || "Aucun log disponible."}
+            </pre>
+          )}
+        </div>
+        <p className="mt-2 text-2xs text-muted-foreground">
+          100 dernières lignes lues via l&apos;API Docker côté serveur.
+        </p>
+      </DialogPopup>
+    </Dialog>
   );
 }
