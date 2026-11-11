@@ -81,5 +81,10 @@ Vérifications :
 
 - `/var/run/docker.sock` reste monté en lecture seule dans le backend ;
 - nginx relaie bien `Upgrade`/`Connection` sur `/api/console/terminal` ;
-- `CONSOLE_TERMINAL_ENABLED=false` si l'accès terminal n'est pas souhaité ;
+- le terminal est désactivé par défaut ; définir `CONSOLE_TERMINAL_ENABLED=true` uniquement si nécessaire ;
 - les lignes `console_audit` sont conservées avec les sauvegardes PostgreSQL.
+
+Le montage `:ro` empêche de remplacer le fichier socket, mais ne limite pas les
+opérations que l'API Docker accepte via ce socket. L'accès au socket reste donc
+un privilège élevé sur l'hôte. La Console et le terminal sont réservés aux
+administrateurs ; ne publie pas le backend et limite les comptes admin.

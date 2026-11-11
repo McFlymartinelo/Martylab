@@ -100,8 +100,8 @@ const envSchema = z.object({
   HOST_ROOT_PATH: z.string().optional(),
   DOCKER_SOCKET_PATH: z.string().optional(),
   /**
-   * Terminal conteneur de la Console (admin uniquement). Activé par défaut ;
-   * `false` retire complètement le canal WebSocket.
+   * Terminal conteneur de la Console (admin uniquement). Désactivé par défaut ;
+   * `true` active explicitement le canal WebSocket privilégié.
    */
   CONSOLE_TERMINAL_ENABLED: booleanFromEnv,
   ORION_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
@@ -233,6 +233,6 @@ export function loadEnv(processEnv: NodeJS.ProcessEnv = process.env): Env {
     ...env,
     SESSION_SECRET: env.SESSION_SECRET ?? DEFAULT_DEV_SESSION_SECRET,
     COOKIE_SECURE: env.COOKIE_SECURE ?? env.NODE_ENV === "production",
-    CONSOLE_TERMINAL_ENABLED: env.CONSOLE_TERMINAL_ENABLED ?? true,
+    CONSOLE_TERMINAL_ENABLED: env.CONSOLE_TERMINAL_ENABLED ?? false,
   };
 }
