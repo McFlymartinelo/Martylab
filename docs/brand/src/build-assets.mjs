@@ -232,11 +232,27 @@ function favicon() {
 `;
 }
 
+/** Badge de notification : silhouette blanche sur fond transparent (Android la teinte). */
+function notificationBadge(size = 96) {
+  const box = size * 0.8;
+  const offset = (size - box) / 2;
+  const body = symbolGroup(box, { x: offset, y: offset, neutral: "#FFFFFF", accent: "#FFFFFF" });
+  return {
+    size,
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" role="img" aria-label="Martylab — badge de notification">
+  <title>Martylab — badge de notification</title>
+${body}
+</svg>
+`,
+  };
+}
+
 const icons = {
   "martylab-app-icon.svg": appIcon({ box: 620, name: "app icon" }).svg,
   "martylab-app-icon-maskable.svg": appIcon({ box: 460, name: "maskable" }).svg,
   "martylab-app-icon-foreground.svg": adaptiveForeground(1024, 440).svg,
   "martylab-favicon.svg": favicon(),
+  "martylab-notification-badge.svg": notificationBadge(96).svg,
 };
 
 for (const [file, content] of Object.entries(icons)) {
@@ -276,6 +292,7 @@ const rendered = [
   render(appSvg, 192, 192, "martylab-pwa-192.png"),
   render(appSvg, 180, 180, "martylab-apple-touch-icon-180.png"),
   render(icons["martylab-favicon.svg"], 32, 32, "martylab-favicon-32.png"),
+  render(icons["martylab-notification-badge.svg"], 96, 96, "martylab-notification-badge-96.png"),
 ];
 
 /* ------------------------------------------------------------------ */

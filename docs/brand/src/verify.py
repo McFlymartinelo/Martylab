@@ -80,12 +80,13 @@ EXPECTED = {
     "martylab-pwa-192.png": (192, 192),
     "martylab-pwa-512.png": (512, 512),
     "martylab-favicon-32.png": (32, 32),
+    "martylab-notification-badge-96.png": (96, 96),
 }
 for name, (w, h) in EXPECTED.items():
     fp = os.path.join(icon_dir, name)
     with Image.open(fp) as im:
         check(im.size == (w, h), f"PNG {name} : {im.size[0]}×{im.size[1]} attendu {w}×{h}")
-        if "foreground" in name:
+        if "foreground" in name or "badge" in name:
             check(im.mode in ("RGBA", "LA"), f"PNG {name} : transparence ({im.mode})")
             check(im.convert("RGBA").getpixel((0, 0))[3] == 0, f"PNG {name} : coin transparent")
         elif "favicon" in name:

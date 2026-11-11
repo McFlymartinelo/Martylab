@@ -12,6 +12,7 @@ cp docs/brand/assets/icons/martylab-pwa-192.png            apps/portal/public/ic
 cp docs/brand/assets/icons/martylab-pwa-512.png            apps/portal/public/icons/icon-512.png
 cp docs/brand/assets/icons/martylab-app-icon-maskable-1024.png apps/portal/public/icons/icon-maskable-1024.png
 cp docs/brand/assets/icons/martylab-apple-touch-icon-180.png   apps/portal/public/icons/apple-touch-icon.png
+cp docs/brand/assets/icons/martylab-notification-badge-96.png  apps/portal/public/icons/badge-96.png
 cp docs/brand/assets/icons/martylab-favicon.svg            apps/portal/public/favicon.svg
 ```
 
@@ -71,6 +72,17 @@ export function BrandMark({ className }: { className?: string }) {
 
 Taille d'usage : 24 px dans la sidebar, 20 px dans la topbar. En dessous de 24 px,
 utiliser le favicon (géométrie simplifiée), pas le logo.
+
+## 4 bis. Notifications
+
+`apps/portal/src/sw.ts` utilisait `/favicon.svg` pour `icon` et `badge`. Une
+notification Android attend un badge **monochrome transparent** : un SVG coloré y
+apparaît comme un aplat teinté. Remplacé par :
+
+```ts
+icon: "/icons/icon-192.png",
+badge: "/icons/badge-96.png",
+```
 
 ## 5. Vérification
 

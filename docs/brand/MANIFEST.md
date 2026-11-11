@@ -1,6 +1,6 @@
 # Manifeste — kit de marque Martylab v1.0.0
 
-Généré le 11 novembre 2026 à 11:27
+Généré le 11 novembre 2026 à 11:41
 par `src/make-manifest.mjs`, à partir des fichiers présents sur disque.
 
 - Version : 1.0.0
@@ -36,6 +36,8 @@ par `src/make-manifest.mjs`, à partir des fichiers présents sur disque.
 | `martylab-apple-touch-icon-180.png` | 180 × 180 | 2377 | `323c12f0cb489cd299fe088c216fe3f694a6eece3eb637f8c888ce1bb982bc13` |
 | `martylab-favicon-32.png` | 32 × 32 | 560 | `22120bf4c9ce57a1d0a168dac87f5bcf9a2a078864d2fdf94e32c646b5be1c6c` |
 | `martylab-favicon.svg` | 32 × 32 | 488 | `419d654aaf5028077c229b19c26b4d9857b4b44e52c344e5ae89acd6539b67bc` |
+| `martylab-notification-badge-96.png` | 96 × 96 | 1287 | `f2ab1698baba1692873887fe541c3ffdd5d95bfdcdefac9ea6a1668f30311a66` |
+| `martylab-notification-badge.svg` | vectoriel | 539 | `345c5677ed620287d4b07fb1e6005a0c33ac2b1a0845013f9ea3e1a6cdc167ee` |
 | `martylab-pwa-192.png` | 192 × 192 | 2374 | `2fd44e4db53f5ed7090bed9172ea9eadaab9b448fbd6f50a54ee0b1b6beb11bf` |
 | `martylab-pwa-512.png` | 512 × 512 | 7314 | `1bb27c57a4ec333d4a850e791a75908751688b9bd22e408916e8a4efde92b0c1` |
 
@@ -43,8 +45,8 @@ par `src/make-manifest.mjs`, à partir des fichiers présents sur disque.
 
 | Fichier | Dimensions | Octets | SHA-256 |
 | --- | --- | --- | --- |
-| `martylab-brand-guide.pdf` | A4 · 10 pages | 1045925 | `45a7a08c66d4b6b9be9bbcf2800da6050be6adeecd2172940fbfec57be484dfc` |
-| `martylab-brand-sheet.pdf` | A4 · 10 pages | 113949 | `0a91f10a0847de17f73d7aa206626ad321200b987aaa647165c654c0340f5393` |
+| `martylab-brand-guide.pdf` | A4 · 10 pages | 1048606 | `f2c595742157fccd8b15e22a4e13812f057d917565ea8a29145f7985f94658b6` |
+| `martylab-brand-sheet.pdf` | A4 · 10 pages | 113949 | `469cf1d14bf421ab6cc0c2c583a898e7403a4fd0e425b50da9398e51fe886152` |
 
 ## Vérification
 
