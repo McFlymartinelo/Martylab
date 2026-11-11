@@ -1,3 +1,8 @@
 # Ensure shell scripts keep LF for Linux containers on Windows checkouts.
 docker/**/*.sh text eol=lf
 *.sh text eol=lf
+
+# Brand kit: byte-exact deliverables. Hashes in docs/brand/MANIFEST.md must match
+# the checked-out files, so Git must not rewrite their line endings.
+docs/brand/assets/** -text
+docs/brand/**/*.pdf binary
