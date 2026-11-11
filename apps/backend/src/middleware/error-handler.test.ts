@@ -16,7 +16,7 @@ function makeApp() {
     throw new AppError(400, "invalid_input", "Invalid input.");
   });
   app.get("/boom", () => {
-    throw new AppError(500, "boom", "Boom.");
+    throw new AppError(500, "boom", "Boom.", { isOperational: false });
   });
   app.use(notFoundHandler);
   app.use(createErrorHandler(logger as never, false));
@@ -54,7 +54,7 @@ describe("notFoundHandler", () => {
     expect(fields).not.toHaveProperty("err");
   });
 
-  it("keeps the stack for 5xx errors", async () => {
+  it("keeps the stack for unexpected 5xx errors", async () => {
     const { app, logger } = makeApp();
     const res = await request(app).get("/boom");
 
@@ -70,6 +70,27 @@ describe("notFoundHandler", () => {
     expect(fields).toMatchObject({ method: "GET", url: "/boom" });
   });
 
+  it("does not print a stack for an operational 503", async () => {
+    const logger = { error: vi.fn(), warn: vi.fn(), info: vi.fn() };
+    const app = express();
+    app.get("/metrics", () => {
+      throw new AppError(503, "metrics_unavailable", "Requires Linux.");
+    });
+    app.use(createErrorHandler(logger as never, false));
+
+    const res = await request(app).get("/metrics");
+
+    expect(res.status).toBe(503);
+    expect(logger.error).not.toHaveBeenCalled();
+    const [fields, message] = logger.warn.mock.calls[0] as [
+      Record<string, unknown>,
+      string,
+    ];
+    expect(message).toBe("Request failed");
+    expect(fields).toMatchObject({ statusCode: 503, code: "metrics_unavailable" });
+    expect(fields).not.toHaveProperty("err");
+  });
+
   it("masks 5xx messages in production but not 4xx", async () => {
     const { app } = makeApp();
     expect((await request(app).get("/bad-request")).body.error.message).toBe(
@@ -78,7 +99,7 @@ describe("notFoundHandler", () => {
 
     const prod = express();
     prod.get("/boom", () => {
-      throw new AppError(500, "boom", "Boom.");
+      throw new AppError(500, "boom", "Boom.", { isOperational: false });
     });
     prod.use(
       createErrorHandler({ error: vi.fn(), warn: vi.fn(), info: vi.fn() } as never, true),

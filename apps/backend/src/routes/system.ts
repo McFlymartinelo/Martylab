@@ -9,7 +9,27 @@ import type {
 } from "@martylab/shared";
 import type { ServerMetricsService } from "../connectors/server/server-metrics.js";
 import type { SystemInfoService } from "../connectors/server/server-system-info.js";
+import { AppError } from "../lib/errors.js";
 import { requireAuth } from "../middleware/auth.js";
+
+/** /proc absent (Windows, ou conteneur sans HOST_PROC_PREFIX) : état prévu. */
+function isProcUnavailable(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: unknown }).code === "ENOENT"
+  );
+}
+
+function unavailableError(error: unknown): AppError {
+  return new AppError(
+    503,
+    "metrics_unavailable",
+    "Les métriques hôte nécessitent Linux (/proc). En développement Windows, cet écran reste vide.",
+    { cause: error },
+  );
+}
 
 export function createSystemRouter(
   serverMetrics: ServerMetricsService,
@@ -41,7 +61,7 @@ export function createSystemRouter(
       };
       res.status(200).json(body);
     } catch (error) {
-      next(error);
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
     }
   });
 
@@ -51,7 +71,7 @@ export function createSystemRouter(
         await serverMetrics.getNetworkStats();
       res.status(200).json(body);
     } catch (error) {
-      next(error);
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
     }
   });
 
@@ -61,7 +81,7 @@ export function createSystemRouter(
         await serverMetrics.getProcessStats();
       res.status(200).json(body);
     } catch (error) {
-      next(error);
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
     }
   });
 
@@ -70,7 +90,7 @@ export function createSystemRouter(
       const body: SystemOverviewResponse = await systemInfo.getOverview();
       res.status(200).json(body);
     } catch (error) {
-      next(error);
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
     }
   });
 
@@ -79,7 +99,7 @@ export function createSystemRouter(
       const body: SystemStorageResponse = await systemInfo.getStorage();
       res.status(200).json(body);
     } catch (error) {
-      next(error);
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
     }
   });
 
@@ -88,7 +108,7 @@ export function createSystemRouter(
       const body: SystemHardwareResponse = await systemInfo.getHardware();
       res.status(200).json(body);
     } catch (error) {
-      next(error);
+      next(isProcUnavailable(error) ? unavailableError(error) : error);
     }
   });
 

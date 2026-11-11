@@ -32,21 +32,10 @@ export function createErrorHandler(logger: Logger, isProduction: boolean) {
           ? "An unexpected error occurred."
           : error.message;
 
-      // 4xx = erreur d'appel, pas incident serveur : une ligne exploitable
-      // (méthode, chemin, code) suffit. Empiler la stack pour un 404 noie le
-      // terminal et laisse croire à un crash.
-      if (error.statusCode >= 500) {
-        logger.error(
-          {
-            err: error,
-            method: req.method,
-            url: req.originalUrl,
-            statusCode: error.statusCode,
-            code: error.code,
-          },
-          "Unhandled server error",
-        );
-      } else {
+      // Une erreur opérationnelle est une condition prévue (validation, session
+      // absente, 404, /proc indisponible sous Windows) : une ligne suffit.
+      // Seules les erreurs inattendues méritent la stack complète.
+      if (error.isOperational) {
         logger.warn(
           {
             method: req.method,
@@ -56,6 +45,17 @@ export function createErrorHandler(logger: Logger, isProduction: boolean) {
             message: error.message,
           },
           "Request failed",
+        );
+      } else {
+        logger.error(
+          {
+            err: error,
+            method: req.method,
+            url: req.originalUrl,
+            statusCode: error.statusCode,
+            code: error.code,
+          },
+          "Unhandled server error",
         );
       }
 

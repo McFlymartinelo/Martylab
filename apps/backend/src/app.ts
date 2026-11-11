@@ -193,6 +193,12 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
         ignore: (req) =>
           req.url === "/api/health" || req.url === "/api/health/live",
       },
+      // Une requête en erreur est déjà décrite par le gestionnaire d'erreurs
+      // (une ligne avec méthode, chemin et code). Sans ce filtre, pino-http
+      // rajoute une entrée « request completed » et invente une stack pour
+      // tout statut >= 500.
+      customLogLevel: (_req, res, err) =>
+        err || res.statusCode >= 400 ? "silent" : "info",
     }),
   );
   app.use(createSessionMiddleware(env, sessionService));
