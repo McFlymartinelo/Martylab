@@ -1,139 +1,144 @@
+import { useSearchParams } from "react-router-dom";
+import {
+  Bell,
+  Info,
+  Palette,
+  Plug,
+  ShieldCheck,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 import { PageHeader } from "@/components/cockpit/page-header";
-import { Bell, Download, Loader2, Smartphone } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useInstallPrompt } from "@/features/pwa/use-install-prompt";
-import {
-  usePushPublicKeyQuery,
-  usePushStatusQuery,
-  usePushSubscriptionMutation,
-  usePushTestMutation,
-  usePushUnsubscribeMutation,
-} from "@/features/push/use-push-query";
+import { AboutSection } from "@/components/settings/about-section";
+import { AppearanceSection } from "@/components/settings/appearance-section";
+import { IntegrationsSection } from "@/components/settings/integrations-section";
+import { NotificationsSection } from "@/components/settings/notifications-section";
+import { ProfileSection } from "@/components/settings/profile-section";
+import { SecuritySection } from "@/components/settings/security-section";
+import { cn } from "@/lib/utils";
+
+interface SettingsSection {
+  id: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+const sections: SettingsSection[] = [
+  {
+    id: "profil",
+    label: "Profil",
+    description: "Ton identité, ton rôle et ta session.",
+    icon: UserRound,
+  },
+  {
+    id: "apparence",
+    label: "Apparence",
+    description: "Thème et installation de l'application mobile.",
+    icon: Palette,
+  },
+  {
+    id: "notifications",
+    label: "Notifications",
+    description: "Alertes push et prérequis navigateur.",
+    icon: Bell,
+  },
+  {
+    id: "securite",
+    label: "Sécurité",
+    description: "Sessions actives et révocation des appareils.",
+    icon: ShieldCheck,
+  },
+  {
+    id: "integrations",
+    label: "Intégrations",
+    description: "État réel des connecteurs configurés sur le serveur.",
+    icon: Plug,
+  },
+  {
+    id: "a-propos",
+    label: "Système & à propos",
+    description: "Version, santé du backend et rapport de diagnostics.",
+    icon: Info,
+  },
+];
 
 export function SettingsPage() {
-  const install = useInstallPrompt();
-  const pushStatusQuery = usePushStatusQuery();
-  const pushPublicKeyQuery = usePushPublicKeyQuery();
-  const subscribeMutation = usePushSubscriptionMutation();
-  const unsubscribeMutation = usePushUnsubscribeMutation();
-  const testMutation = usePushTestMutation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requested = searchParams.get("section");
+  const active = sections.some((section) => section.id === requested)
+    ? requested!
+    : sections[0]!.id;
+  const activeSection = sections.find((section) => section.id === active)!;
 
-  const pushConfigured =
-    pushPublicKeyQuery.data?.configured ?? pushStatusQuery.data?.configured;
-  const pushSubscribed = pushStatusQuery.data?.subscribed ?? false;
-  const pushBusy =
-    subscribeMutation.isPending ||
-    unsubscribeMutation.isPending ||
-    testMutation.isPending;
+  function select(id: string) {
+    setSearchParams({ section: id }, { replace: true });
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <PageHeader
         eyebrow="Configuration · Portail"
         title="Paramètres"
-        description="Installation mobile, notifications push et préférences du portail."
+        description="Profil, apparence, notifications, sécurité et état des intégrations. Les secrets restent sur le serveur : rien de sensible n'est exposé ici."
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Smartphone className="size-4" />
-              Application mobile
-            </CardTitle>
-            <CardDescription>
-              Installe Martylab comme PWA sur ton smartphone ou ta tablette.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {install.isInstalled ? (
-              <p className="text-sm text-muted-foreground">
-                Martylab est installé sur cet appareil.
-              </p>
-            ) : install.canInstall ? (
-              <Button onClick={() => void install.promptInstall()}>
-                <Download className="size-4" />
-                Installer l&apos;application
-              </Button>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Sur iOS : partage Safari → « Sur l&apos;écran d&apos;accueil ».
-                Sur Android : menu du navigateur → « Installer l&apos;application »
-                ou via la bannière d&apos;installation.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Bell className="size-4" />
-              Notifications push
-            </CardTitle>
-            <CardDescription>
-              Alertes Orion et Matchday envoyées en arrière-plan (toutes les 5 min).
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {!pushConfigured ? (
-              <p className="text-sm text-muted-foreground">
-                Les notifications push ne sont pas configurées sur le serveur
-                (clés VAPID manquantes).
-              </p>
-            ) : pushSubscribed ? (
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  disabled={pushBusy}
-                  onClick={() => void testMutation.mutateAsync()}
+      <div className="flex flex-col gap-4 md:flex-row md:items-start">
+        <nav
+          aria-label="Sections des paramètres"
+          className="w-full shrink-0 md:w-56"
+        >
+          <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1 md:flex-col md:overflow-visible">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              const selected = section.id === activeSection.id;
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  aria-current={selected ? "page" : undefined}
+                  onClick={() => select(section.id)}
+                  className={cn(
+                    "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-full md:whitespace-normal",
+                    selected
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                  )}
                 >
-                  {testMutation.isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : null}
-                  Tester
-                </Button>
-                <Button
-                  variant="destructive"
-                  disabled={pushBusy}
-                  onClick={() => void unsubscribeMutation.mutateAsync()}
-                >
-                  Désactiver
-                </Button>
-              </div>
-            ) : (
-              <Button
-                disabled={pushBusy}
-                onClick={() => void subscribeMutation.mutateAsync()}
-              >
-                {subscribeMutation.isPending ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : null}
-                Activer les notifications
-              </Button>
-            )}
+                  <Icon
+                    className={cn(
+                      "size-4 shrink-0",
+                      selected ? "text-primary" : "text-muted-foreground",
+                    )}
+                    aria-hidden="true"
+                  />
+                  <span className="truncate text-left">{section.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
 
-            {subscribeMutation.error ? (
-              <p className="text-sm text-destructive">
-                {subscribeMutation.error.message}
-              </p>
-            ) : null}
-            {testMutation.isSuccess ? (
-              <p className="text-sm text-muted-foreground">
-                Notification de test envoyée.
-              </p>
-            ) : null}
-          </CardContent>
-        </Card>
+        <div className="min-w-0 flex-1 space-y-3">
+          <div>
+            <h2 className="font-heading text-lg font-semibold">
+              {activeSection.label}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {activeSection.description}
+            </p>
+          </div>
+
+          {activeSection.id === "profil" ? <ProfileSection /> : null}
+          {activeSection.id === "apparence" ? <AppearanceSection /> : null}
+          {activeSection.id === "notifications" ? (
+            <NotificationsSection />
+          ) : null}
+          {activeSection.id === "securite" ? <SecuritySection /> : null}
+          {activeSection.id === "integrations" ? <IntegrationsSection /> : null}
+          {activeSection.id === "a-propos" ? <AboutSection /> : null}
+        </div>
       </div>
-
     </div>
   );
 }

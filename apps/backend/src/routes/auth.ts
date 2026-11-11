@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
-import type { AuthResponse } from "@martylab/shared";
+import type {
+  AuthResponse,
+  AuthSessionsResponse,
+} from "@martylab/shared";
 import type { Env } from "../config/env.js";
 import type { SessionService } from "../auth/session-service.js";
 import {
@@ -73,6 +76,87 @@ export function createAuthRouter(env: Env, sessionService: SessionService | null
     const body: AuthResponse = { user: req.user! };
     res.status(200).json(body);
   });
+
+  authRouter.get("/sessions", requireDb, requireAuth, async (req, res, next) => {
+    try {
+      if (!sessionService) {
+        throw new AppError(
+          503,
+          "database_unavailable",
+          "Database is not configured.",
+        );
+      }
+
+      const sessions = await sessionService.listSessions(
+        req.user!.id,
+        req.sessionId ?? "",
+      );
+      const body: AuthSessionsResponse = { sessions };
+      res.status(200).json(body);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  authRouter.post(
+    "/sessions/revoke-others",
+    requireDb,
+    requireAuth,
+    async (req, res, next) => {
+      try {
+        if (!sessionService || !req.sessionId) {
+          throw new AppError(
+            400,
+            "session_required",
+            "A session is required for this action.",
+          );
+        }
+
+        await sessionService.revokeOtherSessions(req.user!.id, req.sessionId);
+        res.status(204).send();
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  authRouter.delete(
+    "/sessions/:sessionId",
+    requireDb,
+    requireAuth,
+    async (req, res, next) => {
+      try {
+        if (!sessionService) {
+          throw new AppError(
+            503,
+            "database_unavailable",
+            "Database is not configured.",
+          );
+        }
+
+        const parsed = z
+          .string()
+          .uuid()
+          .safeParse(req.params.sessionId);
+        if (!parsed.success) {
+          throw new AppError(400, "invalid_session_id", "Invalid session id.");
+        }
+
+        if (parsed.data === req.sessionId) {
+          throw new AppError(
+            400,
+            "current_session",
+            "Use logout to end the current session.",
+          );
+        }
+
+        await sessionService.revokeUserSession(req.user!.id, parsed.data);
+        res.status(204).send();
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
 
   return authRouter;
 }

@@ -1,5 +1,5 @@
-import { and, eq, gt, isNull } from "drizzle-orm";
-import type { SessionUser, UserRole } from "@martylab/shared";
+import { and, desc, eq, gt, isNull, ne } from "drizzle-orm";
+import type { AuthSessionEntry, SessionUser, UserRole } from "@martylab/shared";
 import type { Env } from "../config/env.js";
 import type { Database } from "../db/client.js";
 import { sessions, users } from "../db/schema.js";
@@ -12,12 +12,14 @@ function toSessionUser(row: {
   username: string;
   displayName: string;
   role: UserRole;
+  createdAt: Date;
 }): SessionUser {
   return {
     id: row.id,
     username: row.username,
     displayName: row.displayName,
     role: row.role,
+    createdAt: row.createdAt.toISOString(),
   };
 }
 
@@ -104,6 +106,7 @@ export function createSessionService(db: NonNullable<Database>, env: Env) {
           username: users.username,
           displayName: users.displayName,
           role: users.role,
+          createdAt: users.createdAt,
         })
         .from(sessions)
         .innerJoin(users, eq(sessions.userId, users.id))
@@ -127,6 +130,7 @@ export function createSessionService(db: NonNullable<Database>, env: Env) {
           username: row.username,
           displayName: row.displayName,
           role: row.role,
+          createdAt: row.createdAt,
         }),
       };
     },
@@ -136,6 +140,61 @@ export function createSessionService(db: NonNullable<Database>, env: Env) {
         .update(sessions)
         .set({ revokedAt: new Date() })
         .where(eq(sessions.id, sessionId));
+    },
+
+    async listSessions(
+      userId: string,
+      currentSessionId: string,
+    ): Promise<AuthSessionEntry[]> {
+      const now = new Date();
+      const rows = await db
+        .select({
+          id: sessions.id,
+          createdAt: sessions.createdAt,
+          expiresAt: sessions.expiresAt,
+          userAgent: sessions.userAgent,
+          ipAddress: sessions.ipAddress,
+        })
+        .from(sessions)
+        .where(
+          and(
+            eq(sessions.userId, userId),
+            isNull(sessions.revokedAt),
+            gt(sessions.expiresAt, now),
+          ),
+        )
+        .orderBy(desc(sessions.createdAt));
+
+      return rows.map((row) => ({
+        id: row.id,
+        createdAt: row.createdAt.toISOString(),
+        expiresAt: row.expiresAt.toISOString(),
+        userAgent: row.userAgent,
+        ipAddress: row.ipAddress,
+        current: row.id === currentSessionId,
+      }));
+    },
+
+    /** Revokes one of the user's own sessions; no-op if it is not theirs. */
+    async revokeUserSession(userId: string, sessionId: string) {
+      await db
+        .update(sessions)
+        .set({ revokedAt: new Date() })
+        .where(and(eq(sessions.id, sessionId), eq(sessions.userId, userId)));
+    },
+
+    /** Revokes every active session of the user except the current one. */
+    async revokeOtherSessions(userId: string, currentSessionId: string) {
+      await db
+        .update(sessions)
+        .set({ revokedAt: new Date() })
+        .where(
+          and(
+            eq(sessions.userId, userId),
+            ne(sessions.id, currentSessionId),
+            isNull(sessions.revokedAt),
+          ),
+        );
     },
   };
 }
