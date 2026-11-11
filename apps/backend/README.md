@@ -28,9 +28,9 @@ npm run db:seed -w @martylab/backend
 - `GET /api/system/live` (authenticated, CPU/RAM/réseau sans scan processus)
 - `GET /api/docker/containers` (authenticated)
 - `GET /api/docker/containers/:containerId/logs` (authenticated)
-- `POST /api/docker/containers/:containerId/start` (user+)
-- `POST /api/docker/containers/:containerId/stop` (user+)
-- `POST /api/docker/containers/:containerId/restart` (user+)
+- `POST /api/docker/containers/:containerId/start` (admin)
+- `POST /api/docker/containers/:containerId/stop` (admin)
+- `POST /api/docker/containers/:containerId/restart` (admin)
 - `GET /api/orion/status` (authenticated)
 - `GET /api/orion/climate` (authenticated)
 

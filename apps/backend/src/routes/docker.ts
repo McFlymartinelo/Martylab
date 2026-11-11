@@ -7,7 +7,7 @@ import type {
 } from "@martylab/shared";
 import type { DockerClient } from "../connectors/docker/docker-client.js";
 import { AppError } from "../lib/errors.js";
-import { requireAuth, requireMinRole } from "../middleware/auth.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const logsQuerySchema = z.object({
   tail: z.coerce.number().int().min(10).max(500).optional(),
@@ -144,7 +144,7 @@ export function createDockerRouter(dockerClient: DockerClient) {
   dockerRouter.post(
     "/containers/:containerId/start",
     requireAuth,
-    requireMinRole("user"),
+    requireRole("admin"),
     (req, res, next) => {
       void runAction(req, res, next, "start");
     },
@@ -152,7 +152,7 @@ export function createDockerRouter(dockerClient: DockerClient) {
   dockerRouter.post(
     "/containers/:containerId/stop",
     requireAuth,
-    requireMinRole("user"),
+    requireRole("admin"),
     (req, res, next) => {
       void runAction(req, res, next, "stop");
     },
@@ -160,7 +160,7 @@ export function createDockerRouter(dockerClient: DockerClient) {
   dockerRouter.post(
     "/containers/:containerId/restart",
     requireAuth,
-    requireMinRole("user"),
+    requireRole("admin"),
     (req, res, next) => {
       void runAction(req, res, next, "restart");
     },

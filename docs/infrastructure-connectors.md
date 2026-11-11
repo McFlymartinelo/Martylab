@@ -17,7 +17,7 @@ PORTAINER_INSECURE_TLS=false
 |-------|-------------|
 | `GET /api/portainer/status` | État Portainer + endpoint Docker |
 | `GET /api/portainer/overview` | Conteneurs, images, volumes |
-| `POST /api/portainer/containers/:id/start\|stop\|restart` | Actions (user+) |
+| `POST /api/portainer/containers/:id/start\|stop\|restart` | Actions (admin uniquement) |
 
 Crée un **access token** dans Portainer → Mon compte → Access tokens.
 

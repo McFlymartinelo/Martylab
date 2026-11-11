@@ -5,7 +5,7 @@ import type {
 } from "@martylab/shared";
 import type { PortainerClient } from "../connectors/portainer/portainer-client.js";
 import { AppError } from "../lib/errors.js";
-import { requireAuth, requireMinRole } from "../middleware/auth.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 
 export function createPortainerRouter(portainerClient: PortainerClient) {
   const portainerRouter = Router();
@@ -23,7 +23,7 @@ export function createPortainerRouter(portainerClient: PortainerClient) {
   portainerRouter.post(
     "/containers/:containerId/:action",
     requireAuth,
-    requireMinRole("user"),
+    requireRole("admin"),
     async (req, res, next) => {
       const containerId = req.params.containerId;
       const action = req.params.action;

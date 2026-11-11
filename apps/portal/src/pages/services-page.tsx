@@ -39,7 +39,6 @@ import {
   formatGroupStateSummary,
   groupContainersByApp,
 } from "@/lib/docker-groups";
-import { hasMinRole } from "@/lib/permissions";
 import { useToast } from "@/lib/use-toast";
 
 export function ServicesPage() {
@@ -52,7 +51,7 @@ export function ServicesPage() {
     useState<DockerContainerSummary | null>(null);
 
   const role = authQuery.data?.user?.role;
-  const canManage = role ? hasMinRole(role, "user") : false;
+  const canManage = role === "admin";
 
   const containers = dockerQuery.data?.available
     ? dockerQuery.data.containers
@@ -63,6 +62,15 @@ export function ServicesPage() {
     container: DockerContainerSummary,
     action: "start" | "stop" | "restart",
   ) {
+    if (
+      (action === "stop" || action === "restart") &&
+      !window.confirm(
+        `${action === "stop" ? "Arrêter" : "Redémarrer"} le conteneur « ${container.name} » ? Cette action peut interrompre le service.`,
+      )
+    ) {
+      return;
+    }
+
     const labels = {
       start: "Démarrage demandé",
       stop: "Arrêt demandé",
@@ -95,7 +103,7 @@ export function ServicesPage() {
       <PageHeader
         eyebrow="Infrastructure · Docker"
         title="Services"
-        description="Conteneurs groupés par application. Les invités consultent l'état et les logs ; démarrer, arrêter ou redémarrer exige le rôle utilisateur, et le backend revérifie toujours l'autorisation."
+        description="Conteneurs groupés par application. Les utilisateurs consultent l'état et les logs ; les actions Docker sont réservées aux administrateurs. Arrêter ou redémarrer demande une confirmation."
         actions={
           <Button
             type="button"

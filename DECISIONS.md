@@ -632,3 +632,33 @@ La Console expose **deux niveaux distincts**, tous deux réservés au rôle
 - Les sessions de la page Paramètres sont listables et révocables
   (`GET /api/auth/sessions`, `DELETE /api/auth/sessions/:id`,
   `POST /api/auth/sessions/revoke-others`).
+
+---
+
+# ADR-022 — Actions Docker réservées aux administrateurs
+
+**Statut : Acceptée**
+
+## Contexte
+
+Le backend accède au socket Docker de l'hôte. L'accès à ce socket permet des
+opérations privilégiées ; le montage `:ro` protège le fichier socket contre
+son remplacement, mais ne restreint pas les commandes envoyées à l'API Docker.
+Les actions conteneurs étaient précédemment disponibles au rôle `user`.
+
+## Décision
+
+Les opérations start, stop et restart via Docker direct ou Portainer sont
+réservées au rôle `admin` et vérifiées côté backend. L'interface demande une
+confirmation avant stop et restart. Le terminal conteneur est désactivé par
+défaut (`CONSOLE_TERMINAL_ENABLED=false`) et doit être activé explicitement.
+
+## Alternatives et conséquences
+
+- Un proxy de socket Docker à capacités restreintes réduirait davantage les
+  privilèges, mais ajoute un service et une configuration à maintenir. Il est
+  reporté jusqu'à ce que le besoin justifie cette complexité.
+- Les rôles `user` perdent les actions directes sur les conteneurs ; lecture,
+  logs et intégrations applicatives restent disponibles selon leurs règles.
+- Les déploiements qui nécessitent le terminal doivent ajouter
+  `CONSOLE_TERMINAL_ENABLED=true` dans leur `.env` serveur.

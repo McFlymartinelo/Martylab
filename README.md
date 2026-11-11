@@ -178,9 +178,9 @@ npm run db:seed        # Comptes initiaux
 | `GET /api/system/live` | session | CPU, RAM, disque, réseau (sans scan processus, pour le live 1 s) |
 | `GET /api/docker/containers` | session | Liste des conteneurs Docker |
 | `GET /api/docker/containers/:id/logs` | session | Logs d'un conteneur |
-| `POST /api/docker/containers/:id/start` | user+ | Démarrer un conteneur |
-| `POST /api/docker/containers/:id/stop` | user+ | Arrêter un conteneur |
-| `POST /api/docker/containers/:id/restart` | user+ | Redémarrer un conteneur |
+| `POST /api/docker/containers/:id/start` | admin | Démarrer un conteneur |
+| `POST /api/docker/containers/:id/stop` | admin | Arrêter un conteneur (confirmation UI) |
+| `POST /api/docker/containers/:id/restart` | admin | Redémarrer un conteneur (confirmation UI) |
 | `GET /api/orion/status` | session | État du connecteur Orion |
 | `GET /api/orion/climate` | session | Température et humidité (via Orion) |
 | `GET /api/orion/climate/history` | session | Historique Netatmo (24h / 7j) |
@@ -204,7 +204,7 @@ npm run db:seed        # Comptes initiaux
 | `GET /api/assistant/actions` | session | Journal des actions assistant |
 | `GET /api/portainer/status` | session | État Portainer |
 | `GET /api/portainer/overview` | session | Conteneurs, images, volumes (Portainer) |
-| `POST /api/portainer/containers/:id/start\|stop\|restart` | user+ | Actions conteneur via Portainer |
+| `POST /api/portainer/containers/:id/start\|stop\|restart` | admin | Actions conteneur via Portainer |
 | `GET /api/cloudflare/status` | session | Tunnel Cloudflare + checks domaines |
 | `GET /api/nas/status` | session | État NAS UGREEN (stockage, disques) |
 | `GET /api/auth/sessions` | session | Sessions actives de l'utilisateur |
