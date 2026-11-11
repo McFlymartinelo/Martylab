@@ -9,7 +9,9 @@ import {
   Plug,
   Tv,
   Trophy,
+  RefreshCw,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,14 +28,20 @@ import { usePortainerStatusQuery } from "@/features/portainer/use-portainer-quer
 import { useCloudflareStatusQuery } from "@/features/cloudflare/use-cloudflare-query";
 import { useNasStatusQuery } from "@/features/nas/use-nas-query";
 import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
+import { Button } from "@/components/ui/button";
 
 function StatusBadge({
   configured,
   online,
+  failed,
 }: {
   configured: boolean | undefined;
   online: boolean | undefined;
+  failed: boolean;
 }) {
+  if (failed) {
+    return <Badge variant="destructive">Vérification en erreur</Badge>;
+  }
   if (configured === undefined) {
     return <Badge variant="outline">Vérification…</Badge>;
   }
@@ -51,6 +59,7 @@ function IntegrationCard({
   name,
   configured,
   online,
+  failed,
   description,
   details,
 }: {
@@ -58,6 +67,7 @@ function IntegrationCard({
   name: string;
   configured: boolean | undefined;
   online: boolean | undefined;
+  failed: boolean;
   description: string;
   details: string[];
 }) {
@@ -69,7 +79,7 @@ function IntegrationCard({
             <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <span className="truncate">{name}</span>
           </CardTitle>
-          <StatusBadge configured={configured} online={online} />
+          <StatusBadge configured={configured} online={online} failed={failed} />
         </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
@@ -85,6 +95,7 @@ function IntegrationCard({
 }
 
 export function IntegrationsSection() {
+  const queryClient = useQueryClient();
   const orion = useOrionStatusQuery();
   const matchday = useMatchdayStatusQuery();
   const jellyfin = useJellyfinStatusQuery();
@@ -117,12 +128,38 @@ export function IntegrationsSection() {
         </span>
       </p>
 
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            void Promise.all(
+              [
+                ["orion", "status"],
+                ["matchday", "status"],
+                ["jellyfin", "status"],
+                ["immich", "status"],
+                ["portainer", "status"],
+                ["cloudflare", "status"],
+                ["nas", "status"],
+                ["docker", "containers"],
+              ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+            )
+          }
+        >
+          <RefreshCw className="size-3.5" aria-hidden="true" />
+          Relancer les vérifications
+        </Button>
+      </div>
+
       <div className="grid gap-3 xl:grid-cols-2 2xl:grid-cols-3">
         <IntegrationCard
           icon={Home}
           name="Orion"
           configured={orion.data?.configured}
           online={orion.data?.online}
+          failed={orion.isError}
           description="Domotique, capteurs et éclairages."
           details={
             orion.data?.orionUrl ? [`URL : ${orion.data.orionUrl}`] : []
@@ -134,6 +171,7 @@ export function IntegrationsSection() {
           name="Matchday"
           configured={matchday.data?.configured}
           online={matchday.data?.online}
+          failed={matchday.isError}
           description="Matchs, classement et pronostics."
           details={
             matchday.data?.online
@@ -150,6 +188,7 @@ export function IntegrationsSection() {
           name="Jellyfin"
           configured={jellyfin.data?.configured}
           online={jellyfin.data?.online}
+          failed={jellyfin.isError}
           description="Bibliothèque et sessions de lecture."
           details={
             jellyfin.data?.serverName
@@ -168,6 +207,7 @@ export function IntegrationsSection() {
           name="Photos (Immich)"
           configured={immich.data?.anyConfigured}
           online={immich.data?.anyOnline}
+          failed={immich.isError}
           description="Bibliothèques personnelles et partagées."
           details={immichDetails}
         />
@@ -177,6 +217,7 @@ export function IntegrationsSection() {
           name="Portainer"
           configured={portainer.data?.configured}
           online={portainer.data?.online}
+          failed={portainer.isError}
           description="Supervision de l'environnement Docker."
           details={
             portainer.data?.version
@@ -195,6 +236,7 @@ export function IntegrationsSection() {
           name="Cloudflare Tunnel"
           configured={cloudflare.data?.configured}
           online={cloudflare.data?.online}
+          failed={cloudflare.isError}
           description="Accès public et domaines."
           details={
             cloudflare.data?.tunnelName
@@ -215,6 +257,7 @@ export function IntegrationsSection() {
           name="NAS UGREEN"
           configured={nas.data?.configured}
           online={nas.data?.online}
+          failed={nas.isError}
           description="Stockage, température et pools."
           details={
             nas.data?.online
@@ -233,6 +276,7 @@ export function IntegrationsSection() {
           name="Docker"
           configured={docker.data?.available}
           online={docker.data?.available}
+          failed={docker.isError}
           description="Socket local utilisé par Services et la Console."
           details={
             docker.data?.available
