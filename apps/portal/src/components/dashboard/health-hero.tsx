@@ -86,7 +86,7 @@ export function HealthHero({ metrics, containers, className }: HealthHeroProps) 
         />
       </div>
 
-      {metrics.cpu.history.length > 1 ? (
+      {metrics.cpu.history.length > 4 ? (
         <div className="mt-4">
           <p className="mb-1 text-2xs text-muted-foreground">
             Charge CPU ({metrics.cpu.history.length} mesures)

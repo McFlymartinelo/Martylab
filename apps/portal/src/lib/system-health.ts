@@ -1,5 +1,10 @@
 import type { SystemMetricsResponse } from "@martylab/shared";
 
+/**
+ * Score de charge, pas de disponibilité : il reflète l'utilisation réelle des
+ * ressources. L'uptime reste affiché à part et ne pénalise pas un serveur qui
+ * vient de démarrer.
+ */
 export function computeServerHealthScore(
   metrics: SystemMetricsResponse,
 ): number {
@@ -9,13 +14,8 @@ export function computeServerHealthScore(
       metrics.storage.usagePercent) /
     3;
 
-  const uptimeDays = metrics.uptimeSeconds / 86_400;
-  const uptimeScore = Math.min(100, (uptimeDays / 7) * 100);
-
   const loadScore = Math.max(0, 100 - loadAvg);
-  const health = loadScore * 0.65 + uptimeScore * 0.35;
-
-  return Math.round(Math.max(0, Math.min(100, health)));
+  return Math.round(Math.max(0, Math.min(100, loadScore)));
 }
 
 export function healthStatusLabel(value: number): string {
