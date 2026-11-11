@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-11-11T08:40:14.315Z",
+  "wordmark": {
+    "font": "Bricolage Grotesque Variable",
+    "weight": 600,
+    "trackingEm": -0.02,
+    "capHeight": 66
+  },
+  "grid": {
+    "GRID": 32,
+    "MODULE": 12,
+    "GAP": 4,
+    "RADIUS": 3.5,
+    "ORIGIN": 2
+  },
+  "horizontal": {
+    "symbolSize": 71.033,
+    "gap": 24,
+    "width": 506.87,
+    "height": 88.9
+  },
+  "stacked": {
+    "symbolSize": 104,
+    "gap": 22,
+    "width": 411.83,
+    "height": 214.9
+  },
+  "png": [
+    {
+      "file": "martylab-app-icon-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 16425
+    },
+    {
+      "file": "martylab-app-icon-maskable-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 14095
+    },
+    {
+      "file": "martylab-app-icon-foreground-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 14117
+    },
+    {
+      "file": "martylab-pwa-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 7314
+    },
+    {
+      "file": "martylab-pwa-192.png",
+      "width": 192,
+      "height": 192,
+      "bytes": 2374
+    },
+    {
+      "file": "martylab-apple-touch-icon-180.png",
+      "width": 180,
+      "height": 180,
+      "bytes": 2377
+    },
+    {
+      "file": "martylab-favicon-32.png",
+      "width": 32,
+      "height": 32,
+      "bytes": 560
+    }
+  ]
+}

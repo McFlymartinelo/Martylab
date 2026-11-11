@@ -1,0 +1,614 @@
+{
+  "tokens": {
+    "light": {
+      "background": {
+        "oklch": {
+          "l": 0.973,
+          "c": 0.006,
+          "h": 235
+        },
+        "hex": "#F2F7FA",
+        "rgb": {
+          "r": 242,
+          "g": 247,
+          "b": 250,
+          "inGamut": true
+        },
+        "css": "oklch(97.3% 0.006 235)"
+      },
+      "foreground": {
+        "oklch": {
+          "l": 0.205,
+          "c": 0.018,
+          "h": 245
+        },
+        "hex": "#10181F",
+        "rgb": {
+          "r": 16,
+          "g": 24,
+          "b": 31,
+          "inGamut": true
+        },
+        "css": "oklch(20.5% 0.018 245)"
+      },
+      "card": {
+        "oklch": {
+          "l": 0.995,
+          "c": 0.002,
+          "h": 235
+        },
+        "hex": "#FCFEFF",
+        "rgb": {
+          "r": 252,
+          "g": 254,
+          "b": 255,
+          "inGamut": true
+        },
+        "css": "oklch(99.5% 0.002 235)"
+      },
+      "primary": {
+        "oklch": {
+          "l": 0.52,
+          "c": 0.135,
+          "h": 138
+        },
+        "hex": "#3D7A24",
+        "rgb": {
+          "r": 61,
+          "g": 122,
+          "b": 36,
+          "inGamut": true
+        },
+        "css": "oklch(52.0% 0.135 138)"
+      },
+      "primary-foreground": {
+        "oklch": {
+          "l": 0.99,
+          "c": 0.005,
+          "h": 138
+        },
+        "hex": "#FAFDF9",
+        "rgb": {
+          "r": 250,
+          "g": 253,
+          "b": 249,
+          "inGamut": true
+        },
+        "css": "oklch(99.0% 0.005 138)"
+      },
+      "muted-foreground": {
+        "oklch": {
+          "l": 0.42,
+          "c": 0.016,
+          "h": 245
+        },
+        "hex": "#464E55",
+        "rgb": {
+          "r": 70,
+          "g": 78,
+          "b": 85,
+          "inGamut": true
+        },
+        "css": "oklch(42.0% 0.016 245)"
+      },
+      "border": {
+        "oklch": {
+          "l": 0.896,
+          "c": 0.008,
+          "h": 240
+        },
+        "hex": "#D8DDE1",
+        "rgb": {
+          "r": 216,
+          "g": 221,
+          "b": 225,
+          "inGamut": true
+        },
+        "css": "oklch(89.6% 0.008 240)"
+      },
+      "sidebar": {
+        "oklch": {
+          "l": 0.915,
+          "c": 0.012,
+          "h": 235
+        },
+        "hex": "#DCE4EA",
+        "rgb": {
+          "r": 220,
+          "g": 228,
+          "b": 234,
+          "inGamut": true
+        },
+        "css": "oklch(91.5% 0.012 235)"
+      },
+      "destructive": {
+        "oklch": {
+          "l": 0.52,
+          "c": 0.19,
+          "h": 25
+        },
+        "hex": "#BE222A",
+        "rgb": {
+          "r": 190,
+          "g": 34,
+          "b": 42,
+          "inGamut": true
+        },
+        "css": "oklch(52.0% 0.19 25)"
+      },
+      "success": {
+        "oklch": {
+          "l": 0.5,
+          "c": 0.14,
+          "h": 155
+        },
+        "hex": "#00793D",
+        "rgb": {
+          "r": 0,
+          "g": 121,
+          "b": 61,
+          "inGamut": false
+        },
+        "css": "oklch(50.0% 0.14 155)"
+      },
+      "warn": {
+        "oklch": {
+          "l": 0.7,
+          "c": 0.16,
+          "h": 72
+        },
+        "hex": "#DA8B00",
+        "rgb": {
+          "r": 218,
+          "g": 139,
+          "b": 0,
+          "inGamut": false
+        },
+        "css": "oklch(70.0% 0.16 72)"
+      },
+      "info": {
+        "oklch": {
+          "l": 0.52,
+          "c": 0.14,
+          "h": 245
+        },
+        "hex": "#006EB3",
+        "rgb": {
+          "r": 0,
+          "g": 110,
+          "b": 179,
+          "inGamut": false
+        },
+        "css": "oklch(52.0% 0.14 245)"
+      }
+    },
+    "dark": {
+      "background": {
+        "oklch": {
+          "l": 0.175,
+          "c": 0.014,
+          "h": 250
+        },
+        "hex": "#0C1116",
+        "rgb": {
+          "r": 12,
+          "g": 17,
+          "b": 22,
+          "inGamut": true
+        },
+        "css": "oklch(17.5% 0.014 250)"
+      },
+      "foreground": {
+        "oklch": {
+          "l": 0.96,
+          "c": 0.004,
+          "h": 250
+        },
+        "hex": "#F0F2F4",
+        "rgb": {
+          "r": 240,
+          "g": 242,
+          "b": 244,
+          "inGamut": true
+        },
+        "css": "oklch(96.0% 0.004 250)"
+      },
+      "card": {
+        "oklch": {
+          "l": 0.215,
+          "c": 0.016,
+          "h": 250
+        },
+        "hex": "#141A21",
+        "rgb": {
+          "r": 20,
+          "g": 26,
+          "b": 33,
+          "inGamut": true
+        },
+        "css": "oklch(21.5% 0.016 250)"
+      },
+      "primary": {
+        "oklch": {
+          "l": 0.72,
+          "c": 0.12,
+          "h": 138
+        },
+        "hex": "#7EB66B",
+        "rgb": {
+          "r": 126,
+          "g": 182,
+          "b": 107,
+          "inGamut": true
+        },
+        "css": "oklch(72.0% 0.12 138)"
+      },
+      "primary-foreground": {
+        "oklch": {
+          "l": 0.16,
+          "c": 0.02,
+          "h": 138
+        },
+        "hex": "#090F07",
+        "rgb": {
+          "r": 9,
+          "g": 15,
+          "b": 7,
+          "inGamut": true
+        },
+        "css": "oklch(16.0% 0.02 138)"
+      },
+      "muted-foreground": {
+        "oklch": {
+          "l": 0.64,
+          "c": 0.012,
+          "h": 250
+        },
+        "hex": "#878D93",
+        "rgb": {
+          "r": 135,
+          "g": 141,
+          "b": 147,
+          "inGamut": true
+        },
+        "css": "oklch(64.0% 0.012 250)"
+      },
+      "border": {
+        "oklch": {
+          "l": 0.305,
+          "c": 0.016,
+          "h": 250
+        },
+        "hex": "#293037",
+        "rgb": {
+          "r": 41,
+          "g": 48,
+          "b": 55,
+          "inGamut": true
+        },
+        "css": "oklch(30.5% 0.016 250)"
+      },
+      "sidebar": {
+        "oklch": {
+          "l": 0.12,
+          "c": 0.012,
+          "h": 250
+        },
+        "hex": "#03060A",
+        "rgb": {
+          "r": 3,
+          "g": 6,
+          "b": 10,
+          "inGamut": true
+        },
+        "css": "oklch(12.0% 0.012 250)"
+      },
+      "destructive": {
+        "oklch": {
+          "l": 0.65,
+          "c": 0.19,
+          "h": 25
+        },
+        "hex": "#ED5350",
+        "rgb": {
+          "r": 237,
+          "g": 83,
+          "b": 80,
+          "inGamut": true
+        },
+        "css": "oklch(65.0% 0.19 25)"
+      },
+      "success": {
+        "oklch": {
+          "l": 0.72,
+          "c": 0.14,
+          "h": 155
+        },
+        "hex": "#4EBE7D",
+        "rgb": {
+          "r": 78,
+          "g": 190,
+          "b": 125,
+          "inGamut": true
+        },
+        "css": "oklch(72.0% 0.14 155)"
+      },
+      "warn": {
+        "oklch": {
+          "l": 0.78,
+          "c": 0.15,
+          "h": 72
+        },
+        "hex": "#F2A635",
+        "rgb": {
+          "r": 242,
+          "g": 166,
+          "b": 53,
+          "inGamut": true
+        },
+        "css": "oklch(78.0% 0.15 72)"
+      },
+      "info": {
+        "oklch": {
+          "l": 0.72,
+          "c": 0.12,
+          "h": 245
+        },
+        "hex": "#5EACEB",
+        "rgb": {
+          "r": 94,
+          "g": 172,
+          "b": 235,
+          "inGamut": true
+        },
+        "css": "oklch(72.0% 0.12 245)"
+      }
+    }
+  },
+  "checks": [
+    {
+      "mode": "light",
+      "fg": "foreground",
+      "bg": "background",
+      "fgHex": "#10181F",
+      "bgHex": "#F2F7FA",
+      "ratio": 16.6,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte principal / fond"
+    },
+    {
+      "mode": "light",
+      "fg": "muted-foreground",
+      "bg": "background",
+      "fgHex": "#464E55",
+      "bgHex": "#F2F7FA",
+      "ratio": 7.84,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte secondaire / fond"
+    },
+    {
+      "mode": "light",
+      "fg": "muted-foreground",
+      "bg": "card",
+      "fgHex": "#464E55",
+      "bgHex": "#FCFEFF",
+      "ratio": 8.37,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte secondaire / carte"
+    },
+    {
+      "mode": "light",
+      "fg": "primary",
+      "bg": "background",
+      "fgHex": "#3D7A24",
+      "bgHex": "#F2F7FA",
+      "ratio": 4.86,
+      "target": 3,
+      "pass": true,
+      "label": "Accent (élément non textuel) / fond"
+    },
+    {
+      "mode": "light",
+      "fg": "primary",
+      "bg": "card",
+      "fgHex": "#3D7A24",
+      "bgHex": "#FCFEFF",
+      "ratio": 5.18,
+      "target": 3,
+      "pass": true,
+      "label": "Accent / carte"
+    },
+    {
+      "mode": "light",
+      "fg": "primary-foreground",
+      "bg": "primary",
+      "fgHex": "#FAFDF9",
+      "bgHex": "#3D7A24",
+      "ratio": 5.11,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte sur accent"
+    },
+    {
+      "mode": "light",
+      "fg": "destructive",
+      "bg": "background",
+      "fgHex": "#BE222A",
+      "bgHex": "#F2F7FA",
+      "ratio": 5.64,
+      "target": 4.5,
+      "pass": true,
+      "label": "Danger / fond"
+    },
+    {
+      "mode": "light",
+      "fg": "success",
+      "bg": "background",
+      "fgHex": "#00793D",
+      "bgHex": "#F2F7FA",
+      "ratio": 5.12,
+      "target": 4.5,
+      "pass": true,
+      "label": "Succès / fond"
+    },
+    {
+      "mode": "dark",
+      "fg": "foreground",
+      "bg": "background",
+      "fgHex": "#F0F2F4",
+      "bgHex": "#0C1116",
+      "ratio": 16.9,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte principal / fond"
+    },
+    {
+      "mode": "dark",
+      "fg": "muted-foreground",
+      "bg": "background",
+      "fgHex": "#878D93",
+      "bgHex": "#0C1116",
+      "ratio": 5.65,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte secondaire / fond"
+    },
+    {
+      "mode": "dark",
+      "fg": "muted-foreground",
+      "bg": "card",
+      "fgHex": "#878D93",
+      "bgHex": "#141A21",
+      "ratio": 5.22,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte secondaire / carte"
+    },
+    {
+      "mode": "dark",
+      "fg": "primary",
+      "bg": "background",
+      "fgHex": "#7EB66B",
+      "bgHex": "#0C1116",
+      "ratio": 7.94,
+      "target": 3,
+      "pass": true,
+      "label": "Accent (élément non textuel) / fond"
+    },
+    {
+      "mode": "dark",
+      "fg": "primary",
+      "bg": "card",
+      "fgHex": "#7EB66B",
+      "bgHex": "#141A21",
+      "ratio": 7.33,
+      "target": 3,
+      "pass": true,
+      "label": "Accent / carte"
+    },
+    {
+      "mode": "dark",
+      "fg": "primary-foreground",
+      "bg": "primary",
+      "fgHex": "#090F07",
+      "bgHex": "#7EB66B",
+      "ratio": 8.12,
+      "target": 4.5,
+      "pass": true,
+      "label": "Texte sur accent"
+    },
+    {
+      "mode": "dark",
+      "fg": "destructive",
+      "bg": "background",
+      "fgHex": "#ED5350",
+      "bgHex": "#0C1116",
+      "ratio": 5.38,
+      "target": 4.5,
+      "pass": true,
+      "label": "Danger / fond"
+    },
+    {
+      "mode": "dark",
+      "fg": "success",
+      "bg": "background",
+      "fgHex": "#4EBE7D",
+      "bgHex": "#0C1116",
+      "ratio": 8.11,
+      "target": 4.5,
+      "pass": true,
+      "label": "Succès / fond"
+    },
+    {
+      "mode": "light",
+      "fg": "foreground",
+      "bg": "background",
+      "fgHex": "#10181F",
+      "bgHex": "#F2F7FA",
+      "ratio": 16.6,
+      "target": 3,
+      "pass": true,
+      "label": "Marque foreground sur background"
+    },
+    {
+      "mode": "light",
+      "fg": "primary",
+      "bg": "background",
+      "fgHex": "#3D7A24",
+      "bgHex": "#F2F7FA",
+      "ratio": 4.86,
+      "target": 3,
+      "pass": true,
+      "label": "Marque primary sur background"
+    },
+    {
+      "mode": "dark",
+      "fg": "foreground",
+      "bg": "background",
+      "fgHex": "#F0F2F4",
+      "bgHex": "#0C1116",
+      "ratio": 16.9,
+      "target": 3,
+      "pass": true,
+      "label": "Marque foreground sur background"
+    },
+    {
+      "mode": "dark",
+      "fg": "primary",
+      "bg": "background",
+      "fgHex": "#7EB66B",
+      "bgHex": "#0C1116",
+      "ratio": 7.94,
+      "target": 3,
+      "pass": true,
+      "label": "Marque primary sur background"
+    },
+    {
+      "mode": "dark",
+      "fg": "foreground",
+      "bg": "sidebar",
+      "fgHex": "#F0F2F4",
+      "bgHex": "#03060A",
+      "ratio": 18.09,
+      "target": 3,
+      "pass": true,
+      "label": "Marque foreground sur sidebar"
+    },
+    {
+      "mode": "light",
+      "fg": "foreground",
+      "bg": "card",
+      "fgHex": "#10181F",
+      "bgHex": "#FCFEFF",
+      "ratio": 17.71,
+      "target": 3,
+      "pass": true,
+      "label": "Marque foreground sur card"
+    }
+  ],
+  "generatedAt": "2026-11-11T08:26:01.555Z",
+  "method": "OKLCH → OKLab → sRGB linéaire → gamma 2.4 ; contraste WCAG 2.2 (luminance relative)."
+}

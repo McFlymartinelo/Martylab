@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Martylab — icône d'application">
+  <title>Martylab — icône d'application</title>
+  <rect x="0" y="0" width="1024" height="1024" rx="0" fill="#0C1116"/>
+  <rect x="310.75" y="310.75" width="172.5" height="172.5" rx="50.31" fill="#F0F2F4"/>
+  <rect x="540.75" y="310.75" width="172.5" height="172.5" rx="50.31" fill="#F0F2F4"/>
+  <rect x="310.75" y="540.75" width="172.5" height="172.5" rx="50.31" fill="#F0F2F4"/>
+  <rect x="540.75" y="540.75" width="172.5" height="172.5" rx="50.31" fill="#7EB66B" data-module="active"/>
+</svg>

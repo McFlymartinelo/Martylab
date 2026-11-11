@@ -1,0 +1,5 @@
+# Sorties HTML intermédiaires de build-guide.mjs (polices encodées en base64).
+# Les PDF livrés sont versionnés ; ces fichiers se régénèrent.
+guide.html
+sheet.html
+debug.html

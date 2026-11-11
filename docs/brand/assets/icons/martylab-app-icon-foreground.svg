@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Martylab — calque avant icône adaptative">
+  <title>Martylab — calque avant icône adaptative</title>
+  <rect x="319.5" y="319.5" width="165" height="165" rx="48.13" fill="#F0F2F4"/>
+  <rect x="539.5" y="319.5" width="165" height="165" rx="48.13" fill="#F0F2F4"/>
+  <rect x="319.5" y="539.5" width="165" height="165" rx="48.13" fill="#F0F2F4"/>
+  <rect x="539.5" y="539.5" width="165" height="165" rx="48.13" fill="#7EB66B" data-module="active"/>
+</svg>
