@@ -1,0 +1,881 @@
+/* ==========================================================================
+   Martylab — prototype « Cockpit »
+   3/3a · Mise en page des écrans
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tableau de bord
+   -------------------------------------------------------------------------- */
+
+.hero__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.hero__score {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: 7px;
+}
+
+.hero__score b {
+  font-family: var(--aura-font-display);
+  font-size: 54px;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+}
+
+.hero__score span {
+  font-family: var(--aura-font-mono);
+  font-size: 11px;
+  color: var(--aura-ink-3);
+}
+
+.hero__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--aura-ink-2);
+  white-space: nowrap;
+}
+
+.hero__sub {
+  font-size: 11.5px;
+  color: var(--aura-ink-3);
+  margin-top: 5px;
+}
+
+.hero__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--aura-line);
+}
+
+.metric {
+  min-width: 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--aura-line);
+}
+
+.metric:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.metric__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.metric__label {
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--aura-ink-3);
+}
+
+.metric__val {
+  font-family: var(--aura-font-display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric__val small {
+  font-size: 9px;
+  color: var(--aura-ink-3);
+  font-weight: 500;
+}
+
+.metric .bar {
+  margin-top: 6px;
+}
+
+.metric .spark {
+  margin-top: 5px;
+  height: 22px;
+}
+
+.hero__foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 11px;
+  border-top: 1px solid var(--aura-line);
+  font-family: var(--aura-font-mono);
+  font-size: 9px;
+  color: var(--aura-ink-3);
+}
+
+.hero__foot b {
+  color: var(--aura-ink-2);
+  font-weight: 500;
+}
+
+.today__day {
+  font-family: var(--aura-font-mono);
+  font-size: 9px;
+  color: var(--aura-ink-3);
+}
+
+.today__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 0;
+  border-top: 1px solid var(--aura-line);
+}
+
+.today__item:first-of-type {
+  border-top: 0;
+}
+
+.today__icon {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 8px;
+  background: var(--aura-surface-2);
+  border: 1px solid var(--aura-line);
+  display: grid;
+  place-items: center;
+  color: var(--aura-ink-2);
+}
+
+.today__icon .ic {
+  width: 14px;
+  height: 14px;
+}
+
+.today__title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--aura-ink);
+}
+
+.today__sub {
+  font-size: 10px;
+  color: var(--aura-ink-3);
+}
+
+.today__val {
+  margin-left: auto;
+  font-family: var(--aura-font-mono);
+  font-size: 10px;
+  color: var(--aura-ink-2);
+  white-space: nowrap;
+}
+
+/* Barre de commande */
+.cmdwrap {
+  margin-top: 14px;
+}
+
+.cmdbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--aura-line-strong);
+  border-radius: 12px;
+  background: var(--aura-surface);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 5%, transparent);
+}
+
+.cmdbar .ic {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-2);
+  flex: none;
+}
+
+.cmdbar input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 12.5px;
+}
+
+.cmdbar input::placeholder {
+  color: var(--aura-ink-3);
+}
+
+.cmdbar .kbd {
+  flex: none;
+}
+
+.cmdchips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* Rail de services */
+.svc-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.svc {
+  border: 1px solid var(--aura-line);
+  border-radius: 11px;
+  background: var(--aura-surface);
+  padding: 10px;
+  min-width: 0;
+}
+
+.svc__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.svc__icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--aura-surface-2);
+  border: 1px solid var(--aura-line);
+  display: grid;
+  place-items: center;
+  color: var(--aura-ink-2);
+}
+
+.svc__icon .ic {
+  width: 13px;
+  height: 13px;
+}
+
+.svc__name {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: var(--aura-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.svc__meta {
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  color: var(--aura-ink-3);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Flux d'activité */
+.feed__item {
+  display: flex;
+  gap: 9px;
+  padding: 9px 0;
+  border-top: 1px solid var(--aura-line);
+}
+
+.feed__item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.feed__icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--aura-surface-2);
+  border: 1px solid var(--aura-line);
+  color: var(--aura-ink-3);
+}
+
+.feed__icon .ic {
+  width: 12px;
+  height: 12px;
+}
+
+.feed__body {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--aura-ink-2);
+}
+
+.feed__body b {
+  color: var(--aura-ink);
+  font-weight: 600;
+}
+
+.feed__time {
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  color: var(--aura-ink-3);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+/* Cartes application */
+.appmini {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 0;
+  border-top: 1px solid var(--aura-line);
+}
+
+.appmini:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.appmini__mark {
+  width: 29px;
+  height: 29px;
+  flex: none;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--aura-line);
+  background: var(--aura-surface-2);
+  color: var(--aura-ink);
+  font-family: var(--aura-font-display);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.appmini__mark--accent {
+  background: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--accent) 22%, transparent);
+  color: var(--accent-2);
+}
+
+.appmini__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.appmini__name {
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.appmini__meta {
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  color: var(--aura-ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Applications
+   -------------------------------------------------------------------------- */
+
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.appcard {
+  border: 1px solid var(--aura-line);
+  border-radius: 13px;
+  background: var(--aura-surface);
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.appcard:hover {
+  border-color: var(--aura-line-strong);
+  transform: translateY(-1px);
+}
+
+.appcard__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.appcard__mark {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--aura-surface-2);
+  border: 1px solid var(--aura-line);
+  font-family: var(--aura-font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--aura-ink);
+}
+
+.appcard__mark--accent {
+  background: var(--accent-soft);
+  border-color: color-mix(in oklab, var(--accent) 25%, transparent);
+  color: var(--accent-2);
+}
+
+.appcard__name {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.appcard__id {
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  color: var(--aura-ink-3);
+  margin-top: 2px;
+}
+
+.appcard__desc {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--aura-ink-3);
+  min-height: 31px;
+}
+
+.appcard__foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px solid var(--aura-line);
+}
+
+.appcard__caps {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.cap {
+  font-family: var(--aura-font-mono);
+  font-size: 7.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--aura-line);
+  color: var(--aura-ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filterbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.filterbar .search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 260px;
+  max-width: 100%;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--aura-line);
+  border-radius: 8px;
+  background: var(--aura-surface);
+}
+
+.filterbar .search .ic {
+  width: 13px;
+  height: 13px;
+  color: var(--aura-ink-3);
+}
+
+.filterbar .search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 11.5px;
+}
+
+.filterbar__spacer {
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Système
+   -------------------------------------------------------------------------- */
+
+.syshero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.syshero__dials {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.syshero__side {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 150px;
+}
+
+.sysmini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--aura-line);
+  border-radius: 8px;
+  background: var(--aura-surface-2);
+}
+
+.sysmini .ic {
+  width: 13px;
+  height: 13px;
+  color: var(--aura-ink-3);
+  flex: none;
+}
+
+.sysmini__label {
+  font-size: 9.5px;
+  color: var(--aura-ink-3);
+}
+
+.sysmini__val {
+  margin-left: auto;
+  font-family: var(--aura-font-mono);
+  font-size: 10.5px;
+  color: var(--aura-ink);
+  white-space: nowrap;
+}
+
+.infra {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.infra__card {
+  border: 1px solid var(--aura-line);
+  border-radius: 12px;
+  background: var(--aura-surface);
+  padding: 12px;
+  min-width: 0;
+}
+
+.infra__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.infra__icon {
+  width: 27px;
+  height: 27px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--aura-surface-2);
+  border: 1px solid var(--aura-line);
+  color: var(--aura-ink-2);
+}
+
+.infra__icon .ic {
+  width: 14px;
+  height: 14px;
+}
+
+.infra__name {
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.infra__meta {
+  font-size: 10px;
+  color: var(--aura-ink-3);
+}
+
+.infra__stats {
+  display: flex;
+  gap: 14px;
+  margin-top: 9px;
+  padding-top: 8px;
+  border-top: 1px solid var(--aura-line);
+}
+
+.infra__stat b {
+  display: block;
+  font-family: var(--aura-font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--aura-ink);
+}
+
+.infra__stat span {
+  font-size: 9px;
+  color: var(--aura-ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Matchday
+   -------------------------------------------------------------------------- */
+
+.matchhero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 6px 4px 2px;
+}
+
+.team {
+  text-align: center;
+  min-width: 0;
+}
+
+.team__crest {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 7px;
+  border-radius: 12px;
+  border: 1px solid var(--aura-line);
+  background: var(--aura-surface-2);
+  display: grid;
+  place-items: center;
+  font-family: var(--aura-font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.team__name {
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.team__sub {
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  color: var(--aura-ink-3);
+  margin-top: 2px;
+}
+
+.matchhero__score {
+  text-align: center;
+}
+
+.matchhero__score b {
+  font-family: var(--aura-font-display);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.matchhero__score span {
+  display: block;
+  font-family: var(--aura-font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--aura-ink-3);
+  margin-top: 5px;
+}
+
+.prediction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--aura-line);
+}
+
+.prediction label {
+  font-size: 10px;
+  color: var(--aura-ink-3);
+}
+
+.predbox {
+  width: 34px;
+  height: 32px;
+  border: 1px solid var(--aura-line-strong);
+  border-radius: 7px;
+  background: var(--aura-surface-2);
+  text-align: center;
+  font-family: var(--aura-font-mono);
+  font-size: 14px;
+  color: var(--aura-ink);
+  outline: none;
+}
+
+.matchrow {
+  border: 1px solid var(--aura-line);
+  border-radius: 11px;
+  background: var(--aura-surface);
+  padding: 10px 11px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.matchrow + .matchrow {
+  margin-top: 7px;
+}
+
+.matchrow__time {
+  width: 40px;
+  flex: none;
+  font-family: var(--aura-font-mono);
+  font-size: 9.5px;
+  color: var(--aura-ink-3);
+}
+
+.matchrow__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.matchrow__teams {
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matchrow__meta {
+  font-size: 9.5px;
+  color: var(--aura-ink-3);
+  margin-top: 1px;
+}
+
+.matchrow__score {
+  font-family: var(--aura-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--aura-ink);
+  white-space: nowrap;
+}
+
+.standing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  font-size: 11.5px;
+}
+
+.standing + .standing {
+  margin-top: 2px;
+}
+
+.standing.is-you {
+  background: var(--accent-soft);
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
+.standing__rank {
+  width: 18px;
+  font-family: var(--aura-font-mono);
+  font-size: 9.5px;
+  color: var(--aura-ink-3);
+}
+
+.standing.is-you .standing__rank {
+  color: var(--accent-2);
+}
+
+.standing__name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.standing__pts {
+  font-family: var(--aura-font-mono);
+  font-size: 9.5px;
+  white-space: nowrap;
+}
+
+.msg {
+  padding: 8px 10px;
+  border: 1px solid var(--aura-line);
+  border-radius: 9px;
+  background: var(--aura-surface-2);
+  font-size: 11px;
+}
+
+.msg + .msg {
+  margin-top: 6px;
+}
+
+.msg__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.msg__author {
+  font-weight: 650;
+  color: var(--aura-ink);
+}
+
+.msg__time {
+  font-family: var(--aura-font-mono);
+  font-size: 8px;
+  color: var(--aura-ink-3);
+}
+
+.msg__body {
+  color: var(--aura-ink-2);
+  line-height: 1.4;
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Martylab — refonte « Cockpit » (prototype)</title>
+    <meta name="description" content="Prototype de refonte visuelle de Martylab : toutes les pages, desktop et mobile." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter+Tight:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="aura.css" />
+    <link rel="stylesheet" href="studio.css" />
+    <link rel="stylesheet" href="ui.css" />
+    <link rel="stylesheet" href="pages.css" />
+    <link rel="stylesheet" href="pages2.css" />
+  </head>
+  <body>
+    <div class="studio">
+      <header class="studio__bar">
+        <div class="studio__brand">
+          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="2" y="2" width="13" height="13" rx="4" fill="currentColor" />
+            <rect x="17" y="2" width="13" height="13" rx="4" fill="currentColor" opacity=".32" />
+            <rect x="2" y="17" width="13" height="13" rx="4" fill="currentColor" opacity=".32" />
+            <rect x="17" y="17" width="13" height="13" rx="4" fill="oklch(78% 0.17 138)" />
+          </svg>
+          Martylab — refonte
+          <span>Cockpit · v1</span>
+        </div>
+
+        <div class="studio__spacer"></div>
+
+        <div class="studio__controls">
+          <span class="studio__label">Vue</span>
+          <div class="seg" role="group" aria-label="Vue">
+            <button data-view="desktop" aria-pressed="true">
+              <svg class="ic" aria-hidden="true"><use href="#i-monitor" /></svg>
+              Desktop
+            </button>
+            <button data-view="mobile" aria-pressed="false">
+              <svg class="ic" aria-hidden="true"><use href="#i-smartphone" /></svg>
+              Mobile
+            </button>
+          </div>
+
+          <span class="studio__label">Thème</span>
+          <div class="seg" role="group" aria-label="Thème">
+            <button data-theme="dark" aria-pressed="true">
+              <svg class="ic" aria-hidden="true"><use href="#i-moon" /></svg>
+              Sombre
+            </button>
+            <button data-theme="light" aria-pressed="false">
+              <svg class="ic" aria-hidden="true"><use href="#i-sun" /></svg>
+              Clair
+            </button>
+          </div>
+
+          <span class="studio__label">Accent</span>
+          <div class="accent-row" role="group" aria-label="Accent">
+            <button class="accent-dot" data-swatch="lime" aria-pressed="true" aria-label="Signal (lime)"></button>
+            <button class="accent-dot" data-swatch="teal" aria-pressed="false" aria-label="Teal"></button>
+            <button class="accent-dot" data-swatch="violet" aria-pressed="false" aria-label="Violet"></button>
+            <button class="accent-dot" data-swatch="amber" aria-pressed="false" aria-label="Ambre"></button>
+          </div>
+        </div>
+      </header>
+
+      <div class="studio__body">
+        <aside class="studio__index" id="studio-index"></aside>
+
+        <main class="studio__stage">
+          <div class="stage__meta">
+            <div class="stage__title" id="stage-title">Tableau de bord</div>
+            <div class="stage__note" id="stage-note">
+              Direction <strong>Precision / instrument</strong> · graphite, un seul accent, chiffres tabulaires.
+            </div>
+            <span class="pill-demo">Prototype · données fictives</span>
+          </div>
+
+          <div class="device device--desktop" id="device" data-theme="dark" data-accent="lime">
+            <div class="app" id="app">
+              <aside class="sidebar" id="sidebar"></aside>
+
+              <div class="workarea">
+                <header class="topbar" id="topbar"></header>
+                <header class="mappbar" id="mappbar"></header>
+                <div class="view" id="view"></div>
+                <nav class="tabbar" id="tabbar"></nav>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="icons.js" defer></script>
+    <script src="mockup-helpers.js" defer></script>
+    <script src="mockup-pages-a.js" defer></script>
+    <script src="mockup-pages-b.js" defer></script>
+    <script src="mockup-pages-c.js" defer></script>
+    <script src="mockup-pages-d.js" defer></script>
+    <script src="mockup-app.js" defer></script>
+  </body>
+</html>
