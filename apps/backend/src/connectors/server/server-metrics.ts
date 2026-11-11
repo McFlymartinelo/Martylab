@@ -217,8 +217,13 @@ export function createServerMetricsService(config: ServerMetricsConfig) {
   return {
     getMetrics: () => collectServerMetrics(config),
     getCpuHistory,
-    getNetworkStats: () => collectNetworkStats(config),
-    getProcessStats: () => collectProcessStats(config),
+    getNetworkStats: () =>
+      collectNetworkStats({
+        hostProcPrefix: config.hostProcPrefix,
+        hostSysPrefix: config.hostSysPrefix,
+      }),
+    getProcessStats: () =>
+      collectProcessStats({ hostProcPrefix: config.hostProcPrefix }),
   };
 }
 

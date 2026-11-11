@@ -111,6 +111,14 @@ export interface SystemNetworkInterface {
   name: string;
   receiveBytesPerSecond: number;
   transmitBytesPerSecond: number;
+  operState?: string | null;
+  macAddress?: string | null;
+  speedMbps?: number | null;
+  mtu?: number | null;
+  receivePackets?: number | null;
+  transmitPackets?: number | null;
+  receiveErrors?: number | null;
+  transmitErrors?: number | null;
 }
 
 export interface SystemNetworkResponse {
@@ -129,6 +137,9 @@ export interface SystemProcessEntry {
   memoryBytes: number;
   memoryPercent: number;
   state: string;
+  uid?: number | null;
+  command?: string | null;
+  cpuTimeTicks?: number | null;
 }
 
 export interface SystemProcessesResponse {
@@ -155,6 +166,20 @@ export interface DockerContainerLogsResponse {
 }
 
 export type DockerContainerAction = "start" | "stop" | "restart";
+
+export type {
+  SystemDiskIoEntry,
+  SystemFanEntry,
+  SystemHardwareResponse,
+  SystemHostFacts,
+  SystemLoadAverage,
+  SystemMountEntry,
+  SystemOverviewResponse,
+  SystemRaidEntry,
+  SystemSensorEntry,
+  SystemStorageResponse,
+  SystemSwapUsage,
+} from "./system.js";
 
 export type {
   AssistantActionLogEntry,

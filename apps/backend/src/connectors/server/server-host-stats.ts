@@ -3,12 +3,17 @@ import path from "node:path";
 
 interface HostStatsConfig {
   hostProcPrefix?: string | undefined;
+  hostSysPrefix?: string | undefined;
 }
 
 export interface NetworkInterfaceSnapshot {
   name: string;
   receiveBytes: number;
   transmitBytes: number;
+  receivePackets: number;
+  transmitPackets: number;
+  receiveErrors: number;
+  transmitErrors: number;
 }
 
 export interface NetworkStatsSnapshot {
@@ -22,6 +27,14 @@ export interface NetworkStatsSnapshot {
     name: string;
     receiveBytesPerSecond: number;
     transmitBytesPerSecond: number;
+    operState: string | null;
+    macAddress: string | null;
+    speedMbps: number | null;
+    mtu: number | null;
+    receivePackets: number;
+    transmitPackets: number;
+    receiveErrors: number;
+    transmitErrors: number;
   }>;
 }
 
@@ -34,6 +47,9 @@ export interface ProcessStatsSnapshot {
     memoryBytes: number;
     memoryPercent: number;
     state: string;
+    uid: number | null;
+    command: string | null;
+    cpuTimeTicks: number | null;
   }>;
 }
 
@@ -92,14 +108,58 @@ async function readNetworkInterfaces(
       name,
       receiveBytes: values[0] ?? 0,
       transmitBytes: values[8] ?? 0,
+      receivePackets: values[1] ?? 0,
+      transmitPackets: values[9] ?? 0,
+      receiveErrors: values[2] ?? 0,
+      transmitErrors: values[10] ?? 0,
     });
   }
 
   return interfaces;
 }
 
+async function readOptionalText(filePath: string): Promise<string | null> {
+  try {
+    return (await fs.readFile(filePath, "utf8")).trim();
+  } catch {
+    return null;
+  }
+}
+
+interface InterfaceMetadata {
+  operState: string | null;
+  macAddress: string | null;
+  speedMbps: number | null;
+  mtu: number | null;
+}
+
+async function readInterfaceMetadata(
+  config: HostStatsConfig,
+  name: string,
+): Promise<InterfaceMetadata> {
+  const base = path.join(config.hostSysPrefix ?? "/sys", "class/net", name);
+  const [operState, macAddress, speed, mtu] = await Promise.all([
+    readOptionalText(path.join(base, "operstate")),
+    readOptionalText(path.join(base, "address")),
+    readOptionalText(path.join(base, "speed")),
+    readOptionalText(path.join(base, "mtu")),
+  ]);
+
+  const parsedSpeed = speed ? Number.parseInt(speed, 10) : Number.NaN;
+  const parsedMtu = mtu ? Number.parseInt(mtu, 10) : Number.NaN;
+
+  return {
+    operState,
+    macAddress,
+    speedMbps:
+      Number.isFinite(parsedSpeed) && parsedSpeed > 0 ? parsedSpeed : null,
+    mtu: Number.isFinite(parsedMtu) && parsedMtu > 0 ? parsedMtu : null,
+  };
+}
+
 function computeRates(
   current: NetworkInterfaceSnapshot[],
+  metadata: Map<string, InterfaceMetadata>,
   timestamp: number,
 ): {
   receiveBytesPerSecond: number;
@@ -113,16 +173,33 @@ function computeRates(
     ]),
   );
 
+  const describe = (
+    iface: NetworkInterfaceSnapshot,
+    receiveBytesPerSecond: number,
+    transmitBytesPerSecond: number,
+  ): NetworkStatsSnapshot["interfaces"][number] => {
+    const meta = metadata.get(iface.name);
+    return {
+      name: iface.name,
+      receiveBytesPerSecond,
+      transmitBytesPerSecond,
+      operState: meta?.operState ?? null,
+      macAddress: meta?.macAddress ?? null,
+      speedMbps: meta?.speedMbps ?? null,
+      mtu: meta?.mtu ?? null,
+      receivePackets: iface.receivePackets,
+      transmitPackets: iface.transmitPackets,
+      receiveErrors: iface.receiveErrors,
+      transmitErrors: iface.transmitErrors,
+    };
+  };
+
   if (!previousNetworkSample) {
     previousNetworkSample = { timestamp, interfaces: currentMap };
     return {
       receiveBytesPerSecond: 0,
       transmitBytesPerSecond: 0,
-      interfaces: current.map((iface) => ({
-        name: iface.name,
-        receiveBytesPerSecond: 0,
-        transmitBytesPerSecond: 0,
-      })),
+      interfaces: current.map((iface) => describe(iface, 0, 0)),
     };
   }
 
@@ -146,11 +223,11 @@ function computeRates(
     totalReceiveDelta += receiveDelta;
     totalTransmitDelta += transmitDelta;
 
-    return {
-      name: iface.name,
-      receiveBytesPerSecond: Math.round(receiveDelta / elapsedSeconds),
-      transmitBytesPerSecond: Math.round(transmitDelta / elapsedSeconds),
-    };
+    return describe(
+      iface,
+      Math.round(receiveDelta / elapsedSeconds),
+      Math.round(transmitDelta / elapsedSeconds),
+    );
   });
 
   previousNetworkSample = { timestamp, interfaces: currentMap };
@@ -177,6 +254,27 @@ function parseStatusField(content: string, field: string): string | null {
   return match?.[1]?.trim() ?? null;
 }
 
+/**
+ * Cumulative CPU time (utime + stime) in clock ticks, read from
+ * `/proc/[pid]/stat`. The executable name may contain spaces and parentheses,
+ * so fields are parsed from the last closing parenthesis.
+ */
+function readCpuTimeTicks(stat: string): number | null {
+  const closing = stat.lastIndexOf(")");
+  if (closing === -1) {
+    return null;
+  }
+
+  const fields = stat.slice(closing + 2).trim().split(/\s+/);
+  const utime = Number.parseInt(fields[11] ?? "", 10);
+  const stime = Number.parseInt(fields[12] ?? "", 10);
+  if (!Number.isFinite(utime) || !Number.isFinite(stime)) {
+    return null;
+  }
+
+  return utime + stime;
+}
+
 async function readTopProcesses(
   config: HostStatsConfig,
   limit = 12,
@@ -196,13 +294,17 @@ async function readTopProcesses(
 
   for (const pid of pids) {
     try {
-      const status = await fs.readFile(
-        path.join(root, String(pid), "status"),
-        "utf8",
-      );
+      const processRoot = path.join(root, String(pid));
+      const [status, cmdline, stat] = await Promise.all([
+        fs.readFile(path.join(processRoot, "status"), "utf8"),
+        readOptionalText(path.join(processRoot, "cmdline")),
+        readOptionalText(path.join(processRoot, "stat")),
+      ]);
       const name = parseStatusField(status, "Name");
       const rssKb = parseStatusField(status, "VmRSS");
       const state = parseStatusField(status, "State")?.charAt(0) ?? "?";
+      const uidField = parseStatusField(status, "Uid");
+      const uid = uidField ? Number.parseInt(uidField.split(/\s+/)[0] ?? "", 10) : NaN;
 
       if (!name || !rssKb) continue;
 
@@ -215,12 +317,19 @@ async function readTopProcesses(
           ? Math.round((memoryBytes / totalMemoryBytes) * 1000) / 10
           : 0;
 
+      const command = cmdline
+        ? cmdline.replace(/\0/g, " ").trim().slice(0, 160) || null
+        : null;
+
       processes.push({
         pid,
         name,
         memoryBytes,
         memoryPercent,
         state,
+        uid: Number.isFinite(uid) ? uid : null,
+        command,
+        cpuTimeTicks: stat ? readCpuTimeTicks(stat) : null,
       });
     } catch {
       // Process may have exited between readdir and read.
@@ -237,7 +346,15 @@ export async function collectNetworkStats(
 ): Promise<NetworkStatsSnapshot> {
   const timestamp = Date.now();
   const interfaces = await readNetworkInterfaces(config);
-  const rates = computeRates(interfaces, timestamp);
+  const metadata = new Map(
+    await Promise.all(
+      interfaces.map(
+        async (iface) =>
+          [iface.name, await readInterfaceMetadata(config, iface.name)] as const,
+      ),
+    ),
+  );
+  const rates = computeRates(interfaces, metadata, timestamp);
 
   pushNetworkHistory(rates.receiveBytesPerSecond, rates.transmitBytesPerSecond);
 

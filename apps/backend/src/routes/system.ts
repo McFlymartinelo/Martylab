@@ -1,13 +1,20 @@
 import { Router } from "express";
 import type {
+  SystemHardwareResponse,
   SystemMetricsResponse,
   SystemNetworkResponse,
+  SystemOverviewResponse,
   SystemProcessesResponse,
+  SystemStorageResponse,
 } from "@martylab/shared";
 import type { ServerMetricsService } from "../connectors/server/server-metrics.js";
+import type { SystemInfoService } from "../connectors/server/server-system-info.js";
 import { requireAuth } from "../middleware/auth.js";
 
-export function createSystemRouter(serverMetrics: ServerMetricsService) {
+export function createSystemRouter(
+  serverMetrics: ServerMetricsService,
+  systemInfo: SystemInfoService,
+) {
   const systemRouter = Router();
 
   systemRouter.get("/metrics", requireAuth, async (_req, res, next) => {
@@ -52,6 +59,33 @@ export function createSystemRouter(serverMetrics: ServerMetricsService) {
     try {
       const body: SystemProcessesResponse =
         await serverMetrics.getProcessStats();
+      res.status(200).json(body);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  systemRouter.get("/overview", requireAuth, async (_req, res, next) => {
+    try {
+      const body: SystemOverviewResponse = await systemInfo.getOverview();
+      res.status(200).json(body);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  systemRouter.get("/storage", requireAuth, async (_req, res, next) => {
+    try {
+      const body: SystemStorageResponse = await systemInfo.getStorage();
+      res.status(200).json(body);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  systemRouter.get("/hardware", requireAuth, async (_req, res, next) => {
+    try {
+      const body: SystemHardwareResponse = await systemInfo.getHardware();
       res.status(200).json(body);
     } catch (error) {
       next(error);

@@ -43,6 +43,7 @@ import { createNasClient } from "./connectors/nas/nas-client.js";
 import { createJellyfinClient } from "./connectors/jellyfin/jellyfin-client.js";
 import { createImmichClient } from "./connectors/immich/immich-client.js";
 import { createServerMetricsService } from "./connectors/server/server-metrics.js";
+import { createSystemInfoService } from "./connectors/server/server-system-info.js";
 import { createUserService } from "./users/user-service.js";
 import { createAssistantRepository } from "./assistant/assistant-repository.js";
 import { createAssistantService } from "./assistant/assistant-service.js";
@@ -61,6 +62,11 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     : null;
   const userService = database.db ? createUserService(database.db) : null;
   const serverMetrics = createServerMetricsService({
+    hostProcPrefix: env.HOST_PROC_PREFIX,
+    hostSysPrefix: env.HOST_SYS_PREFIX,
+    hostRootPath: env.HOST_ROOT_PATH,
+  });
+  const systemInfo = createSystemInfoService({
     hostProcPrefix: env.HOST_PROC_PREFIX,
     hostSysPrefix: env.HOST_SYS_PREFIX,
     hostRootPath: env.HOST_ROOT_PATH,
@@ -199,7 +205,7 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   app.use("/api/auth", createAuthRouter(env, sessionService));
   app.use("/api/plugins", requireAuth, pluginsRouter);
   app.use("/api/users", createUsersRouter(userService));
-  app.use("/api/system", createSystemRouter(serverMetrics));
+  app.use("/api/system", createSystemRouter(serverMetrics, systemInfo));
   app.use("/api/docker", createDockerRouter(dockerClient));
   app.use("/api/orion", createOrionRouter(orionClient));
   app.use("/api/matchday", createMatchdayRouter(matchdayClient));
