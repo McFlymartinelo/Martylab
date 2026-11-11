@@ -54,14 +54,7 @@ export function SystemProcessesTab() {
       id: "name",
       header: "Processus",
       render: (process) => (
-        <div className="min-w-0">
-          <p className="truncate font-medium">{process.name}</p>
-          {process.command ? (
-            <p className="max-w-64 truncate text-2xs text-muted-foreground">
-              {process.command}
-            </p>
-          ) : null}
-        </div>
+        <p className="truncate font-medium">{process.name}</p>
       ),
     },
     {

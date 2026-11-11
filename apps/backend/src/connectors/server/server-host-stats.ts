@@ -48,7 +48,6 @@ export interface ProcessStatsSnapshot {
     memoryPercent: number;
     state: string;
     uid: number | null;
-    command: string | null;
     cpuTimeTicks: number | null;
   }>;
 }
@@ -295,9 +294,8 @@ async function readTopProcesses(
   for (const pid of pids) {
     try {
       const processRoot = path.join(root, String(pid));
-      const [status, cmdline, stat] = await Promise.all([
+      const [status, stat] = await Promise.all([
         fs.readFile(path.join(processRoot, "status"), "utf8"),
-        readOptionalText(path.join(processRoot, "cmdline")),
         readOptionalText(path.join(processRoot, "stat")),
       ]);
       const name = parseStatusField(status, "Name");
@@ -317,10 +315,6 @@ async function readTopProcesses(
           ? Math.round((memoryBytes / totalMemoryBytes) * 1000) / 10
           : 0;
 
-      const command = cmdline
-        ? cmdline.replace(/\0/g, " ").trim().slice(0, 160) || null
-        : null;
-
       processes.push({
         pid,
         name,
@@ -328,7 +322,6 @@ async function readTopProcesses(
         memoryPercent,
         state,
         uid: Number.isFinite(uid) ? uid : null,
-        command,
         cpuTimeTicks: stat ? readCpuTimeTicks(stat) : null,
       });
     } catch {

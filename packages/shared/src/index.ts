@@ -138,7 +138,6 @@ export interface SystemProcessEntry {
   memoryPercent: number;
   state: string;
   uid?: number | null;
-  command?: string | null;
   cpuTimeTicks?: number | null;
 }
 
