@@ -36,7 +36,7 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
       <div className="flex h-14 items-center gap-2 px-4">
-        <div className="brand-gradient flex size-7 items-center justify-center rounded-lg text-sm font-semibold text-white">
+        <div className="brand-mark flex size-7 items-center justify-center rounded-lg text-sm font-semibold">
           M
         </div>
         <span className="text-sm font-semibold tracking-tight">Martylab</span>

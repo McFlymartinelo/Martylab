@@ -19,7 +19,7 @@ export function ComingSoonPage() {
 
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16 text-center">
-          <div className="brand-gradient flex size-14 items-center justify-center rounded-2xl text-primary-foreground">
+          <div className="brand-mark flex size-14 items-center justify-center rounded-2xl">
             <Icon className="size-6" aria-hidden="true" />
           </div>
           <div className="space-y-1.5">

@@ -54,7 +54,7 @@ export function LoginPage() {
     <div className="flex min-h-svh items-center justify-center bg-background px-4 py-10">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
-          <div className="brand-gradient mb-2 flex size-12 items-center justify-center rounded-2xl text-lg font-semibold text-white">
+          <div className="brand-mark mb-2 flex size-12 items-center justify-center rounded-2xl text-lg font-semibold">
             M
           </div>
           <CardTitle className="text-xl">Martylab</CardTitle>
