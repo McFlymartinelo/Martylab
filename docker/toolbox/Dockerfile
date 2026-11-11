@@ -15,5 +15,11 @@ RUN apk add --no-cache \
   less \
   openssh-client
 
+# Le toolbox tourne en root alors que les dépôts de l'hôte appartiennent à
+# l'utilisateur : sans cette exception, chaque `git status` échoue avec
+# "detected dubious ownership". Écrit dans /etc/gitconfig, donc persistant
+# quand le conteneur est recréé.
+RUN git config --system --add safe.directory '*'
+
 # Image volontairement sans entrypoint : le service tourne sur `sleep infinity`
 # et n'est utilisé que pour ses binaires.
