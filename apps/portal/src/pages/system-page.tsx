@@ -65,10 +65,12 @@ export function SystemPage() {
         }
       />
 
-      <Tabs defaultValue="overview" className="gap-4">
+      <Tabs defaultValue="overview" className="min-w-0 gap-4">
+        {/* Horizontal scroller: the six labels are wider than a phone screen,
+            so the strip must scroll instead of widening the page. */}
         <TabsList
           variant="line"
-          className="w-full justify-start overflow-x-auto pb-1"
+          className="w-full max-w-full min-w-0 justify-start overflow-x-auto pb-1"
           aria-label="Sections du système"
         >
           {tabs.map((tab) => (
