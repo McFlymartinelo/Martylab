@@ -17,7 +17,7 @@ export function ConsolePage() {
       <PageHeader
         eyebrow="Infrastructure · Console"
         title="Console"
-        description="Deux niveaux d'accès : des commandes typées, validées et journalisées côté serveur, et un terminal interactif limité aux conteneurs Docker. Réservé aux administrateurs."
+        description="Deux niveaux d'accès : des commandes typées, validées et journalisées côté serveur, et un terminal interactif limité aux conteneurs Docker, protégé par un second facteur. Réservé aux administrateurs."
         actions={
           <Badge variant="outline">
             <ShieldAlert className="size-3" aria-hidden="true" />

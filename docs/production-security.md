@@ -70,21 +70,47 @@ chmod +x scripts/rotate-production-secrets.sh
 
 Voir [backup-postgres.md](./backup-postgres.md) pour la sauvegarde PostgreSQL.
 
-## 7. Console et terminal conteneur
+## 7. Console, terminal conteneur et second facteur
 
-La Console (ADR-021) est réservée aux administrateurs :
+La Console (ADR-021, ADR-023) est réservée aux administrateurs :
 
 - commandes typées : allowlist, confirmation explicite, audit en base ;
-- terminal : `docker exec` dans un conteneur, jamais le shell de l'hôte.
+- terminal : `docker exec` dans un conteneur, jamais le shell de l'hôte ;
+- second facteur : le terminal exige une session ouverte avec un code TOTP
+  validé (`/api/auth/mfa/verify`).
 
 Vérifications :
 
 - `/var/run/docker.sock` reste monté en lecture seule dans le backend ;
 - nginx relaie bien `Upgrade`/`Connection` sur `/api/console/terminal` ;
 - le terminal est désactivé par défaut ; définir `CONSOLE_TERMINAL_ENABLED=true` uniquement si nécessaire ;
+- `CONSOLE_TERMINAL_CONTAINERS` limite les conteneurs ouvrables (ex. `martylab-toolbox`) ;
+- au moins un administrateur a activé le TOTP, sinon le terminal reste fermé ;
 - les lignes `console_audit` sont conservées avec les sauvegardes PostgreSQL.
 
 Le montage `:ro` empêche de remplacer le fichier socket, mais ne limite pas les
 opérations que l'API Docker accepte via ce socket. L'accès au socket reste donc
 un privilège élevé sur l'hôte. La Console et le terminal sont réservés aux
 administrateurs ; ne publie pas le backend et limite les comptes admin.
+
+## 8. Accès machine complet (profil `toolbox`)
+
+Le service `toolbox` de `compose.yaml` est une porte root assumée :
+
+```bash
+docker compose --profile toolbox up -d toolbox
+```
+
+- `/` de l'hôte est monté dans `/host` en lecture-écriture ;
+- `pid: host` : `htop` voit tous les processus ;
+- socket Docker disponible : `docker ps`, `docker logs`, etc. ;
+- `network_mode: none` : aucun port, aucun accès réseau.
+
+Il n'est jamais démarré par `docker compose up -d`. Conséquences à accepter :
+
+- toute personne qui obtient une session admin **avec second facteur** obtient
+  root sur l'hôte (via `chroot /host`) ;
+- supprimer le conteneur (`docker compose --profile toolbox down toolbox`)
+  révoque cet accès immédiatement ;
+- ne jamais publier de port sur ce conteneur, ni l'ajouter au réseau
+  `martylab`.

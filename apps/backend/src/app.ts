@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import type { Server as HttpServer } from "node:http";
 import { createSessionService } from "./auth/session-service.js";
+import { createMfaService } from "./auth/mfa-service.js";
 import type { Env } from "./config/env.js";
 import type { createDatabase } from "./db/client.js";
 import type { Logger } from "./lib/logger.js";
@@ -66,6 +67,10 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   const sessionService = database.db
     ? createSessionService(database.db, env)
     : null;
+  const mfaService =
+    database.db && env.SESSION_SECRET
+      ? createMfaService({ db: database.db, sessionSecret: env.SESSION_SECRET })
+      : null;
   const userService = database.db ? createUserService(database.db) : null;
   const serverMetrics = createServerMetricsService({
     hostProcPrefix: env.HOST_PROC_PREFIX,
@@ -96,6 +101,8 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
     env,
     sessionService,
     dockerExec,
+    dockerClient,
+    allowedContainers: env.CONSOLE_TERMINAL_CONTAINERS ?? [],
     repository: consoleRepository,
     logger,
   });
@@ -235,7 +242,17 @@ export function createApp(env: Env, logger: Logger, database: DatabaseHandle) {
   // on the whole /api/auth router used to throttle legitimate session reads
   // (/me) and logouts after ~10 page loads.
   app.use("/api/auth/login", createAuthRateLimiter());
-  app.use("/api/auth", createAuthRouter(env, sessionService));
+  // Toutes les mutations MFA (y compris `/mfa/verify`) sont rate-limitées. Le
+  // GET de statut est pollé par l'interface et doit rester libre.
+  const mfaMutationLimiter = createAuthRateLimiter();
+  app.use("/api/auth/mfa", (req, res, next) => {
+    if (req.method === "GET" || req.method === "HEAD") {
+      next();
+      return;
+    }
+    mfaMutationLimiter(req, res, next);
+  });
+  app.use("/api/auth", createAuthRouter(env, sessionService, mfaService));
   app.use("/api/plugins", requireAuth, pluginsRouter);
   app.use("/api/users", createUsersRouter(userService));
   app.use("/api/system", createSystemRouter(serverMetrics, systemInfo));

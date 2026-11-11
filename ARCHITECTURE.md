@@ -79,19 +79,24 @@ Details for Cloudflare Tunnel setup: [`docs/cloudflare-tunnel.md`](docs/cloudfla
 
 ---
 
-## 5. Console (ADR-021)
+## 5. Console (ADR-021, ADR-023)
 
 ```text
-Admin browser
+Admin browser + second facteur vérifié
   ├─ POST /api/console/execute   → allowlist → collecteurs / connecteurs
-  └─ WS  /api/console/terminal   → docker exec TTY → conteneur choisi
+  └─ WS  /api/console/terminal   → docker exec TTY → conteneur autorisé
 ```
 
 - Rôle `admin` obligatoire, vérifié à chaque requête et pendant la poignée de
   main WebSocket (cookie de session + `Origin`).
-- Aucun `child_process`, aucun shell hôte, aucun `sudo`.
+- Le terminal exige en plus `session.mfa_verified = true` : un second facteur
+  TOTP a été validé lors de la connexion de cette session.
+- Aucun `child_process`, aucun shell hôte, aucun `sudo` dans le backend.
 - Chaque exécution et chaque session terminal sont écrites dans
   `console_audit`.
-- Le terminal ne peut cibler qu'un conteneur Docker existant ; il ne donne pas
-  accès au shell du Debian.
+- Le terminal ne peut cibler qu'un conteneur Docker existant ; `CONSOLE_TERMINAL_CONTAINERS`
+  restreint la liste aux noms autorisés.
+- L'accès machine complet, si souhaité, passe par le service `toolbox`
+  (profil Compose optionnel) : c'est un conteneur jetable qui porte les
+  montages, jamais le backend.
 - `CONSOLE_TERMINAL_ENABLED=false` désactive le canal WebSocket.

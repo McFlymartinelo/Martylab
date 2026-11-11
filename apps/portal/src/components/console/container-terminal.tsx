@@ -2,11 +2,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Terminal as Xterm } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
-import { Eraser, Play, Square } from "lucide-react";
+import { Eraser, Play, ShieldAlert, Square } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Unavailable } from "@/components/cockpit/feedback";
 import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
+import { useMfaStatusQuery } from "@/features/auth/use-mfa";
 import {
   useContainerTerminal,
   type ContainerTerminalStatus,
@@ -60,6 +69,7 @@ const statusVariant: Record<
 
 export function ContainerTerminal() {
   const dockerQuery = useDockerContainersQuery();
+  const mfaQuery = useMfaStatusQuery();
   const containers = useMemo(
     () =>
       dockerQuery.data?.available
@@ -173,6 +183,35 @@ export function ContainerTerminal() {
 
   const busy = status === "connecting" || status === "connected";
 
+  // Le serveur refuse de toute façon la connexion : on évite d'exposer un
+  // terminal inutilisable et on explique la règle.
+  if (mfaQuery.data && !mfaQuery.data.sessionVerified) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShieldAlert className="size-4 text-amber-500" aria-hidden="true" />
+            Second facteur requis
+          </CardTitle>
+          <CardDescription>
+            Le terminal ouvre un shell privilégié : il exige une session
+            vérifiée par un second facteur.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            {mfaQuery.data.enabled
+              ? "Ton compte est protégé, mais cette session a été ouverte avec le seul mot de passe. Déconnecte-toi puis reconnecte-toi en saisissant ton code."
+              : "Active l'authentification à deux facteurs (TOTP) depuis les paramètres, puis reconnecte-toi."}
+          </p>
+          <Button variant="outline" size="sm" render={<Link to="/settings" />}>
+            Ouvrir les paramètres
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-end gap-2">
@@ -271,9 +310,10 @@ export function ContainerTerminal() {
       )}
 
       <p className="text-2xs text-muted-foreground">
-        Session Docker `exec` ouverte dans le conteneur sélectionné. Aucun accès
-        au shell de l&apos;hôte, aucune élévation de privilèges. Session fermée
-        après 30 minutes d&apos;inactivité.
+        Session Docker `exec` ouverte dans le conteneur sélectionné, après
+        vérification du second facteur. Aucun accès au shell de l&apos;hôte,
+        aucune élévation de privilèges. Session fermée après 30 minutes
+        d&apos;inactivité.
       </p>
     </div>
   );

@@ -14,6 +14,7 @@ const actor: SessionUser = {
   displayName: "Alexandre",
   role: "admin",
   createdAt: new Date().toISOString(),
+  mfaEnabled: true,
 };
 
 function createHarness() {

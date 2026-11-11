@@ -5,6 +5,8 @@ declare global {
     interface Request {
       user?: SessionUser;
       sessionId?: string;
+      /** La session courante a été ouverte avec un second facteur validé. */
+      sessionMfaVerified?: boolean;
     }
   }
 }

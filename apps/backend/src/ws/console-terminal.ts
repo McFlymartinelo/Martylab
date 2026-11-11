@@ -2,7 +2,10 @@ import type { IncomingMessage, Server as HttpServer } from "node:http";
 import type { Duplex } from "node:stream";
 import { StringDecoder } from "node:string_decoder";
 import { WebSocket, WebSocketServer } from "ws";
-import type { ConsoleTerminalClientMessage } from "@martylab/shared";
+import type {
+  ConsoleTerminalClientMessage,
+  DockerContainerSummary,
+} from "@martylab/shared";
 import type { Env } from "../config/env.js";
 import type { SessionService } from "../auth/session-service.js";
 import type {
@@ -10,6 +13,7 @@ import type {
   DockerExecSession,
 } from "../connectors/docker/docker-exec.js";
 import { isAllowedShell } from "../connectors/docker/docker-exec.js";
+import type { DockerClient } from "../connectors/docker/docker-client.js";
 import type { ConsoleRepository } from "../console/console-repository.js";
 import type { Logger } from "../lib/logger.js";
 
@@ -17,9 +21,9 @@ import type { Logger } from "../lib/logger.js";
  * Terminal conteneur (admin uniquement).
  *
  * Le navigateur ouvre un WebSocket same-origin ; le backend vérifie le cookie
- * de session et le rôle admin, puis relie le socket au flux `docker exec`.
- * Aucun accès au shell de l'hôte Debian n'est possible par ce canal : seul un
- * conteneur Docker existant peut être ouvert.
+ * de session, le rôle admin, la présence d'un second facteur validé, puis
+ * relie le socket au flux `docker exec`. Aucun accès au shell de l'hôte Debian
+ * par ce canal : seul un conteneur Docker existant peut être ouvert.
  */
 
 const TERMINAL_PATH = "/api/console/terminal";
@@ -74,10 +78,20 @@ export function createConsoleTerminalServer(options: {
   env: Env;
   sessionService: SessionService | null;
   dockerExec: DockerExecConnector;
+  dockerClient: DockerClient;
+  allowedContainers: string[];
   repository: ConsoleRepository | null;
   logger: Logger;
 }) {
-  const { env, sessionService, dockerExec, repository, logger } = options;
+  const {
+    env,
+    sessionService,
+    dockerExec,
+    dockerClient,
+    allowedContainers,
+    repository,
+    logger,
+  } = options;
   const wss = new WebSocketServer({ noServer: true, maxPayload: MAX_PAYLOAD });
   let started = false;
 
@@ -137,6 +151,16 @@ export function createConsoleTerminalServer(options: {
       reject(socket, 403, "Réservé aux administrateurs.");
       return;
     }
+    // Le terminal est la seule porte vers un privilège de type root : il exige
+    // un second facteur validé pour la session courante.
+    if (!resolved.mfaVerified) {
+      reject(
+        socket,
+        403,
+        "Authentification à deux facteurs requise pour ouvrir un terminal.",
+      );
+      return;
+    }
 
     const url = new URL(request.url ?? "/", "http://localhost");
     const containerId = url.searchParams.get("container") ?? "";
@@ -154,6 +178,42 @@ export function createConsoleTerminalServer(options: {
       return;
     }
 
+    // Allowlist optionnelle : on résout la référence (nom ou id) pour comparer
+    // toujours sur le nom réel du conteneur, jamais sur la chaîne fournie.
+    let targetContainerId = containerId;
+    if (allowedContainers.length > 0) {
+      let containers: DockerContainerSummary[];
+      try {
+        containers = await dockerClient.listContainers();
+      } catch (error) {
+        logger.warn({ err: error }, "Unable to list containers for allowlist");
+        reject(socket, 502, "Liste des conteneurs indisponible.");
+        return;
+      }
+
+      const container = containers.find(
+        (entry) =>
+          entry.name === containerId ||
+          entry.id === containerId ||
+          entry.id.startsWith(containerId),
+      );
+
+      if (!container) {
+        reject(socket, 404, "Conteneur introuvable.");
+        return;
+      }
+      if (!allowedContainers.includes(container.name)) {
+        logger.warn(
+          { username: resolved.user.username, containerId, name: container.name },
+          "Console terminal refused by allowlist",
+        );
+        reject(socket, 403, "Ce conteneur n'est pas autorisé par la console.");
+        return;
+      }
+
+      targetContainerId = container.id;
+    }
+
     const actor = resolved.user;
     const safeCols = Number.isFinite(cols) ? Math.min(Math.max(cols, 20), 300) : 80;
     const safeRows = Number.isFinite(rows) ? Math.min(Math.max(rows, 5), 120) : 24;
@@ -166,7 +226,7 @@ export function createConsoleTerminalServer(options: {
     let execSession: DockerExecSession;
     try {
       execSession = await dockerExec.openSession({
-        containerId,
+        containerId: targetContainerId,
         shell,
         cols: safeCols,
         rows: safeRows,
@@ -310,7 +370,7 @@ export function createConsoleTerminalServer(options: {
             command: `terminal ${containerId} ${shell}`,
             status: "success",
             risk: "destructive",
-            outputPreview: "Ouverture d'une session terminal.",
+            outputPreview: "Ouverture d'une session terminal (2FA vérifié).",
             durationMs: null,
           })
           .catch((error: unknown) => {

@@ -662,3 +662,80 @@ défaut (`CONSOLE_TERMINAL_ENABLED=false`) et doit être activé explicitement.
   logs et intégrations applicatives restent disponibles selon leurs règles.
 - Les déploiements qui nécessitent le terminal doivent ajouter
   `CONSOLE_TERMINAL_ENABLED=true` dans leur `.env` serveur.
+
+---
+
+# ADR-023 — Second facteur TOTP et accès machine assumé
+
+**Statut : Acceptée**
+
+## Contexte
+
+Le terminal de la Console ouvre un `docker exec` avec le socket Docker du
+backend. Or l'accès au socket Docker est équivalent à un accès root : on peut y
+créer un conteneur privilégié qui monte `/`. La règle « pas de shell hôte »
+était donc une discipline de code, pas une barrière technique.
+
+Le besoin exprimé est explicite : pouvoir utiliser `htop`, `git` et, plus
+généralement, un vrai terminal sur la machine. Le risque réel n'est pas
+l'existence de ce terminal, mais le fait qu'il soit atteignable avec un simple
+cookie de session volé, sur un portail exposé par Cloudflare Tunnel.
+
+## Décision
+
+Le terminal reste le seul canal privilégié, mais il est désormais doublement
+conditionné :
+
+1. **Second facteur obligatoire** — un compte peut activer le TOTP
+   (RFC 6238) depuis Paramètres → Sécurité. Quand il est activé, `POST
+   /api/auth/login` ne renvoie plus de session mais un défi signé (HMAC,
+   5 minutes) ; la session n'est créée qu'après `POST /api/auth/mfa/verify`.
+   La colonne `sessions.mfa_verified` mémorise ce fait, et le WebSocket du
+   terminal refuse toute session où elle vaut `false`.
+2. **Allowlist de conteneurs** — `CONSOLE_TERMINAL_CONTAINERS` restreint les
+   conteneurs ouvrables. La référence reçue est résolue via l'API Docker puis
+   comparée au **nom réel** du conteneur, jamais à la chaîne fournie.
+
+L'accès machine complet passe par un conteneur dédié `toolbox`
+(profil Compose `toolbox`), jamais par le conteneur backend : `/` de l'hôte y
+est monté dans `/host`, `pid: host`, socket Docker, aucun réseau, aucun port.
+
+## Détails d'implémentation
+
+- TOTP implémenté dans `apps/backend/src/auth/totp.ts` avec `node:crypto`
+  (HMAC-SHA1, base32), validé par les vecteurs de test de la RFC 6238.
+  Fenêtre de tolérance : ±1 pas (30 s).
+- Les secrets TOTP sont chiffrés en AES-256-GCM, clé dérivée de
+  `SESSION_SECRET` par HKDF. Changer `SESSION_SECRET` invalide donc les
+  enrôlements — acceptable, toutes les sessions tombent de toute façon.
+- 10 codes de secours à usage unique, stockés en HMAC-SHA256 (hauteur
+  d'entropie suffisante, Argon2 serait trop lent pour 10 comparaisons).
+- Enrôlement, désactivation et régénération exigent le mot de passe ou un code
+  TOTP : un cookie volé ne permet pas de s'approprier le second facteur.
+- À l'activation, la session courante est marquée vérifiée et toutes les autres
+  sessions non vérifiées de l'utilisateur sont révoquées.
+
+## Alternatives écartées
+
+- **Shell hôte via SSH** : identifiants à stocker, canal supplémentaire à
+  sécuriser, et aucune intégration avec l'audit existant.
+- **`child_process` libre dans le backend** : n'apporte rien (l'image backend
+  n'a ni `htop` ni `git`, et `/proc` y est celui du conteneur), casse l'audit
+  par commande et transforme le backend en cible de choix.
+- **2FA obligatoire pour tous les rôles dès la connexion** : verrouillerait
+  l'administrateur hors de son portail en cas de perte de téléphone, alors que
+  seul le terminal justifie cette exigence. La règle retenue est « 2FA pour le
+  privilège », pas « 2FA pour tout ».
+
+## Conséquences
+
+- Migration `0004_mfa.sql` : `users.totp_secret`, `users.totp_enabled_at`,
+  `sessions.mfa_verified`, table `user_backup_codes`.
+- Nouvelles routes : `GET /api/auth/mfa`, `POST /api/auth/mfa/setup`,
+  `/enable`, `/disable`, `/backup-codes`, et `POST /api/auth/mfa/verify`
+  (rate-limité comme `/login`).
+- Dépendance ajoutée : `qrcode` (backend), uniquement pour produire le QR
+  d'enrôlement en data URL. Aucune dépendance côté portail.
+- Un administrateur sans TOTP conserve l'accès à tout le portail, mais pas au
+  terminal : l'interface affiche explicitement la règle.
+- Le service `toolbox` n'est jamais démarré par `docker compose up -d`.

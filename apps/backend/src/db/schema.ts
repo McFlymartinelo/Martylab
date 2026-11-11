@@ -1,4 +1,6 @@
 import {
+  boolean,
+  index,
   integer,
   pgEnum,
   pgTable,
@@ -22,6 +24,10 @@ export const users = pgTable("users", {
   displayName: varchar("display_name", { length: 120 }).notNull(),
   passwordHash: text("password_hash").notNull(),
   role: userRoleEnum("role").notNull(),
+  /** Secret TOTP chiffré (AES-256-GCM) ; présent aussi avant activation. */
+  totpSecret: text("totp_secret"),
+  /** Renseigné uniquement quand l'utilisateur a confirmé un premier code. */
+  totpEnabledAt: timestamp("totp_enabled_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -42,9 +48,28 @@ export const sessions = pgTable("sessions", {
     .defaultNow()
     .notNull(),
   revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  /** La session a été ouverte avec un second facteur validé. */
+  mfaVerified: boolean("mfa_verified").default(false).notNull(),
   userAgent: text("user_agent"),
   ipAddress: varchar("ip_address", { length: 64 }),
 });
+
+/** Codes de secours MFA : à usage unique, seuls les hachés sont stockés. */
+export const userBackupCodes = pgTable(
+  "user_backup_codes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    codeHash: text("code_hash").notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [index("user_backup_codes_user_id_idx").on(table.userId)],
+);
 
 export const assistantConversations = pgTable("assistant_conversations", {
   id: uuid("id").defaultRandom().primaryKey(),

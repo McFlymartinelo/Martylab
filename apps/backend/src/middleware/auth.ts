@@ -26,6 +26,7 @@ export function createSessionMiddleware(
       if (resolved) {
         req.user = resolved.user;
         req.sessionId = resolved.sessionId;
+        req.sessionMfaVerified = resolved.mfaVerified;
       }
 
       next();

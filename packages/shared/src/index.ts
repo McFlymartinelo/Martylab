@@ -15,6 +15,8 @@ export interface SessionUser {
   displayName: string;
   role: UserRole;
   createdAt: string;
+  /** Un second facteur (TOTP) est activé sur ce compte. */
+  mfaEnabled: boolean;
 }
 
 export interface AuthSessionEntry {
@@ -23,6 +25,8 @@ export interface AuthSessionEntry {
   expiresAt: string;
   userAgent: string | null;
   ipAddress: string | null;
+  /** La session a été ouverte avec un second facteur validé. */
+  mfaVerified: boolean;
   current: boolean;
 }
 
@@ -71,6 +75,59 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   user: SessionUser;
+}
+
+/**
+ * Réponse de `POST /api/auth/login`.
+ *
+ * Le mot de passe seul n'ouvre plus de session quand un second facteur est
+ * activé : le serveur renvoie un défi signé, court, à présenter avec le code
+ * TOTP sur `POST /api/auth/mfa/verify`.
+ */
+export type LoginResponse =
+  | { status: "ok"; user: SessionUser }
+  | { status: "mfa_required"; challengeToken: string };
+
+export interface MfaVerifyRequest {
+  challengeToken: string;
+  code: string;
+}
+
+export interface MfaStatusResponse {
+  /** Un second facteur est activé sur le compte. */
+  enabled: boolean;
+  /** La session courante a été ouverte avec ce second facteur. */
+  sessionVerified: boolean;
+  /** Codes de secours encore utilisables. */
+  backupCodesRemaining: number;
+}
+
+export interface MfaSetupRequest {
+  /** Le mot de passe est exigé : une session volée ne peut pas enrôler un 2FA. */
+  password: string;
+}
+
+export interface MfaSetupResponse {
+  secret: string;
+  otpauthUri: string;
+  /** QR code PNG en data URL, prêt à afficher dans une balise <img>. */
+  qrDataUrl: string;
+}
+
+export interface MfaEnableRequest {
+  code: string;
+}
+
+export interface MfaEnableResponse {
+  backupCodes: string[];
+}
+
+export interface MfaDisableRequest {
+  password: string;
+}
+
+export interface MfaBackupCodesResponse {
+  backupCodes: string[];
 }
 
 export interface UsersResponse {

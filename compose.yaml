@@ -48,6 +48,7 @@ services:
       HOST_ROOT_PATH: /host/root
       DOCKER_SOCKET_PATH: /var/run/docker.sock
       CONSOLE_TERMINAL_ENABLED: ${CONSOLE_TERMINAL_ENABLED:-false}
+      CONSOLE_TERMINAL_CONTAINERS: ${CONSOLE_TERMINAL_CONTAINERS:-}
       ORION_URL: ${ORION_URL:-}
       ORION_PUBLIC_URL: ${ORION_PUBLIC_URL:-}
       ORION_API_KEY: ${ORION_API_KEY:-}
@@ -136,6 +137,32 @@ services:
       retries: 5
     networks:
       - martylab
+
+  # ---------------------------------------------------------------------------
+  # Toolbox — accès machine complet depuis la console (opt-in explicite).
+  #
+  # C'est une porte root : / de l'hôte est monté en lecture-écriture, le
+  # namespace PID est partagé (htop voit tous les processus) et le socket
+  # Docker est disponible. Il n'est démarré que sur demande :
+  #
+  #   docker compose --profile toolbox up -d toolbox
+  #
+  # Aucun port publié, aucun réseau : le seul chemin d'entrée est
+  # Console → Terminal, réservé aux admins avec second facteur validé.
+  # ---------------------------------------------------------------------------
+  toolbox:
+    profiles: ["toolbox"]
+    build:
+      context: .
+      dockerfile: docker/toolbox/Dockerfile
+    container_name: martylab-toolbox
+    restart: unless-stopped
+    command: ["sleep", "infinity"]
+    pid: host
+    network_mode: none
+    volumes:
+      - /:/host
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   martylab_postgres_data:

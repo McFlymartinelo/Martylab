@@ -9,7 +9,11 @@ export function useLoginMutation() {
   return useMutation({
     mutationFn: (payload: LoginRequest) => loginRequest(payload),
     onSuccess: (data) => {
-      queryClient.setQueryData(authQueryKey, data);
+      // Avec un second facteur, le serveur ne renvoie qu'un défi : aucune
+      // session n'existe encore et il ne faut pas mettre l'utilisateur en cache.
+      if (data.status === "ok") {
+        queryClient.setQueryData(authQueryKey, { user: data.user });
+      }
     },
   });
 }

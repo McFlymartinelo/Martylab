@@ -66,7 +66,7 @@ function parseOptionalPositiveInt(value: unknown): number | undefined {
   return parsed;
 }
 
-function parseHostnameList(value: unknown): string[] | undefined {
+function parseCsvList(value: unknown): string[] | undefined {
   if (typeof value !== "string") {
     return undefined;
   }
@@ -78,8 +78,8 @@ function parseHostnameList(value: unknown): string[] | undefined {
 
   return trimmed
     .split(",")
-    .map((hostname) => hostname.trim())
-    .filter((hostname) => hostname.length > 0);
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
 }
 
 const envSchema = z.object({
@@ -104,6 +104,15 @@ const envSchema = z.object({
    * `true` active explicitement le canal WebSocket privilégié.
    */
   CONSOLE_TERMINAL_ENABLED: booleanFromEnv,
+  /**
+   * Allowlist optionnelle des conteneurs ouvrables depuis le Terminal.
+   * Vide = tous les conteneurs (rétrocompatible). Recommandé : n'autoriser que
+   * le conteneur « toolbox » qui porte l'accès machine.
+   */
+  CONSOLE_TERMINAL_CONTAINERS: z.preprocess(
+    parseCsvList,
+    z.array(z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/)).optional(),
+  ),
   ORION_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
   ORION_PUBLIC_URL: z.preprocess(parseOptionalUrl, z.string().url().optional()),
   ORION_API_KEY: z.preprocess(trimEnvString, z.string().optional()),
@@ -131,7 +140,7 @@ const envSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.preprocess(trimEnvString, z.string().optional()),
   CLOUDFLARE_TUNNEL_ID: z.preprocess(trimEnvString, z.string().optional()),
   CLOUDFLARE_CHECK_HOSTNAMES: z.preprocess(
-    parseHostnameList,
+    parseCsvList,
     z.array(z.string().min(1)).optional(),
   ),
   CLOUDFLARE_TIMEOUT_MS: z.coerce.number().int().positive().default(6000),
