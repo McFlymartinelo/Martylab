@@ -144,10 +144,13 @@ export function createAssistantToolRegistry(
       ),
       async execute(_context, parameters) {
         const lightId = String(parameters.lightId ?? "");
-        const on = Boolean(parameters.on);
+        const on = parameters.on;
 
-        if (!lightId) {
-          return { success: false, summary: "lightId requis." };
+        if (!lightId || typeof on !== "boolean") {
+          return {
+            success: false,
+            summary: "Un identifiant de lumière et un état marche/arrêt sont requis.",
+          };
         }
 
         const result = await deps.orionClient.setLightState(lightId, { on });

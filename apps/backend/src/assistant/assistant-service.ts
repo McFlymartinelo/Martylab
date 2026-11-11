@@ -64,7 +64,11 @@ export function createAssistantService(input: {
     user: SessionUser,
     conversationId: string,
     message: string,
-  ): Promise<{ calls: ReturnType<typeof planToolCalls>; llmError?: string }> {
+  ): Promise<{
+    calls: ReturnType<typeof planToolCalls>;
+    reply?: string;
+    llmError?: string;
+  }> {
     const availableTools = tools
       .list()
       .filter((tool) => hasMinRole(user.role, tool.minRole));
@@ -89,8 +93,15 @@ export function createAssistantService(input: {
           return { calls: planToolCalls(message), llmError: llmResult.error };
         }
 
-        if (llmResult.calls.length > 0) {
-          return { calls: llmResult.calls };
+        const allowedIds = new Set(availableTools.map((tool) => tool.id));
+        const safeCalls = llmResult.calls.filter((call) =>
+          allowedIds.has(call.toolId),
+        );
+        if (safeCalls.length > 0) {
+          return { calls: safeCalls };
+        }
+        if (llmResult.reply) {
+          return { calls: [], reply: llmResult.reply };
         }
       } catch (error) {
         return {
@@ -114,6 +125,9 @@ export function createAssistantService(input: {
     const context: AssistantToolContext = { user: input.user };
 
     if (tool.requiresConfirmation && !input.skipConfirmation) {
+      const target = Object.entries(input.parameters)
+        .map(([key, value]) => `${key} : ${String(value)}`)
+        .join(" · ");
       const confirmationId = await repository.createPendingConfirmation({
         userId: input.user.id,
         conversationId: input.conversationId,
@@ -135,7 +149,7 @@ export function createAssistantService(input: {
       return {
         type: "confirmation" as const,
         confirmationId,
-        summary: `Confirmation requise pour ${tool.name}.`,
+        summary: `Confirme l'action « ${tool.name} »${target ? ` · ${target}` : ""} ?`,
       };
     }
 
@@ -238,13 +252,15 @@ export function createAssistantService(input: {
       let metadata: Record<string, unknown> | null = null;
 
       if (planned.llmError) {
-        assistantContent = `⚠️ LLM indisponible (${planned.llmError}) — repli sur le planificateur local.\n\n`;
+        assistantContent =
+          "⚠️ L'IA est indisponible ; j'utilise le routage local.\n\n";
       }
 
       if (plannedCalls.length === 0) {
-        assistantContent += buildHelpMessage();
+        assistantContent += planned.reply ?? buildHelpMessage();
       } else {
         const summaries: string[] = [];
+        const completedResults: Array<{ toolId: string; summary: string }> = [];
 
         for (const call of plannedCalls) {
           const outcome = await executeToolCall({
@@ -266,9 +282,19 @@ export function createAssistantService(input: {
           }
 
           summaries.push(outcome.summary);
+          completedResults.push({ toolId: call.toolId, summary: outcome.summary });
         }
 
         assistantContent = summaries.join("\n\n");
+        if (pendingConfirmationId === null && llmPlanner && completedResults.length > 0) {
+          const synthesis = await llmPlanner.summarizeToolResults({
+            message: trimmed,
+            results: completedResults,
+          });
+          if (synthesis.content) {
+            assistantContent = synthesis.content;
+          }
+        }
       }
 
       const assistantMessage = await repository.insertMessage({

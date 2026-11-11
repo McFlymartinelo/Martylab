@@ -15,6 +15,9 @@ un tool enregistré, avec permissions et journalisation.
 - Confirmation obligatoire pour les actions sensibles
 - Journal des actions (`GET /api/assistant/actions`)
 - Planificateur local (mots-clés FR) + LLM optionnel (OpenAI-compatible)
+- Réponse conversationnelle optionnelle après exécution des outils ; sans clé,
+  le résumé local reste utilisé
+- Clarification demandée par le modèle lorsqu'une cible ou un paramètre manque
 
 ## Configuration LLM (optionnel)
 
@@ -27,8 +30,13 @@ ASSISTANT_LLM_MODEL=gpt-4o-mini
 ASSISTANT_LLM_TIMEOUT_MS=30000
 ```
 
-Compatible avec toute API OpenAI-compatible (OpenAI, OpenRouter, Ollama avec
-adaptateur, etc.).
+Compatible avec les API qui acceptent les appels d'outils au format OpenAI
+(OpenAI, Gemini via son endpoint de compatibilité, OpenRouter et certains
+serveurs locaux). Vérifier que le modèle choisi prend en charge les appels
+d'outils. Le modèle reçoit le message et les derniers échanges pour choisir
+les outils ; après exécution, il reçoit leurs résumés afin de rédiger la réponse.
+Les secrets ne sont jamais envoyés au navigateur. Sans LLM ou en cas de panne,
+le routeur local et les résumés des connecteurs restent disponibles.
 
 ## Endpoints Martylab
 
