@@ -20,8 +20,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(payload.title ?? "Martylab", {
       body: payload.body ?? "Nouvelle notification",
-      icon: "/favicon.svg",
-      badge: "/favicon.svg",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/badge-96.png",
       data: { url: payload.url ?? "/" },
     }),
   );
