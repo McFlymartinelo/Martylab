@@ -39,6 +39,24 @@ export function formatTemperature(celsius: number | null): string {
   return `${celsius.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} °C`;
 }
 
+export function formatIsoDate(value: string | null | undefined): string {
+  if (!value) {
+    return "—";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+  return new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+export function formatRate(value: number): string {
+  return value.toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+}
+
 export function formatHumidity(humidity: number | null): string {
   if (humidity === null) {
     return "—";

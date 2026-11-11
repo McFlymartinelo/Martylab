@@ -1,105 +1,102 @@
-import { Container } from "lucide-react";
-import { useDockerContainersQuery } from "@/features/docker/use-docker-query";
-import { useSystemMetricsQuery } from "@/features/system/use-system-metrics-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { RefreshCw } from "lucide-react";
+import { dockerContainersQueryKey } from "@/features/docker/use-docker-query";
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { DockerContainerGroups } from "@/components/system/docker-container-groups";
-import { InfrastructurePanels } from "@/components/system/infrastructure-panels";
-import { SystemInstrumentationPanel } from "@/components/system/system-instrumentation-panel";
+  systemMetricsQueryKey,
+  useSystemMetricsQuery,
+} from "@/features/system/use-system-metrics-query";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/cockpit/page-header";
+import { SystemHardwareTab } from "@/components/system/tabs/system-hardware-tab";
+import { SystemJournalTab } from "@/components/system/tabs/system-journal-tab";
+import { SystemNetworkTab } from "@/components/system/tabs/system-network-tab";
+import { SystemOverviewTab } from "@/components/system/tabs/system-overview-tab";
+import { SystemProcessesTab } from "@/components/system/tabs/system-processes-tab";
+import { SystemStorageTab } from "@/components/system/tabs/system-storage-tab";
+
+const tabs = [
+  { id: "overview", label: "Vue d'ensemble" },
+  { id: "network", label: "Réseau" },
+  { id: "storage", label: "Stockage" },
+  { id: "processes", label: "Processus" },
+  { id: "hardware", label: "Matériel" },
+  { id: "journal", label: "Journal" },
+] as const;
 
 export function SystemPage() {
+  const queryClient = useQueryClient();
   const metricsQuery = useSystemMetricsQuery();
-  const dockerQuery = useDockerContainersQuery();
-  const metrics = metricsQuery.data;
+  const measuredAt = metricsQuery.data?.timestamp;
+
+  const eyebrow = measuredAt
+    ? `Infrastructure · mesure à ${new Intl.DateTimeFormat("fr-FR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZoneName: "short",
+      }).format(new Date(measuredAt))}`
+    : "Infrastructure · télémétrie serveur";
+
+  function refresh() {
+    void queryClient.invalidateQueries({ queryKey: ["system"] });
+    void queryClient.invalidateQueries({ queryKey: dockerContainersQueryKey });
+    void queryClient.invalidateQueries({ queryKey: systemMetricsQueryKey });
+  }
 
   return (
-    <div className="space-y-6">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Système</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Supervision du serveur, de l&apos;infrastructure (Portainer, Cloudflare,
-          NAS) et des conteneurs Docker.
-        </p>
-      </section>
+    <div className="space-y-5">
+      <PageHeader
+        eyebrow={eyebrow}
+        title="Système"
+        description="Télémétrie du serveur lue en lecture seule : santé, réseau, stockage, processus, matériel et journal. Les données indisponibles sont signalées, jamais simulées."
+        actions={
+          <Button
+            type="button"
+            variant="outline"
+            onClick={refresh}
+            disabled={metricsQuery.isFetching}
+          >
+            <RefreshCw
+              className={metricsQuery.isFetching ? "animate-spin" : undefined}
+              aria-hidden="true"
+            />
+            Actualiser
+          </Button>
+        }
+      />
 
-      {metricsQuery.isLoading ? (
-        <p className="text-sm text-muted-foreground">
-          Chargement des métriques…
-        </p>
-      ) : null}
+      <Tabs defaultValue="overview" className="gap-4">
+        <TabsList
+          variant="line"
+          className="w-full justify-start overflow-x-auto pb-1"
+          aria-label="Sections du système"
+        >
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id} className="flex-none px-2.5">
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {metricsQuery.isError ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Métriques indisponibles</CardTitle>
-            <CardDescription>
-              Impossible de joindre <code>/api/system/metrics</code>.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      ) : null}
-
-      {metrics ? <SystemInstrumentationPanel metrics={metrics} /> : null}
-
-      <InfrastructurePanels />
-
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Container className="size-4 text-muted-foreground" aria-hidden="true" />
-          <h2 className="text-sm font-medium text-muted-foreground">
-            Conteneurs Docker
-          </h2>
-        </div>
-
-        {dockerQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">
-            Chargement des conteneurs…
-          </p>
-        ) : null}
-
-        {dockerQuery.isError ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Docker indisponible</CardTitle>
-              <CardDescription>
-                Le connecteur Docker n&apos;a pas pu être joint.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ) : null}
-
-        {dockerQuery.data && !dockerQuery.data.available ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Connecteur Docker non configuré</CardTitle>
-              <CardDescription>
-                Monte <code>/var/run/docker.sock</code> dans le conteneur backend
-                et définis <code>DOCKER_SOCKET_PATH</code> pour activer cette
-                fonctionnalité.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ) : null}
-
-        {dockerQuery.data?.available && dockerQuery.data.containers.length === 0 ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>Aucun conteneur</CardTitle>
-              <CardDescription>
-                Aucun conteneur Docker détecté sur ce serveur.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ) : null}
-
-        {dockerQuery.data?.available && dockerQuery.data.containers.length > 0 ? (
-          <DockerContainerGroups containers={dockerQuery.data.containers} />
-        ) : null}
-      </section>
+        <TabsContent value="overview">
+          <SystemOverviewTab />
+        </TabsContent>
+        <TabsContent value="network">
+          <SystemNetworkTab />
+        </TabsContent>
+        <TabsContent value="storage">
+          <SystemStorageTab />
+        </TabsContent>
+        <TabsContent value="processes">
+          <SystemProcessesTab />
+        </TabsContent>
+        <TabsContent value="hardware">
+          <SystemHardwareTab />
+        </TabsContent>
+        <TabsContent value="journal">
+          <SystemJournalTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
