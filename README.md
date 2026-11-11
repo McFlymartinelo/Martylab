@@ -50,10 +50,15 @@ Adapter pour le dev local :
 
 ```env
 NODE_ENV=development
+PORT=3100
 CORS_ORIGIN=http://localhost:5173
 COOKIE_SECURE=false
-DATABASE_URL=postgresql://martylab:martylab-dev-password@localhost:5432/martylab
+DATABASE_URL=postgresql://martylab:martylab-dev-password@localhost:5433/martylab
 ```
+
+`PORT` est le port du backend : 3100 par défaut pour ne pas entrer en conflit avec
+un autre projet qui occupe déjà 3000. Le proxy Vite lit cette valeur dans `.env`,
+il n'y a donc rien d'autre à configurer.
 
 ### 3. Démarrer PostgreSQL (dev)
 
@@ -63,12 +68,23 @@ npm run db:migrate
 npm run db:seed
 ```
 
+Le conteneur publie PostgreSQL sur `127.0.0.1:5433` (5432 est souvent déjà pris).
+Pour changer : `POSTGRES_DEV_PORT=5434` avant la commande, et la même valeur dans
+`DATABASE_URL`.
+
 ### 4. Lancer le backend et le portail
 
 ```bash
-npm run dev:backend   # http://localhost:3000
-npm run dev:portal    # http://localhost:5173
+npm run dev
 ```
+
+Une seule commande : le backend (`http://localhost:3100`) et le portail
+(`http://localhost:5173`) démarrent en parallèle, avec les logs des deux. `Ctrl+C`
+arrête les deux.
+
+Ils restent lançables séparément (`npm run dev:backend`, `npm run dev:portal`),
+mais lancer `dev:portal` seul suppose que le backend écoute déjà sur le port de
+`PORT`.
 
 ### Comptes seed (développement)
 

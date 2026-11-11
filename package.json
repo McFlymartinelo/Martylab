@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
+    "dev": "node scripts/dev.mjs",
     "dev:portal": "npm run dev -w @martylab/portal",
     "dev:backend": "npm run dev -w @martylab/backend",
     "start:backend": "npm run start -w @martylab/backend",

@@ -8,6 +8,9 @@
 #   docker compose -f docker/dev/compose.postgres.yml up -d
 #   docker compose -f docker/dev/compose.postgres.yml down      # stop
 #   docker compose -f docker/dev/compose.postgres.yml down -v   # stop + wipe data
+#
+# Port 5433 by default: another local Postgres (other projects, native install)
+# often already holds 5432. Override with POSTGRES_DEV_PORT if needed.
 
 services:
   postgres:
@@ -18,7 +21,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-martylab}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-martylab-dev-password}
     ports:
-      - "127.0.0.1:5432:5432"
+      - "127.0.0.1:${POSTGRES_DEV_PORT:-5433}:5432"
     volumes:
       - martylab_dev_postgres_data:/var/lib/postgresql/data
     healthcheck:
