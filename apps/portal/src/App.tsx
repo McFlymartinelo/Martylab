@@ -51,7 +51,11 @@ const soonRoutes = navItems.filter((item) => item.status === "soon");
 
 function RouteFallback() {
   return (
-    <div className="py-8 text-sm text-muted-foreground">Chargement…</div>
+    <div className="space-y-3 py-2" role="status" aria-live="polite">
+      <div className="h-6 w-44 animate-pulse rounded-md bg-muted" />
+      <div className="h-40 animate-pulse rounded-xl border border-border bg-card" />
+      <span className="sr-only">Chargement de la page…</span>
+    </div>
   );
 }
 

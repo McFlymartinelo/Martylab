@@ -39,12 +39,14 @@ import {
   groupContainersByApp,
 } from "@/lib/docker-groups";
 import { hasMinRole } from "@/lib/permissions";
+import { useToast } from "@/lib/use-toast";
 
 export function ServicesPage() {
   const queryClient = useQueryClient();
   const authQuery = useAuthQuery();
   const dockerQuery = useDockerContainersQuery();
   const actionMutation = useDockerContainerActionMutation();
+  const toast = useToast();
   const [logsContainer, setLogsContainer] =
     useState<DockerContainerSummary | null>(null);
 
@@ -60,7 +62,31 @@ export function ServicesPage() {
     container: DockerContainerSummary,
     action: "start" | "stop" | "restart",
   ) {
-    actionMutation.mutate({ containerId: container.id, action });
+    const labels = {
+      start: "Démarrage demandé",
+      stop: "Arrêt demandé",
+      restart: "Redémarrage demandé",
+    } as const;
+
+    actionMutation.mutate(
+      { containerId: container.id, action },
+      {
+        onSuccess: () => {
+          toast.show({
+            title: labels[action],
+            description: container.name,
+            type: "success",
+          });
+        },
+        onError: () => {
+          toast.show({
+            title: "Action impossible",
+            description: `Le serveur a refusé l'action sur ${container.name}.`,
+            type: "error",
+          });
+        },
+      },
+    );
   }
 
   return (
