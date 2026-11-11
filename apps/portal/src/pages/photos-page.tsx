@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/cockpit/page-header";
 import type {
   ImmichInstanceStatus,
   ImmichInstanceSummary,
@@ -187,13 +188,11 @@ export function PhotosPage() {
 
   return (
     <div className="space-y-8">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Photos</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Bibliothèques Immich personnelles et partagées. Ouvre Immich pour
-          gérer les albums et les liens de partage publics.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Univers · Photos"
+        title="Photos"
+        description="Bibliothèques Immich personnelles et partagées. Ouvre Immich pour gérer les albums et les liens de partage publics."
+      />
 
       {statusQuery.isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement Immich…</p>

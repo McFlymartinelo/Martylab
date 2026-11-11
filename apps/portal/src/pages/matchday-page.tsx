@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/cockpit/page-header";
 import { ExternalLink, MessageSquare, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { MatchdayMatch } from "@martylab/shared";
@@ -105,28 +106,25 @@ export function MatchdayPage() {
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">Matchday</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            Matchs du jour, classement et messages du groupe — sans quitter
-            Martylab.
-          </p>
-        </div>
-
-        {page?.matchdayUrl ? (
-          <Button
-            variant="outline"
-            size="sm"
-            render={
-              <a href={page.matchdayUrl} target="_blank" rel="noreferrer" />
-            }
-          >
-            <ExternalLink className="size-4" />
-            Ouvrir Matchday
-          </Button>
-        ) : null}
-      </section>
+      <PageHeader
+        eyebrow="Univers · Matchday"
+        title="Matchday"
+        description="Matchs du jour, classement et messages du groupe — sans quitter Martylab."
+        actions={
+          page?.matchdayUrl ? (
+            <Button
+              variant="outline"
+              size="sm"
+              render={
+                <a href={page.matchdayUrl} target="_blank" rel="noreferrer" />
+              }
+            >
+              <ExternalLink className="size-4" />
+              Ouvrir Matchday
+            </Button>
+          ) : undefined
+        }
+      />
 
       {statusQuery.isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement Matchday…</p>

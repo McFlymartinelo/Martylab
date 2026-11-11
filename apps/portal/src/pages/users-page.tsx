@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/cockpit/page-header";
 import { useState } from "react";
 import { Pencil, Trash2, UserPlus } from "lucide-react";
 import type { User, UserRole } from "@martylab/shared";
@@ -177,13 +178,11 @@ export function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Utilisateurs</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Gère les comptes et les rôles Martylab (administrateur, utilisateur,
-          invité).
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Configuration · Comptes"
+        title="Utilisateurs"
+        description="Gère les comptes et les rôles Martylab (administrateur, utilisateur, invité)."
+      />
 
       <Card>
         <CardHeader>

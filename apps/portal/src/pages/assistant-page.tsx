@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/cockpit/page-header";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bot, List, Loader2, Plus, Send, Trash2 } from "lucide-react";
@@ -169,12 +170,11 @@ export function AssistantPage() {
 
   return (
     <div className="space-y-6">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Assistant</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Interroge tes services connectés via des outils explicites et sécurisés.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Pilotage · Assistant"
+        title="Assistant"
+        description="Interroge tes services connectés via des outils explicites et sécurisés."
+      />
 
       <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
         <Card

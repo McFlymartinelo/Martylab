@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/cockpit/page-header";
 import { Bell, Download, Loader2, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,12 +35,11 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Paramètres</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Installation mobile, notifications push et préférences du portail.
-        </p>
-      </section>
+      <PageHeader
+        eyebrow="Configuration · Portail"
+        title="Paramètres"
+        description="Installation mobile, notifications push et préférences du portail."
+      />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>

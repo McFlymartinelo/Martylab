@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/cockpit/page-header";
 import { navItems } from "@/lib/nav-items";
 
 export function ComingSoonPage() {
@@ -12,10 +13,12 @@ export function ComingSoonPage() {
   const Icon = item?.icon ?? Sparkles;
 
   return (
-    <div className="space-y-8">
-      <section className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">{label}</h1>
-      </section>
+    <div className="space-y-6">
+      <PageHeader
+        eyebrow="Configuration · À venir"
+        title={label}
+        description="Cette entrée de navigation est conservée mais son backend n'existe pas encore."
+      />
 
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-16 text-center">

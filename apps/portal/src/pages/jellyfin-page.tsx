@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/cockpit/page-header";
 import type { JellyfinMediaItem } from "@martylab/shared";
 import {
   ExternalLink,
@@ -60,28 +61,25 @@ export function JellyfinPage() {
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">Jellyfin</h1>
-          <p className="max-w-2xl text-sm text-muted-foreground">
-            Bibliothèques, lecture en cours, ajouts récents et activité du
-            serveur média.
-          </p>
-        </div>
-
-        {page?.jellyfinUrl ? (
-          <Button
-            variant="outline"
-            size="sm"
-            render={
-              <a href={page.jellyfinUrl} target="_blank" rel="noreferrer" />
-            }
-          >
-            <ExternalLink className="size-4" />
-            Ouvrir Jellyfin
-          </Button>
-        ) : null}
-      </section>
+      <PageHeader
+        eyebrow="Univers · Jellyfin"
+        title="Jellyfin"
+        description="Bibliothèques, lecture en cours, ajouts récents et activité du serveur média."
+        actions={
+          page?.jellyfinUrl ? (
+            <Button
+              variant="outline"
+              size="sm"
+              render={
+                <a href={page.jellyfinUrl} target="_blank" rel="noreferrer" />
+              }
+            >
+              <ExternalLink className="size-4" />
+              Ouvrir Jellyfin
+            </Button>
+          ) : undefined
+        }
+      />
 
       {statusQuery.isLoading ? (
         <p className="text-sm text-muted-foreground">Chargement Jellyfin…</p>
