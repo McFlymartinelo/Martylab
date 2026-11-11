@@ -162,6 +162,11 @@ services:
     network_mode: none
     volumes:
       - /:/host
+      # Même chemin que sur l'hôte : les chemins transmis au démon Docker
+      # (contexte de build, sources de bind mount) restent valides. Sans ce
+      # montage, `docker compose up` lancé depuis /host/... construirait depuis
+      # un chemin inexistant côté hôte.
+      - ${HOST_PROJECTS_ROOT:-/srv/docker}:${HOST_PROJECTS_ROOT:-/srv/docker}
       - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:

@@ -102,6 +102,8 @@ docker compose --profile toolbox up -d toolbox
 ```
 
 - `/` de l'hôte est monté dans `/host` en lecture-écriture ;
+- `/srv/docker` est monté **au même chemin** : `git` et `docker compose`
+  s'y comportent exactement comme sur l'hôte (chemins de build valides) ;
 - `pid: host` : `htop` voit tous les processus ;
 - socket Docker disponible : `docker ps`, `docker logs`, etc. ;
 - `network_mode: none` : aucun port, aucun accès réseau.
