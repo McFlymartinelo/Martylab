@@ -42,7 +42,7 @@ export function MobileNav() {
               end={item.to === "/"}
               className={({ isActive }) =>
                 cn(
-                  "group relative flex min-h-[52px] flex-col items-center justify-end gap-1 pb-1.5 text-2xs transition-colors",
+                  "group relative flex min-h-[52px] flex-col items-center justify-end gap-1 pb-1.5 text-2xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
                   item.mobileCta ? "" : "pt-1.5",
                   isActive ? "text-primary" : "text-muted-foreground",
                 )
@@ -136,7 +136,7 @@ function MoreSheetLink({
       onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          "flex min-h-11 flex-col items-start gap-1.5 rounded-xl bg-muted/60 p-3 text-2xs transition-colors",
+          "flex min-h-11 flex-col items-start gap-1.5 rounded-xl bg-muted/60 p-3 text-2xs transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
           isActive
             ? "text-primary ring-1 ring-primary/40"
             : "text-foreground hover:bg-muted",

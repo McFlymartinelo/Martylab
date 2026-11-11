@@ -110,7 +110,7 @@ export function Sidebar() {
                   end={item.to === "/"}
                   className={({ isActive }) =>
                     cn(
-                      "group/nav relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.8125rem] font-medium transition-colors",
+                      "group/nav relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.8125rem] font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
                       "before:absolute before:top-2 before:bottom-2 before:left-0 before:w-0.5 before:rounded-full",
                       isActive
                         ? "bg-sidebar-accent text-sidebar-accent-foreground before:bg-primary"

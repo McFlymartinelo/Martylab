@@ -105,7 +105,7 @@ export function NotificationsMenu() {
 
         {isLoading ? (
           <p className="px-2 py-4 text-center text-sm text-muted-foreground">
-            Chargement…
+            Chargement des notifications…
           </p>
         ) : null}
 

@@ -45,7 +45,9 @@ export function RecentActivityPanel() {
       </CardHeader>
       <CardContent>
         {logsQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">Chargement…</p>
+          <p className="text-sm text-muted-foreground">
+            Chargement de l&apos;activité…
+          </p>
         ) : null}
 
         {logsQuery.isError ? (

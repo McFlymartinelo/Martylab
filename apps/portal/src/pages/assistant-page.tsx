@@ -108,7 +108,9 @@ export function AssistantChat({
     <div className={cn("flex flex-col", compact ? "h-[360px]" : "min-h-[60vh]")}>
       <div className="flex-1 space-y-3 overflow-y-auto px-1 py-2">
         {conversationQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">Chargement…</p>
+          <p className="text-sm text-muted-foreground">
+            Chargement de la conversation…
+          </p>
         ) : null}
 
         {messages.map((message) => (
@@ -200,7 +202,9 @@ export function AssistantPage() {
             </Button>
 
             {conversationsQuery.isLoading ? (
-              <p className="text-sm text-muted-foreground">Chargement…</p>
+              <p className="text-sm text-muted-foreground">
+                Chargement des conversations…
+              </p>
             ) : null}
 
             <ul className="space-y-1">
